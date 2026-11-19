@@ -13,6 +13,37 @@ const pages = {
 const paths = {play:'M8 4l12 8-12 8z',pause:'M7 5v14m9-14v14'};
 function icon(path) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+path+'"/></svg>'; }
 function dual(en,zh){return '<span class="dual"><b>'+en+'</b><small lang="zh-CN">'+zh+'</small></span>';}
+function statusBlock(tone, en, zh) {
+  const symbol = {ok:'✓', error:'!', pending:'…', neutral:'–'}[tone];
+  return '<span class="status-block status-'+tone+'"><span class="status-symbol" aria-hidden="true">'+symbol+'</span>'+dual(en,zh)+'</span>';
+}
+function paintStatus(node, tone, en, zh) {
+  if (!node || node.dataset.label === tone+en+zh) return;
+  node.dataset.label=tone+en+zh;
+  node.innerHTML=statusBlock(tone,en,zh);
+}
+function replayStatus(node) {
+  if (unavailable || source.error) paintStatus(node,'error','Replay unavailable','回放不可用');
+  else if (isSample() && source.readyState>=2 && Number.isFinite(source.duration)) paintStatus(node,'ok','Replay ready','回放就绪');
+  else paintStatus(node,'pending','Loading replay','回放加载中');
+}
+function validateDraft() {
+  if (!$('duration')) return false;
+  const durationOK=$('duration').validity.valid;
+  const taskOK=$('task').value.trim().length>0;
+  const valid=durationOK && taskOK;
+  $('duration').setAttribute('aria-invalid',String(!durationOK));
+  $('task').setAttribute('aria-invalid',String(!taskOK));
+  if (!durationOK) paintStatus($('draft-status'),'error','Invalid duration','时长须为 1–1800 秒整数');
+  else if (!taskOK) paintStatus($('draft-status'),'error','Task prompt required','任务指令不能为空');
+  else paintStatus($('draft-status'),'ok','Draft valid','草稿参数有效');
+  return valid;
+}
+function archivedRunStatus() {
+  if (!provenance || provenance.source_run_outcome!=='FAILED_RETAINED') return '';
+  const reason=provenance.source_run_error?.includes('evidence queue full')?'证据队列已满':'运行记录报告失败';
+  return '<div class="run-result">'+statusBlock('error','Recorded run interrupted','历史试验中止 · '+reason)+'</div>';
+}
 function group(label,keys){return '<div class="nav-group">'+keys.map(k=>'<a href="#'+k+'" data-page="'+k+'">'+icon(pages[k][2])+dual(k==='deploy'?'Deployment':k==='dagger'?'DAgger':pages[k][1],pages[k][0])+'</a>').join('')+'</div>';}
 $('navigation').innerHTML=group('', ['connect','teleop','motion','deploy','dagger'])+group('', ['records']);
 const draft={route:'FP32 + RTC',step:'10000',duration:'40',task:'右臂将红色方块放入绿色桶'};
@@ -31,10 +62,10 @@ function label(en,zh,field){return '<label class="field">'+dual(en,zh)+field+'</
 function table(headers,rows){return '<div class="table-scroll"><table><thead><tr>'+headers.map(([en,zh])=>'<th>'+dual(en,zh)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(row=>'<tr>'+row.map(cell=>'<td>'+cell+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';}
 function camera(){
  const views=[['front','Front','前视'],['right','Right wrist','右腕']];
- return section('Camera replay','相机回放','<div class="feeds">'+views.map(([id,en,zh])=>'<figure class="feed"><canvas id="cam-'+id+'" width="480" height="360" aria-label="'+en+' / '+zh+'"></canvas><figcaption>'+dual(en,zh)+'</figcaption></figure>').join('')+'</div><div class="playbar"><button id="play" data-do="play" aria-label="Play / 播放">'+icon(paths.play)+'</button><span class="clock" id="timecode">—</span><input id="scrub" type="range" step="0.033333" min="0" value="12" max="47" aria-label="Timeline / 回放进度"><span id="endtime" class="clock">—</span><select id="rate" aria-label="Speed / 倍速"><option value=".5">0.5×</option><option value="1">1×</option><option value="2">2×</option></select></div><p id="media-origin" class="source-line"></p>');
+ return section('Camera replay','相机回放','<div class="feeds">'+views.map(([id,en,zh])=>'<figure class="feed"><canvas id="cam-'+id+'" width="480" height="360" aria-label="'+en+' / '+zh+'"></canvas><figcaption>'+dual(en,zh)+'</figcaption></figure>').join('')+'</div><div class="playbar"><button id="play" data-do="play" aria-label="Play / 播放">'+icon(paths.play)+'</button><span class="clock" id="timecode">—</span><input id="scrub" type="range" step="0.033333" min="0" value="12" max="47" aria-label="Timeline / 回放进度"><span id="endtime" class="clock">—</span><select id="rate" aria-label="Speed / 倍速"><option value=".5">0.5×</option><option value="1">1×</option><option value="2">2×</option></select></div><p id="media-origin" class="source-line"></p>','<span id="replay-status" aria-live="polite"></span>');
 }
 function plot(){return '<section class="module"><div class="chart-head"><h2>'+dual('Joint angles','关节角度')+'</h2><div class="legend">'+colors.map((c,i)=>'<button data-joint="'+i+'" style="--swatch:'+c+'" aria-pressed="'+visible.has(i)+'" aria-label="Toggle J'+(i+1)+'"><i></i>J'+(i+1)+'</button>').join('')+'</div></div><div class="chart-frame"><canvas id="trace" aria-label="Recorded joint angles / 实测关节角度"></canvas></div></section>';}
-function parameters(){return '<section class="params"><div class="params-head"><h2>'+dual('Model & task','模型与任务')+'</h2></div><div class="params-body">'+label('Execution route','执行路线','<select id="route">'+routes.map(([r,en])=>'<option value="'+r+'">'+en+'</option>').join('')+'</select>')+'<div class="pair">'+label('Checkpoint','检查点','<select id="step">'+[5000,10000,15000,20000].map(s=>'<option>'+s+'</option>').join('')+'</select>')+label('Duration (s)','时长（秒）','<input id="duration" type="number" min="1" max="1800" step="1" required>')+'</div>'+label('Task prompt','任务指令','<textarea id="task" maxlength="256"></textarea>')+button('Review draft','查看部署草稿','draft','primary block')+'</div></section>';}
+function parameters(){return '<section class="params"><div class="params-head"><h2>'+dual('Model & task','模型与任务')+'</h2></div><div class="params-body">'+label('Execution route','执行路线','<select id="route">'+routes.map(([r,en])=>'<option value="'+r+'">'+en+'</option>').join('')+'</select>')+'<div class="pair">'+label('Checkpoint','检查点','<select id="step">'+[5000,10000,15000,20000].map(s=>'<option>'+s+'</option>').join('')+'</select>')+label('Duration (s)','时长（秒）','<input id="duration" type="number" min="1" max="1800" step="1" required>')+'</div>'+label('Task prompt','任务指令','<textarea id="task" maxlength="256"></textarea>')+'<div class="draft-state" id="draft-status" aria-live="polite"></div>'+button('Review draft','查看部署草稿','draft','primary block')+'</div></section>';}
 function admission(){return section('Readiness','执行条件',facts([['Robot','机械臂',dual('Offline','未连接')],['USB storage','录制 U 盘',dual('Unverified','未核验')],['Model','模型实例',dual('Offline','未接入')]]));}
 function deployment(){return '<div class="split"><div>'+camera()+plot()+'</div><div class="sidebar-panel">'+parameters()+'<div class="module" style="margin-top:18px">'+admission()+'</div></div></div>';}
 function sampleFacts(){return isSample()?facts([['State samples','状态记录',samples.length.toLocaleString('en-US')],['Front frames','前视原始帧',provenance.native_frames.front],['Wrist frames','右腕原始帧',provenance.native_frames.right],['Outcome','任务结果',dual('Unscored','未评分')]]):'—';}
@@ -42,15 +73,15 @@ function teleop(){return '<div class="split"><div>'+camera()+plot()+'</div><div 
 function jointTable(){return table([['Joint','关节'],['Measured (°)','实测角度']],colors.map((_,i)=>['J'+(i+1),'<span id="measure-'+i+'">—</span>']));}
 function motion(){return '<div class="split"><div>'+camera()+plot()+'</div><div class="sidebar-panel">'+section('Joint readout','回放帧读数',jointTable())+section('Motion review','运动复核',button('Go to record','打开试验记录','record'))+'</div></div>';}
 function alignmentTable(){return table([['Channel','通道'],['Joint error','关节偏差'],['Gripper error','夹爪偏差'],['Feedback','反馈']],[['Left · can_left','左侧'],['Right · can_right','右侧']].map(([en,zh])=>[dual(en,zh),'—','—',dual('Offline','无实时反馈')]));}
-function connect(){return '<div class="split"><div>'+section('Devices','设备连接',table([['Device','设备'],['Function','用途'],['Status','状态']],[[dual('GPU workstation','4090 工作站'),dual('Inference','模型推理'),dual('Offline','未接入')],[dual('Robot computer','AgileX 工控机'),dual('Control & capture','执行与采集'),dual('Offline','未接入')],[dual('USB storage','录制 U 盘'),dual('Episode storage','数据保存'),dual('Unverified','待核验')]]))+section('Arm channels','机械臂通道',alignmentTable())+'</div><div class="sidebar-panel">'+section('Calibration','校准状态',facts([['Left zero','左侧零点','—'],['Right zero','右侧零点','—']])+button('Check inputs','核对预览输入','check'))+'</div></div>';}
-function dagger(){return '<div class="dg"><div class="stat-grid">'+metric('Wait time','等待时间','<span id="wait">—</span>',true)+metric('Policy','模型执行',dual('Offline','未接入'))+metric('Recorder','纠正录制',dual('Idle','未录制'))+'</div>'+section('Arm handover','双臂交接',alignmentTable()+'<div class="actions">'+button('Intervene','失败介入','intervene','primary')+button('Finish & save','结束并保存','finish')+'</div><p id="dg-msg" role="status" class="inline-state"></p>')+'</div>';}
-function records(){return '<div class="split"><div>'+camera()+plot()+'</div><div class="sidebar-panel">'+section('Episode','试验记录',isSample()?facts([['Date','采集日期',provenance.date],['Route','执行路线',provenance.model.route],['Checkpoint','检查点',provenance.model.checkpoint],['Playback','视频时长',provenance.video_duration_s.toFixed(2)+' s'],['Capture','采集时长',provenance.native_episode_duration_s.toFixed(2)+' s']]):'—')+section('Samples','采样',sampleFacts())+'</div></div>';}
+function connect(){return '<div class="split"><div>'+section('Devices','设备连接',table([['Device','设备'],['Function','用途'],['Status','状态']],[[dual('GPU workstation','4090 工作站'),dual('Inference','模型推理'),dual('Offline','未接入')],[dual('Robot computer','AgileX 工控机'),dual('Control & capture','执行与采集'),dual('Offline','未接入')],[dual('USB storage','录制 U 盘'),dual('Episode storage','数据保存'),dual('Unverified','待核验')]]))+section('Arm channels','机械臂通道',alignmentTable())+'</div><div class="sidebar-panel">'+section('Calibration','校准状态',facts([['Left zero','左侧零点','—'],['Right zero','右侧零点','—']])+'<div id="local-inputs-status" class="input-state" aria-live="polite"></div>'+button('Check inputs','核对预览输入','check'))+'</div></div>';}
+function dagger(){return '<div class="dg"><div class="stat-grid">'+metric('Wait time','等待时间','<span id="wait">—</span>',true)+metric('Policy','模型执行',statusBlock('neutral','Offline','未接入'))+metric('Recorder','纠正录制',statusBlock('neutral','Idle','未录制'))+'</div>'+section('Arm handover','双臂交接',alignmentTable()+'<div class="actions">'+button('Intervene','失败介入','intervene','primary')+button('Finish & save','结束并保存','finish')+'</div><p id="dg-msg" role="status" class="inline-state"></p>')+'</div>';}
+function records(){return '<div class="split"><div>'+camera()+plot()+'</div><div class="sidebar-panel">'+section('Episode','试验记录',isSample()?archivedRunStatus()+facts([['Date','采集日期',provenance.date],['Route','执行路线',provenance.model.route],['Checkpoint','检查点',provenance.model.checkpoint],['Playback','视频时长',provenance.video_duration_s.toFixed(2)+' s'],['Capture','采集时长',provenance.native_episode_duration_s.toFixed(2)+' s']]):'—')+section('Samples','采样',sampleFacts())+'</div></div>';}
 const templates={deploy:deployment,teleop,motion,dagger,connect,records};
 const notes={
   deploy:['Draft settings stay in this browser. Playback uses an archived episode.','参数只保存在当前页面，回放使用已归档的试验。'],
   teleop:['Archived camera frames and joint samples share the recorded timeline.','相机画面与关节采样按原始回放时间轴显示。'],
   motion:['Readouts are measured right-arm angles from the selected frame.','读数来自所选回放帧的右臂实测角度。'],
-  records:['The source run stopped when its evidence queue filled. Task outcome was not scored.','原试验因证据队列已满而中止，任务结果未评分。'],
+  records:['The run status comes from the archived episode. Task outcome was not scored.','运行状态来自归档回执，任务结果未评分。'],
   connect:['Device checks require a live connection. This preview opens local media only.','设备核验需要实机连接。此预览只读取本地媒体。'],
   dagger:['Preview timer only. Shared CAN targets cannot independently verify leader alignment.','预演只运行本地计时。共享 CAN 目标不能独立证明主臂对齐。']
 };
@@ -73,6 +104,7 @@ function render(){
   alignNavigation();
   $('layout').innerHTML=templates[current]();
   for(const key of Object.keys(draft))if($(key))$(key).value=draft[key];
+  validateDraft();
   if($('rate'))$('rate').value=String(source.playbackRate);
   if(!$( 'play') && !source.paused)source.pause();
   refresh(true);window.scrollTo(0,0);
@@ -102,12 +134,15 @@ function drawTrace(){
 }
 function reflectWait(){if(!$('wait'))return;
   $('wait').textContent=timerStart===null?'—':((performance.now()-timerStart)/1000).toFixed(1)+' s';
-  $('dg-msg').innerHTML=timerStart!==null?dual('Waiting for handover','等待交接 · 预演'):waitFinished?dual('Ended · no recording','预演已结束 · 未生成录制文件'):'';
+  if(timerStart!==null) paintStatus($('dg-msg'),'pending','Waiting for handover','等待交接 · 预演');
+  else if(waitFinished) paintStatus($('dg-msg'),'neutral','Ended · no recording','预演已结束 · 未生成录制文件');
   document.querySelector('[data-do="intervene"]').disabled=timerStart!==null;
   document.querySelector('[data-do="finish"]').disabled=timerStart===null;
 }
 function refresh(force=false){
   reflectWait();
+  replayStatus($('replay-status'));
+  replayStatus($('local-inputs-status'));
   if(!$('play'))return;
   const playable=dataReady && Number.isFinite(source.duration) && !source.error;
   if(!initialSeek&&Number.isFinite(source.currentTime))clock=source.currentTime;
@@ -126,7 +161,12 @@ function modal(title,rows,extra){
   parent.append(dl);if(extra){const p=document.createElement('p');p.className='caption';p.innerHTML=dual(...extra);parent.append(p);}
   $('dialog').showModal();
 }
-function saveDraftKey(e){if(Object.hasOwn(draft,e.target.id))draft[e.target.id]=e.target.value;}
+function saveDraftKey(e){
+  if(Object.hasOwn(draft,e.target.id)){
+    draft[e.target.id]=e.target.value;
+    validateDraft();
+  }
+}
 $('layout').addEventListener('input',e=>{saveDraftKey(e);if(e.target.id==='scrub'&&Number.isFinite(source.duration)){source.currentTime=Number(e.target.value);clock=source.currentTime;drawTrace();}});
 $('layout').addEventListener('change',e=>{saveDraftKey(e);if(e.target.id==='rate')source.playbackRate=Number(e.target.value);});
 document.body.addEventListener('click',async e=>{
@@ -138,7 +178,7 @@ document.body.addEventListener('click',async e=>{
     case 'finish':timerStart=null;waitFinished=true;reflectWait();break;
     case 'record':location.hash='records';break;
     case 'check':modal(['Preview inputs','预览输入'],[['Media','历史媒体',source.readyState>=2?'Loaded / 已载入':'Unavailable / 不可用'],['Joint samples','关节记录',String(samples.length)],['Robot link','实机通路','Offline / 未接入']]);break;
-    case 'draft':if(!$('duration').checkValidity()||!draft.task.trim()){if(!$('duration').reportValidity())return;$('task').focus();return;}modal(['Deployment draft','部署草稿'],[['Route','执行路线',routes.find(r=>r[0]===draft.route)?.[1]||draft.route],['Checkpoint','检查点',draft.step],['Duration','时长',draft.duration+' s'],['Task prompt','任务指令',draft.task]]);break;
+    case 'draft':if(!validateDraft()){if(!$('duration').reportValidity())return;$('task').focus();return;}modal(['Deployment draft','部署草稿'],[['Route','执行路线',routes.find(r=>r[0]===draft.route)?.[1]||draft.route],['Checkpoint','检查点',draft.step],['Duration','时长',draft.duration+' s'],['Task prompt','任务指令',draft.task]]);break;
     case 'source':modal(['Source & license','数据来源与许可'],[['Episode','样例',provenance?.episode_id||'—'],['Joint samples','右臂关节采样',String(samples.length)],['License','许可','CC BY 4.0'],['Credit','署名','Yang Taige, Ye Hanzhi / Emerge Robotics']],['The two camera views are cropped from the published recording. Joint angles use its time base.','两路画面从公开录像裁切，实测关节角使用同一回放时间轴。']);break;
   }
 });
@@ -150,7 +190,8 @@ $('stop-preview').addEventListener('click',()=>{
 });
 window.addEventListener('hashchange',render);window.addEventListener('resize',()=>{alignNavigation();if($('trace'))drawTrace();});
 source.addEventListener('loadedmetadata',()=>{length=source.duration;if(initialSeek){source.currentTime=Math.min(12,length);initialSeek=false;}refresh(true);});
-for(const event of ['loadeddata','seeked','timeupdate','play','pause','ended'])source.addEventListener(event,()=>refresh(true));
+for(const event of ['loadeddata','canplay','seeked','timeupdate','play','pause','ended'])source.addEventListener(event,()=>refresh(true));
+source.addEventListener('playing',()=>{unavailable='';refresh(true);});
 source.addEventListener('error',()=>{unavailable='Video unavailable / 视频载入失败';refresh(true);});
 setInterval(()=>{if(!document.hidden && timerStart!==null)reflectWait();},100);
 async function init(){

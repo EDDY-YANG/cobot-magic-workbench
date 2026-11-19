@@ -36,3 +36,46 @@ footer{align-items:center;padding:13px 0 4px;font-size:12px}.foot-note{max-width
 
 main{display:flex;flex-direction:column}#layout{padding-bottom:24px}footer{margin-top:auto}.primary:disabled .dual small{color:#68798b}
 @media(max-width:600px){.mast .mast-title,.mast .mast-slash{display:none}.mast .brand,.mast .env b,.mast .global-stop b{white-space:nowrap}.mast .brand-mark{flex:none}.mast .brand{font-size:15px}.mast .env{gap:5px}}
+
+
+/* Evaluation states pair color with a symbol and a bilingual conclusion. */
+.status-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px 7px 9px;
+  border: 1px solid var(--state-border);
+  border-inline-start: 4px solid var(--state-accent);
+  border-radius: 5px;
+  color: var(--state-text);
+  background: var(--state-fill);
+  text-align: left;
+  font: 650 14px/1.2 "Segoe UI","Microsoft YaHei UI",Arial,sans-serif;
+}
+.status-ok { --state-fill:#dcf6e7; --state-border:#94cfa9; --state-accent:#197044; --state-text:#115031; }
+.status-error { --state-fill:#ffe5e5; --state-border:#e9aaaa; --state-accent:#b42332; --state-text:#891b27; }
+.status-pending { --state-fill:#fff2d6; --state-border:#e3c183; --state-accent:#89570c; --state-text:#684306; }
+.status-neutral { --state-fill:#f2f5f8; --state-border:#d6dfe8; --state-accent:#647485; --state-text:#495766; }
+.status-symbol {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--state-accent);
+  color: white;
+  font: 700 13px/1 system-ui,sans-serif;
+}
+.status-block .dual {align-items:flex-start;gap:2px;}
+.status-block .dual small {color:var(--state-text);font-size:11px;}
+.draft-state,.input-state,.run-result {margin:10px 0 12px;}
+.draft-state .status-block,.run-result .status-block {width:100%;}
+.run-result .status-block {font-size:16px;padding-block:12px;}
+.section-head:has(#replay-status) {align-items:center;}
+.field [aria-invalid="true"] {border-color:#b42332;background:#fff7f7;}
+@media(max-width:600px){
+  .status-block {font-size:13px;padding:6px 8px;gap:6px;}
+  .status-symbol {width:16px;height:16px;font-size:12px;}
+}
+@media(forced-colors:active){.status-symbol {border:1px solid currentColor;}}
