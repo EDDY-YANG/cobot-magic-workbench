@@ -13,3 +13,10 @@ The packaged forms, selections, keyboard handlers, charts, 3D assets and dialogs
 The optional `Appearance/` directory is an unpacked Chromium extension for the existing loopback applications. It contains only a manifest, stylesheet and the presentation script, and requests no browser API permissions. Applied to the original application, it uses that application's existing origin, permissions, backend and action handlers. The extension itself never sends an API request. **The original application's buttons are real in this mode.** Inspection does not install or activate this extension.
 
 The package is private workstation delivery. Its static assets and their checksums are listed in `assets.json`; existing robot and three.js licenses are included. Git tracks the styling and inspection tools, not downloaded production assets or evidence. A visual inspection does not establish hardware readiness or task success.
+
+
+## Original button interfaces on the operator PC
+
+The separate **Workbench Native Buttons** package opens the actual 8875 workbench (or the native 4090 8873 entry) and the original 8891 review app in Microsoft Edge. Extract the package and launch `Open-Original-Workbench.cmd`. It uses the existing lab SSH credentials for any missing loopback forwards. It neither starts an HTTP proxy nor changes the service or CSRF configuration. The launcher performs GET requests to identify the services; robot actions remain attached to the original buttons.
+
+This mode displays **Native controls / 原接口 · 真实操作**. Buttons invoke production actions with all existing restrictions. Edge uses a separate local profile for this appearance version, so browser-only drafts from the ordinary browser are not copied. To retain the ordinary profile's drafts, the same Appearance directory can be loaded as an unpacked extension in that profile instead. The extension has no network API, host proxy or request-modification permissions.

@@ -406,10 +406,13 @@ G|G
     el.querySelectorAll(selector).forEach(decorate);
   }
   function init(){
-    if(document.body.hasAttribute('data-ui-review')){
+    const readOnly=document.body.hasAttribute('data-ui-review');
+    const nativePort=['8873','8875','8891'].includes(location.port);
+    const gateway=['8910','8880'].includes(location.port) && location.pathname.startsWith('/workbench/');
+    if(readOnly || (location.hostname==='127.0.0.1' && (nativePort || gateway))){
       const flag=document.createElement('span');
-      flag.className='appearance-review';
-      flag.textContent='Read-only / 只读检视';
+      flag.className=readOnly ? 'appearance-review' : 'appearance-review appearance-native';
+      flag.textContent=readOnly ? 'Read-only / 只读检视' : 'Native controls / 原接口 · 真实操作';
       document.querySelector('.topbar-right')?.prepend(flag);
     }
     const titles={connect:'Connection & calibration',teleop:'Teleoperation & capture',motion:'Joints & gripper',deploy:'Policy deployment'};

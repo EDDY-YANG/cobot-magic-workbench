@@ -99,3 +99,5 @@
 .operator-themed body .operator-page-title small{display:block;margin:5px 0 0;color:#627183;font:500 14px/1.35 "Segoe UI","Microsoft YaHei UI",sans-serif;letter-spacing:0}
 .operator-themed body #usb-status[data-ui-en]{font-size:10px!important}
 .operator-themed body #usb-status[data-ui-en]::before{font-size:12px}
+
+.operator-themed body .appearance-native{color:#203c61;background:#edf3fc;border-color:#afc4e1}
