@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head><meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; form-action 'none'; object-src 'none'"><script src="preview-only.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Emerge Robotics · AgileX 工作台</title>
+  </head>
+  <body class="pixel-workbench emerge-workbench compact-workbench">
+    <aside class="sidebar">
+      <a class="brand" href="#connect" aria-label="Emerge Robotics 工作台" title="Emerge Robotics">
+        <span class="brand-mark"><svg class="emerge-brand-mark" viewBox="0 0 26 26" aria-hidden="true"><path fill="currentColor" d="M9 2h6v6H9zM16 9h6v6h-6zM2 16h6v6H2zM9 16h6v6H9zM16 16h6v6h-6z"/></svg></span>
+        <span class="emerge-brand-name">Emerge<span class="brand-sub">Robotics</span></span>
+      </a>
+      <div class="nav-label">AGILEX / PIPER</div>
+      <nav aria-label="主页面">
+        <button class="nav-item active" data-page="connect" aria-label="连接与零点校准">
+          <span class="nav-icon">⌘</span
+          ><span>连接与零点校准<small>连接、诊断、坐标基准</small></span
+          ><span class="nav-number">01</span>
+        </button>
+        <button class="nav-item" data-page="teleop" aria-label="遥操作与采集">
+          <span class="nav-icon">◉</span
+          ><span>遥操作与采集<small>实时画面、分段录制</small></span
+          ><span class="nav-number">02</span>
+        </button>
+        <button class="nav-item" data-page="motion" aria-label="运动测试">
+          <span class="nav-icon">◇</span
+          ><span>运动测试<small>实际姿态、目标预览</small></span
+          ><span class="nav-number">03</span>
+        </button>
+        <button class="nav-item" data-page="deploy" aria-label="模型部署">
+          <span class="nav-icon">↗</span
+          ><span>模型部署<small>影子推理、实机运行</small></span
+          ><span class="nav-number">04</span>
+        </button>
+      <a class="nav-item" href="http://127.0.0.1:8891/" target="_blank" rel="noopener" data-human-review-entry aria-label="数据复核">
+          <span class="nav-icon">▤</span><span>数据复核<small>示范质量、部署评价</small></span><span class="nav-number">05</span>
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="pill neutral" id="backend-pill">等待后端</span>
+        <p>一个控制入口<br />真实反馈 · 可读记录</p>
+        <span class="version">UNIFIED CONTROL / v1</span>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb">
+          工作台 <span>/</span> <b id="page-breadcrumb">连接与零点校准</b>
+        </div>
+        <div class="topbar-right">
+          <span id="host-label">tiger-agilex</span
+          ><button class="button quiet" data-action="status">↻ 刷新状态</button
+          ><button class="button stop" id="stop-button">■ 停止新目标</button>
+        </div>
+      </header>
+      <div class="global-status" aria-label="实时系统状态">
+        <div>
+          <span class="dot" id="connection-dot"></span><label>SSH 通道</label
+          ><strong id="connection-status">未连接</strong>
+        </div>
+        <div>
+          <label>右臂 / 最后报告模式</label><strong id="right-mode">未知</strong><small id="right-mode-freshness">待读数 · 模式未核对</small>
+        </div>
+        <div><label>反馈年龄</label><strong id="feedback-age">—</strong></div>
+        <div><label>共享采集</label><strong id="hub-status">未知</strong></div>
+        <div><label>U 盘</label><strong id="usb-status">尚未核对</strong></div>
+        <div><label>当前任务</label><strong id="current-job">空闲</strong></div>
+      </div>
+      <p class="page-refresh-notice" id="page-refresh-status" role="status">等待新的只读状态；操作条件尚未核对。</p>
+      <div class="stop-latch-banner warn" id="stop-latch-banner" aria-live="polite">
+        <div>
+          <strong id="stop-latch-status">停止锁存尚未核对</strong>
+          <p id="stop-latch-detail">等待后端核对运行目录与 U 盘中的 STOP 状态。</p>
+        </div>
+        <button class="button" data-action="clear_stop">清除停止锁存</button>
+      </div>
+      <main>
+        <section class="page active" id="page-connect">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">01 / SYSTEM & COORDINATES</div>
+              <h1>先看清机器，再建立连接。</h1>
+              <p>
+                连接、总线、相机和存储统一检查。零点校准与移动到零位是不同操作。
+              </p>
+            </div>
+            <span class="chip">只读检查先行</span>
+          </div>
+          <div class="page-readiness" id="connect-readiness" aria-live="polite"></div>
+          <div class="action-error" id="connect-action-error" role="alert" hidden></div>
+          <article class="panel usb-target-panel" data-usb-panel aria-label="AgileX 录制 U 盘">
+            <div class="panel-title"><div><div class="eyebrow">STORAGE / USB TARGET</div><h2>AgileX 录制 U 盘</h2></div><button class="button" data-usb-scan>↻ 检查已插 U 盘</button></div>
+            <p class="usb-target-state" data-usb-state role="status">尚未扫描 AgileX 上实际挂载的 USB。</p>
+            <div class="usb-device-grid" data-usb-candidates></div>
+            <p class="usb-target-path" data-usb-target>录制目标：未选定，暂不能录制。</p>
+            <p class="footnote" data-usb-detail>显示的是机器人上的真实挂载，不是 PC 或 4090 上的盘。仅一颗合格盘时自动选定，多颗时由你选择；采集中锁定目标，拔盘不转存内部硬盘。</p>
+            <p class="action-error" data-usb-error role="alert" hidden></p>
+          </article>
+          <div class="button-row">
+            <button class="button" data-open-gripper>夹爪零点与行程核验</button>
+            <span class="muted">先比对物理间距与反馈坐标，再决定是否设零。</span>
+          </div>
+          <article class="panel gripper-calibration-panel" id="gripper-calibration-panel" aria-labelledby="gripper-calibration-heading" hidden>
+            <div class="panel-title">
+              <div><div class="eyebrow">RIGHT GRIPPER / COORDINATE CHECK</div><h2 id="gripper-calibration-heading" tabindex="-1">夹爪零点与行程核验</h2></div>
+              <button class="button quiet" id="gripper-panel-close">收起核验</button>
+            </div>
+            <p class="panel-copy">零点标定（Zero Calibration）把当前夹爪坐标设成零，不会自动寻找机械闭合位置。反馈坐标可能为负；保留真实符号，以卡尺实测的指尖间距检查零点和行程关系。</p>
+            <div class="gripper-calibration-grid">
+              <section aria-labelledby="gripper-read-heading">
+                <h3 id="gripper-read-heading">1 · 只读反馈与人工测量</h3>
+                <dl class="gripper-readout-fields">
+                  <div><dt>G · 实际反馈坐标</dt><dd id="gripper-calibration-value">—</dd></div>
+                  <div><dt>0x2A8 独立年龄</dt><dd id="gripper-calibration-age">—</dd></div>
+                  <div><dt>驱动状态</dt><dd id="gripper-calibration-status">未知</dd></div>
+                  <div><dt>原始载荷</dt><dd><code id="gripper-calibration-raw">未知</code></dd></div>
+                </dl>
+                <p class="footnote" id="gripper-calibration-source">等待新鲜真实反馈；六关节状态不能代替夹爪状态。</p>
+                <button class="button" data-action="gripper_inspect" data-params='{"arm":"right","seconds":2}'>保存 2 秒只读核验</button>
+                <label class="field-label" for="gripper-measured-gap">卡尺实测指尖间距 · mm</label>
+                <div class="gripper-measure-fields">
+                  <input id="gripper-measured-gap" type="number" min="0" max="120" step="0.01" placeholder="输入实测值" />
+                  <select id="gripper-measure-label" aria-label="测量姿态"><option value="closed">闭合</option><option value="mid">中间开度</option><option value="open">全开</option></select>
+                </div>
+                <button class="button" data-action="gripper_measure">登记实测与当前反馈</button>
+                <p class="footnote">登记只保存你的卡尺读数和同一时刻真实反馈，不发送开闭目标。重复记录闭合、中间与全开位置；相同偏差支持零点问题，比例或方向不对需先查行程配置。</p>
+              </section>
+              <section aria-labelledby="gripper-zero-heading">
+                <h3 id="gripper-zero-heading">2 · 有条件的夹爪设零</h3>
+                <p class="footnote">先保存原读数，再独立失能空载夹爪；按对应型号流程确认机械闭合基准并测量，卡尺间距须 ≤0.2 mm。设零入口要求反馈健康、新鲜、已失能；不会自动闭合、清故障、失能六关节或重新使能。0.2 mm 是物理基准验收条件，不是新的运动限位。</p>
+                <div class="confirmation-box" id="gripper-confirmations">
+                  
+                  
+                  
+                  
+                  <small>现场声明由操作人核实。勾选不能替代真实驱动反馈、互斥写入或物理测量。</small>
+                </div>
+                <p id="gripper-confirmation-state" class="footnote" aria-live="polite">现场声明及实测值尚未完成。</p>
+                <div class="button-row"><button class="button" data-action="gripper_disable">仅夹爪失能</button><button class="button primary" data-action="gripper_zero">设当前位置为夹爪零点</button></div>
+                <p class="footnote">设零任务保存前后反馈和实际 SDK 载荷。收到发送回执不能证明物理基准正确；失败保留诊断，不能反复设零或放宽限位。</p>
+              </section>
+            </div>
+            <details class="gripper-cpv-guide">
+              <summary>查看厂家 CPV 恢复流程与适用条件</summary>
+              <p>CPV 是厂家上位机提供的恢复入口。本页没有已验收的 CPV 协议，不发送 CPV 指令，也不把普通机械臂复位冒充 CPV 修复。</p>
+              <ol>
+                <li>先保存固件、型号、原始反馈、故障位及闭合／中间／全开实测；区分零点偏移、尺度错误和驱动故障。</li>
+                <li>若方向反转、全开为负或厂家确认需要 CPV 恢复，先按对应设备版本向厂家核实适用流程，并可靠支撑整臂。</li>
+                <li>厂家 Issue #128 给出的顺序是：在厂家上位机执行 CPV 复位，再闭合夹爪设零。厂家同时说明机械臂需重新设置零点；需作为全臂校准另行准备。</li>
+                <li>完成后重新核验 J1–J6、夹爪物理行程和旧模型坐标兼容性；核验通过前不恢复策略发送。</li>
+              </ol>
+              <a href="https://github.com/agilexrobotics/piper_sdk/issues/128" target="_blank" rel="noopener">厂家 CPV 案例与回复 ↗</a>
+            </details>
+          </article>
+          <article class="panel controller-panel" id="controller-mode-panel" aria-labelledby="controller-mode-heading">
+            <div class="panel-title">
+              <div><div class="eyebrow">RIGHT ARM / CONTROLLER HANDOFF</div><h2 id="controller-mode-heading">底层控制模式 · 遥操、电脑控制与待机</h2></div>
+              <div class="mode-state-pills"><span class="pill neutral" id="mode-state" aria-live="polite">UNKNOWN · 未知</span><span class="pill warn" id="mode-freshness">待读数 · 模式未核对</span></div>
+            </div>
+            <p class="panel-copy">按当前用途选择电脑控制、原厂主从高跟随、待机或六关节失能。每次独立提交并读取真实回执；模式操作不自动发送位置目标，恢复高跟随仍可能让执行臂响应主臂。</p>
+            <div class="mode-summary">
+              <div><label>最后真实报告的模式 · 新鲜度单独核对</label><strong id="mode-actual">尚未收到可识别的真实模式</strong><p id="mode-reason">连接后先刷新模式诊断。</p></div>
+              <div><label>最近一次模式请求 · 历史结果</label><strong id="mode-requested">尚无模式请求回执</strong><p id="mode-history-context">本栏记录该次请求的时间和结果；当前模式、使能与控制来源分别以新鲜反馈为准。</p></div>
+            </div>
+            <dl class="mode-fields">
+              <div><dt>ctrl_mode · 指令通道</dt><dd id="mode-ctrl">—</dd></div>
+              <div><dt>arm_status · 机械臂状态</dt><dd id="mode-arm">—</dd></div>
+              <div><dt>mode_feed · 运动模式</dt><dd id="mode-feed">—</dd></div>
+              <div><dt>teach_status · 示教状态</dt><dd id="mode-teach">—</dd></div>
+              <div><dt>err_code · 错误位</dt><dd id="mode-error">—</dd></div>
+              <div><dt>0x2A1 反馈年龄</dt><dd id="mode-age">—</dd></div>
+            </dl>
+            <div class="mode-raw"><label>完整 0x2A1 原始载荷</label><code id="mode-raw-status">尚无真实状态帧</code></div>
+            <p class="footnote" id="mode-source">源时间戳尚未核对。</p>
+            <p class="footnote">反馈年龄是收到该状态帧后经过的时间，包含链路与缓存等待；它不等于 CAN 发送周期。模式过期时保留最后报告名称，不代表当前模式已获确认；执行仍使用原有新鲜度核验。</p>
+            <div class="mode-enable-section"><span class="field-label">六关节电机使能 · 实际低速反馈</span><div class="mode-enables" id="mode-enables" aria-label="各关节真实使能状态"></div><p class="footnote" id="mode-enable-source">低速反馈源时间与新鲜度尚未核对。</p></div>
+            <div class="note" id="mode-position-mode">控制子模式请求：尚无请求回执。0x2A1 无法直接证明 is_mit_mode 的内部状态。</div>
+            <div class="mode-diagnostic-grid">
+              <div><h3>控制来源活动 · 最近接收时间窗</h3><span class="pill neutral" id="mode-activity-status">等待控制来源活动观察</span><p class="footnote" id="mode-activity-note">关注 0x151 载荷中的 0xAD 高跟随请求。仅凭 CAN ID 不能确定发送者；未见控制帧不能证明主臂信号已经隔离。</p><pre class="data-output mode-data" id="mode-external">尚未完成模式观察。</pre></div>
+              <div><h3>提交条件与历史诊断</h3><p class="footnote" id="mode-switchability">后端尚未提供切换条件。</p><pre class="data-output mode-data" id="mode-job-receipt">尚无本页模式任务回执。</pre><details class="mode-request-details"><summary>展开原始字段与失败原因</summary><pre id="mode-request-raw">尚无模式请求回执。</pre></details></div>
+            </div>
+            <ol class="mode-guide">
+              <li><b>识别真实模式</b><span>只接收诊断，核对完整状态帧、新鲜度、电机和其他控制来源。</span></li>
+              <li><b>完成现场交接条件</b><span>模式接管需要结束示教、隔离主臂信号和可靠承托；独立复位另需审查原厂机械零位流程。</span></li>
+              <li><b>选择本次用途并等反馈</b><span>电脑接管请求待机后进入 CAN/MOVEJ；恢复原厂遥操请求高跟随；待机与六关节失能有独立入口，结果分别核验。</span></li>
+              <li><b>另行使能与运动验收</b><span>此处模式任务不使能电机、不发送关节或夹爪目标。进入运动测试核对实际响应。</span></li>
+            </ol>
+            <div class="confirmation-box mode-confirmations" id="mode-confirmations">
+              <strong>模式切换前的现场声明</strong>
+              
+              
+              
+              
+              
+              
+              
+              <small>勾选是现场操作人的声明，不是传感器证据，也不能代替线路隔离和可靠支撑。</small>
+              <p id="mode-confirmation-state" class="footnote" aria-live="polite">现场声明尚未完成。</p>
+            </div>
+            <div class="button-row">
+              <button class="button" data-action="mode_inspect" data-params='{"arm":"right","seconds":1}'>刷新模式诊断</button>
+              <button class="button primary" data-action="mode_takeover">切换到电脑 CAN / MOVEJ</button>
+              <button class="button primary" data-action="mode_high_follow">恢复原厂主从高跟随</button>
+              <button class="button" data-action="mode_standby">切到待机</button>
+              <button class="button mode-reset-button" data-action="mode_disable">六关节失能</button>
+              <button class="button mode-reset-button" data-action="mode_reset">受支撑单次复位</button>
+              <p class="muted">电脑接管、待机与失能要求先隔离主臂目标；恢复高跟随则要求正确主从角色、姿态对应和新鲜目标流。待机不等于电机失能；六关节失能会失去保持力，不包含夹爪。这里不改主从角色、不重新校零。高跟随请求的内部状态不能只靠 CAN/MOVEJ 回传确认，仍须现场核实跟随。</p>
+              <button class="button quiet" data-open-page="motion">运动测试 →</button>
+            </div>
+            <details><summary>各模式当前可用条件与阻止原因</summary><ul id="semantic-mode-preflight"><li>等待网页后端核对。</li></ul><p class="footnote" id="semantic-mode-evidence">等待带来源的目标与反馈。</p></details>
+            <p class="footnote">teach_status = 2 表示结束记录，不单独视为故障。执行臂的 0xFC 输出角色可保留；角色和当前指令通道分别判断。受支撑复位可能失去保持力，完成后重新诊断，不自动使能或回位。</p>
+          </article>
+          <div class="grid cols-3">
+            <article class="panel span-2">
+              <div class="panel-title">
+                <h2>连接与设备</h2>
+                <span class="subtle" id="last-refresh">暂无实时检查</span>
+              </div>
+              <div class="device-grid">
+                <div class="device-card">
+                  <span class="device-symbol">⌁</span><label>AgileX 主机</label
+                  ><strong id="device-host">未核对</strong
+                  ><small id="device-identity"
+                    >主机身份由真实 SSH 返回确认</small
+                  >
+                </div>
+                <div class="device-card">
+                  <span class="device-symbol">⊞</span
+                  ><label>真实 U 盘挂载</label
+                  ><strong id="device-usb">未核对</strong
+                  ><small id="device-usb-detail"
+                    >诊断、采集和运行报告写入 U 盘</small
+                  >
+                </div>
+                <div class="device-card">
+                  <span class="device-symbol">⇄</span><label>右臂 CAN</label
+                  ><strong id="device-can">未知</strong
+                  ><small id="device-can-detail"
+                    >帧率、反馈时间与错误计数</small
+                  >
+                </div>
+                <div class="device-card">
+                  <span class="device-symbol">◎</span><label>ROS 通路</label
+                  ><strong id="device-ros">未知</strong
+                  ><small>ROS 与直接 CAN 独立评估</small>
+                </div>
+              </div>
+              <div class="button-row">
+                <button class="button primary" data-action="connect">
+                  连接 AgileX</button
+                ><button class="button" data-action="disconnect">
+                  断开页面通道</button
+                ><button
+                  class="button"
+                  data-action="diagnose"
+                  data-params='{"seconds":3}'
+                >
+                  检查 CAN / ROS</button
+                ><button
+                  class="button"
+                  data-action="limits"
+                  data-params='{"arm":"right"}'
+                >
+                  读取原厂限位
+                </button>
+              </div>
+              <p class="footnote">
+                连接与断开不自动移动或关闭电机。CAN
+                诊断和原厂限位查询的发送范围由任务回执记录。
+              </p>
+            </article>
+            <article class="panel">
+              <div class="panel-title">
+                <h2>设备准备</h2>
+                <span class="mini-tag">SHARED SOURCE</span>
+              </div>
+              <div class="check-list">
+                <div><span id="prep-identity">○</span>主机身份</div>
+                <div><span id="prep-usb">○</span>U 盘真实挂载</div>
+                <div><span id="prep-right">○</span>右臂新鲜反馈</div>
+                <div><span id="prep-cameras">○</span>相机共享数据源</div>
+              </div>
+              <button class="button wide" data-action="hub_start">
+                启动共享监控</button
+              ><button
+                class="button wide"
+                data-action="hub_start"
+                data-params='{"takeover_existing":true}'
+              >
+                接管已识别的旧只读采集器</button
+              ><button class="button wide" data-action="hub_stop">
+                停止共享监控</button
+              ><button class="button wide" data-action="sync">
+                显式同步当前源码
+              </button>
+              <p class="footnote">
+                接管需单独审核，可能中断旧监控。其他相机占用者仍会阻止启动；同步只更新已列入库的文件。
+              </p>
+            </article>
+            <article class="panel span-2">
+              <div class="panel-title">
+                <h2>六关节零点校准向导</h2>
+                <span class="pill warn">原厂写入尚未接通</span>
+              </div>
+              <div class="calibration-steps">
+                <div>
+                  <span>01</span><b>保存校准前信息</b>
+                  <p>真实角度、控制器、坐标版本。</p>
+                </div>
+                <div>
+                  <span>02</span><b>按原厂要求定位</b>
+                  <p>确认机械基准与支撑条件。</p>
+                </div>
+                <div>
+                  <span>03</span><b>执行原厂设零</b>
+                  <p>经核对的版本和指令。</p>
+                </div>
+                <div>
+                  <span>04</span><b>核对坐标兼容性</b>
+                  <p>模型、数据与准备位重新检查。</p>
+                </div>
+              </div>
+              <div class="note">
+                六关节原厂校准写入尚未接通。此向导展示操作顺序；不发送设零、复位或电机失能指令。夹爪核验与有条件设零使用上方独立入口。
+              </div>
+              <button class="button" data-action="status">
+                保存当前只读状态</button
+              ><button
+                class="button"
+                disabled
+                title="未实现原厂校准写入，不会冒充可执行功能"
+              >
+                执行零点校准 · 未接通
+              </button>
+            </article>
+            <article class="panel">
+              <div class="panel-title"><h2>坐标基准</h2></div>
+              <div class="metric-block">
+                <label>训练准备位来源</label>
+                <p>25 段稳定示范的起始统计</p>
+              </div>
+              <div class="metric-block">
+                <label>校准与模型兼容性</label
+                ><strong class="warn-text">尚未验证</strong>
+              </div>
+              <p class="footnote">
+                六关节 0° 是数值目标，不是零点校准，也不等于已验证停放姿态。
+              </p>
+              <button class="button wide" data-open-page="motion">
+                打开运动测试 →
+              </button>
+            </article>
+          </div>
+        </section>
+        <section class="page" id="page-teleop">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">02 / TELEOPERATION & DATA</div>
+              <h1>观察、操作，记录每一条。</h1>
+              <p>
+                预览最多 2 Hz，界面目标刷新 2.5 Hz；保存与 CAN
+                接收独立。共享相机源避免重复打开设备。
+              </p>
+            </div>
+            <a
+              class="button"
+              id="rerun-link"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              >打开 Rerun ↗</a
+            >
+          </div>
+          <div class="page-readiness" id="teleop-readiness" aria-live="polite"></div>
+          <div class="action-error" id="teleop-action-error" role="alert" hidden></div>
+          <article class="panel usb-target-panel" data-usb-panel aria-label="当前数据保存位置">
+            <div class="panel-title"><div><div class="eyebrow">DATA / USB TARGET</div><h2>当前数据保存位置</h2></div><button class="button" data-usb-scan>↻ 检查已插 U 盘</button></div>
+            <p class="usb-target-state" data-usb-state role="status">尚未核对 AgileX 上实际挂载的 USB。</p>
+            <div class="usb-device-grid" data-usb-candidates></div>
+            <p class="usb-target-path" data-usb-target>录制目标：未选定，暂不能录制。</p>
+            <p class="footnote" data-usb-detail>完成本条收尾后才能换盘。盘的名称、UUID 和实际目录会一起显示；盘不可用时停止新写入，不自动切换。</p>
+            <p class="action-error" data-usb-error role="alert" hidden></p>
+          </article>
+          <div class="camera-grid">
+            <article class="camera-panel">
+              <div class="camera-heading">
+                <b>头部相机</b><span data-camera-state="front">无实时源</span>
+              </div>
+              <div class="camera-frame">
+                <img data-camera="front" alt="头部真实实时画面" hidden />
+                <div class="camera-empty">
+                  ◎<span>等待真实相机图像</span><small>不生成或补帧</small>
+                </div>
+              </div>
+              <div class="camera-footer">
+                FRONT <span data-camera-detail="front">—</span>
+              </div>
+            </article>
+            <article class="camera-panel">
+              <div class="camera-heading">
+                <b>右腕相机</b><span data-camera-state="right">无实时源</span>
+              </div>
+              <div class="camera-frame">
+                <img data-camera="right" alt="右腕真实实时画面" hidden />
+                <div class="camera-empty">
+                  ◎<span>等待真实相机图像</span><small>不生成或补帧</small>
+                </div>
+              </div>
+              <div class="camera-footer">
+                RIGHT WRIST <span data-camera-detail="right">—</span>
+              </div>
+            </article>
+            <article class="camera-panel">
+              <div class="camera-heading">
+                <b>左腕相机</b><span data-camera-state="left">无实时源</span>
+              </div>
+              <div class="camera-frame">
+                <img data-camera="left" alt="左腕真实实时画面" hidden />
+                <div class="camera-empty">
+                  ◎<span>等待真实相机图像</span><small>不生成或补帧</small>
+                </div>
+              </div>
+              <div class="camera-footer">
+                LEFT WRIST <span data-camera-detail="left">—</span>
+              </div>
+            </article>
+          </div>
+          <div class="grid cols-3">
+            <article class="panel span-2">
+              <div class="panel-title">
+                <h2>关节时间线</h2>
+                <span class="subtle">真实反馈 · 当前页面采样</span>
+              </div>
+              <canvas
+                id="joint-chart"
+                height="200"
+                aria-label="右臂关节角时间线"
+              ></canvas>
+              <div class="chart-legend">
+                <span>J1</span><span>J2</span><span>J3</span><span>J4</span
+                ><span>J5</span><span>J6</span>
+              </div>
+              <p class="footnote">
+                图表仅绘制本页接收到的真实样本，不插值补齐通信缺口。完整高频数据由采集服务保存。
+              </p>
+              <div class="button-row">
+                <button class="button" data-action="hub_start">启动监控</button
+                ><button class="button" data-open-controller>遥操／待机／失能设置</button>
+              </div>
+              <div class="note" id="teleop-reason">
+                已由厂家恢复主从跟随时，可直接准备采集；需要切换控制器模式时打开上方设置。
+              </div>
+            </article>
+            <article class="panel recording-panel">
+              <div class="panel-title">
+                <h2>右臂示范采集</h2>
+                <span class="pill neutral" id="recording-state">未核对</span>
+              </div>
+              <p class="footnote">准备本次采集 → 开始本条 → 收尾保存 → 人工复核 → 下一条。采集名称按北京时间自动生成，不需要填写或复制批次 ID。</p>
+              <div class="note" id="capture-scope-status">本次采集范围等待服务核对。</div>
+              <p class="footnote" id="capture-image-status">图像处理与内参版本等待核对。</p>
+              <input id="collection-title" type="hidden" maxlength="120" />
+              <label class="field-label" for="task-name">公共任务描述</label><input id="task-name" value="右臂将红色方块放入绿色桶" maxlength="160" />
+              <div class="collection-fields-row">
+                <div><label class="field-label" for="collection-operator">操作人</label><input id="collection-operator" maxlength="80" placeholder="实际操作人" /></div>
+                <div><label class="field-label" for="collection-target">人工合格目标</label><input id="collection-target" type="number" min="1" max="10000" step="1" value="70" /></div>
+              </div>
+              <div class="button-row"><button class="button" id="collection-create" disabled>准备本次采集</button><button class="button quiet" id="collection-new-draft">准备新的采集</button></div>
+              <input id="collection-batch-id" type="hidden" maxlength="128" />
+              <button class="button wide" id="collection-resume" hidden disabled>核对最近一次采集</button>
+              <p class="footnote" id="collection-batch-state">填写实际操作人并准备本次采集；名称会按开始时间生成。</p>
+              <details id="collection-batch-details"><summary>采集存储标识与恢复详情</summary><p class="footnote">内部标识用于保存和失败恢复，由程序管理，不需要手工输入。</p></details>
+              <div class="collection-progress" aria-label="人工合格示范进度">
+                <strong id="collection-progress-text">— / — 人工合格</strong><progress id="collection-progress" max="100" value="0" hidden></progress>
+                <div class="collection-counts"><span>原生保存 <b id="collection-native-count">—</b></span><span>人工合格 <b id="collection-accepted-count">—</b></span><span>拒绝 <b id="collection-rejected-count">—</b></span><span>待复核 <b id="collection-unreviewed-count">—</b></span></div>
+                <p class="footnote" id="collection-counts-source">统计只来自真实 USB 批次回执；目标按人工合格条数计算。</p>
+              </div>
+              <label class="field-label" for="episode-class">本条类别</label><select id="episode-class">
+                <option value="A">A · 基础抓放</option>
+                <option value="B">B · 位置变化</option>
+                <option value="C">C · 桶位变化</option>
+                <option value="D">D · 综合变化</option>
+                <option value="random">随机位置</option>
+                <option value="recovery">恢复示范</option>
+                <option value="test">通路测试</option>
+              </select>
+              <label class="field-label" for="collection-notes">本条备注</label><input id="collection-notes" maxlength="512" placeholder="位置、接触情况、异常或需要复核的片段" />
+              <p class="footnote collection-trial" id="collection-trial-state">创建或续接真实批次后准备本条身份。</p>
+              <div class="recording-timer" id="recording-timer">—</div>
+              <dl class="collection-live-stats"><div><dt>状态样本</dt><dd id="collection-samples">—</dd></div><div><dt>本次图像</dt><dd id="collection-camera-counts">—</dd></div><div><dt>本次原始 CAN</dt><dd id="collection-can-counts">—</dd></div><div><dt>队列积压</dt><dd id="collection-backlog">—</dd></div><div><dt>实际保存字节</dt><dd id="collection-raw-bytes">—</dd></div><div><dt>U 盘剩余</dt><dd id="collection-usb-free">—</dd></div><div><dt>容量检查时间</dt><dd id="collection-usb-checked">当前未核对</dd></div><div><dt>采集质量提示</dt><dd id="collection-quality">当前未核对</dd></div><div><dt>错误 / 溢出</dt><dd id="collection-recording-error">当前未核对</dd></div></dl>
+              <p class="footnote">先录 3 条代表性示范估算本批容量；本批默认目标为 70 条人工合格数据。容量是后台只读快照，不自动切盘或删除失败记录。</p>
+              <button class="button primary wide" id="record-start" disabled>● 开始本条</button>
+              <button class="button wide" id="collection-record-stop" disabled>■ 结束并保存</button>
+              <button class="button wide" id="collection-next" disabled>下一条 · 仅准备新身份</button>
+              <button class="button quiet wide" id="collection-record-retry" disabled>重试／核对本条开录</button>
+              <p class="footnote">仅用于结果待核验且已确认没有活动录制的本条：后台读取 USB 冻结元数据，复用原试次身份；不根据列表摘要重建备注，不自动生成下一条。</p>
+              <p class="footnote" id="collection-recording-detail">开录后冻结本条元数据；“下一条”须真实收尾完成，不会自动开录或移动机械臂。</p>
+            </article>
+            <article class="panel span-3">
+              <div class="panel-title">
+                <h2>批次 Episode 与人工复核</h2>
+                <span class="subtle">原生保存 ≠ 合格训练导出</span>
+              </div>
+              <div class="collection-list-toolbar">
+                <button class="button" id="collection-list-refresh" disabled>读取批次列表</button>
+                <label>本页类别<select id="collection-category-filter"><option value="all">全部类别</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="random">随机</option><option value="recovery">恢复</option><option value="test">测试</option></select></label>
+                <label>本页复核<select id="collection-review-filter"><option value="all">全部复核</option><option value="accepted">人工合格</option><option value="rejected">拒绝</option><option value="unreviewed">待复核</option></select></label>
+                <button class="button quiet" id="collection-list-prev" disabled>上一页</button><span id="collection-list-page">—</span><button class="button quiet" id="collection-list-next" disabled>下一页</button>
+              </div>
+              <p class="footnote" id="collection-list-source">每页 10 条，筛选仅当前页；未查询的条目不作为零条或已通过。</p>
+              <div id="collection-episode-list" class="empty-line">尚未读取真实批次列表。</div>
+              <section class="collection-review-panel" id="collection-review-panel" hidden aria-labelledby="collection-review-heading">
+                <h3 id="collection-review-heading">人工复核本条示范</h3><p class="footnote" id="collection-review-identity">未选择真实已收尾 episode。</p>
+                <div class="collection-fields-row"><div><label class="field-label" for="collection-reviewer">复核人</label><input id="collection-reviewer" maxlength="80" placeholder="实际复核人" /></div><div><label class="field-label" for="collection-review-note">复核依据</label><input id="collection-review-note" maxlength="512" placeholder="核对原始画面、状态和失败信息后填写依据" /></div></div>
+                <div class="button-row"><button class="button primary" id="collection-accept" disabled>保存人工合格判定</button><button class="button" id="collection-reject" disabled>保存拒绝判定</button></div>
+                <p class="footnote">人工判定仅登记示范质量；不伪造物理成功、不改变原始数据、不删除失败。原生录制仍须质量检查、时间对齐与训练格式导出。</p>
+              </section>
+              <details><summary>查看未归入批次的历史原始录制</summary><button class="button quiet" data-action="record_list">读取原始录制列表</button><div id="episode-list" class="empty-line">尚未读取历史列表。</div></details>
+            </article>
+          </div>
+        </section>
+        <section class="page" id="page-motion">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">03 / MOTION & POSE</div>
+              <h1>看见当前姿态，预览下一步。</h1>
+              <p>
+                右臂真实 URDF
+                模型。鼠标拖动仅编辑目标预览；点击独立执行按钮才发送运动请求。界面目标刷新
+                2.5 Hz，CAN 接收独立。
+              </p>
+            </div>
+            <span class="chip">RIGHT FOLLOWER</span>
+          </div>
+          <div class="page-readiness" id="motion-readiness" aria-live="polite"></div>
+          <div class="action-error" id="motion-action-error" role="alert" hidden></div>
+          <div class="mode-link-strip"><span>右臂底层模式：<strong data-mode-summary>UNKNOWN · 未知</strong></span><button class="button quiet" data-open-page="connect" data-open-mode>查看模式诊断与切换 →</button></div>
+          <div class="confirmation-box motion-confirmations" id="motion-confirmations">
+            <strong>执行前现场确认</strong>
+            
+            
+            <small id="motion-confirmation-state">执行运动需要完成两个现场确认。网页不会替代隔离或碰撞检查。</small>
+          </div>
+          <article class="panel" aria-label="双执行臂只读实时关节表">
+            <div class="panel-title">
+              <h2>双执行臂实时读数 · 只读</h2>
+              <span class="subtle">复用当前状态刷新 · 不发送指令</span>
+            </div>
+            <div class="mode-diagnostic-grid">
+              <div><h3>右执行臂 <span class="pill neutral" id="follower-right-feedback">尚未核对</span></h3><p class="footnote" id="follower-right-ages">等待真实反馈</p><p class="footnote" id="follower-right-mode">UNKNOWN · 等待完整状态</p></div>
+              <div><h3>左执行臂 <span class="pill neutral" id="follower-left-feedback">尚未核对</span></h3><p class="footnote" id="follower-left-ages">等待真实反馈</p><p class="footnote" id="follower-left-mode">UNKNOWN · 等待完整状态</p></div>
+            </div>
+            <table class="follower-readouts" aria-label="左右执行臂实际关节角和夹爪开度">
+              <thead><tr><th scope="col">实测量</th><th scope="col">右执行臂</th><th scope="col">左执行臂</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">J1 · °</th><td id="follower-right-j0">--</td><td id="follower-left-j0">--</td></tr>
+                <tr><th scope="row">J2 · °</th><td id="follower-right-j1">--</td><td id="follower-left-j1">--</td></tr>
+                <tr><th scope="row">J3 · °</th><td id="follower-right-j2">--</td><td id="follower-left-j2">--</td></tr>
+                <tr><th scope="row">J4 · °</th><td id="follower-right-j3">--</td><td id="follower-left-j3">--</td></tr>
+                <tr><th scope="row">J5 · °</th><td id="follower-right-j4">--</td><td id="follower-left-j4">--</td></tr>
+                <tr><th scope="row">J6 · °</th><td id="follower-right-j5">--</td><td id="follower-left-j5">--</td></tr>
+                <tr><th scope="row">夹爪开度 · mm</th><td id="follower-right-gripper">--</td><td id="follower-left-gripper">--</td></tr>
+              </tbody>
+            </table>
+            <p class="footnote">关节角和夹爪开度分别核对接收年龄；过期、缺失或失联的读数显示 --。夹爪显示线性开度，不是角度，不对正负实测值做裁剪。当前只接入两条执行臂；两条遥操作主臂的实际遥测尚未独立连接，不能用目标指令代替。</p>
+          </article>
+          <div class="grid motion-layout">
+            <article class="panel robot-panel">
+              <div class="panel-title">
+                <h2>PiPER 右执行臂</h2>
+                <div class="view-legend">
+                  <span class="actual-key"></span>真实反馈
+                  <span class="target-key"></span>目标预览
+                </div>
+              </div>
+              <div id="robot-view" class="robot-viewport">
+                <div class="empty-line">加载官方模型资产…</div>
+              </div>
+              <div class="robot-toolbar">
+                <span id="robot-source">实际姿态：未接收到真实反馈</span
+                ><button class="button quiet" id="target-from-actual">
+                  目标 ← 当前角度
+                </button>
+              </div>
+              <div class="note compact">
+                拖动高亮关节环编辑角度；拖动画面旋转视角，滚轮缩放。目标预览不具备碰撞验证，不能据此证明路径安全。
+              </div>
+            </article>
+            <article class="panel motion-controls">
+              <div class="panel-title">
+                <h2>关节姿态窗口</h2>
+                <span class="pill neutral" id="motion-feedback-state"
+                  >未知</span
+                >
+              </div>
+              <div class="joint-header">
+                <span>关节</span><span>实际 ° / mm</span><span>目标 ° / mm</span>
+              </div>
+              <div id="joint-editor"></div>
+              <div class="joint-row gripper-joint-readout" aria-label="G夹爪实际开度与目标毫米">
+                <label class="gripper-joint-label" for="gripper-target-mm">G</label><strong id="actual-gripper" class="joint-actual">—</strong><input id="gripper-target-mm" type="number" step="0.1" placeholder="mm" aria-label="G目标开度毫米" />
+              </div>
+              <div class="gripper-motion-controls">
+                <label class="field-label" for="gripper-target-range">G 开合距离 · mm</label>
+                <input id="gripper-target-range" type="range" step="0.1" disabled aria-label="G开合距离滑条" />
+                <p class="footnote" id="gripper-target-detail">等待真实夹爪反馈和配置范围。修改数值仅编辑下次目标。</p>
+                <div class="button-row"><button class="button quiet" id="gripper-target-current" disabled>G目标 ← 当前开度</button><button class="button" id="gripper-target-plan">查看G计划</button><button class="button primary" id="gripper-target-execute">执行G开合</button></div>
+                <p class="footnote">G独立执行，J1–J6继续使用原来的按钮。执行时按实际反馈确认到位；使用现有夹爪力度和手动参考速度。G指令可使能健康的夹爪，不重新校零。</p>
+              </div>
+              <p class="footnote" id="gripper-readout-source">夹爪反馈年龄尚未核对；不会借用关节新鲜度。</p>
+              <p class="target-draft-state" id="target-draft-state">目标等待真实角度初始化；尚无可执行草稿。</p>
+              <div class="gripper-row">
+                <span>夹爪行程反馈</span><strong id="gripper-value">—</strong>
+              </div>
+              <div class="inline-note" role="status">
+                <span class="pill neutral" id="gripper-health-motion">夹爪独立状态未核对</span>
+                <p id="gripper-health-detail-motion">等待新的 0x2A8；不是六关节控制模式。</p>
+              </div>
+              <div class="button-row">
+                <button class="button" data-action="status">读取真实姿态</button
+                ><button class="button" id="target-reset">重置预览</button>
+                <button class="button quiet" data-open-gripper>夹爪零点与行程核验 →</button>
+              </div>
+              <hr />
+              <label class="field-label" for="motion-speed"
+                >运动速度上限 · °/s</label
+              >
+              <div class="inline-field">
+                <input
+                  id="motion-speed"
+                  type="number"
+                  min="1"
+                  max="10"
+                  step="0.1"
+                  value="10"
+                /><span>默认 10°/s · 加速度以配置为准</span>
+              </div>
+              <button class="button wide" id="preview-target">
+                查看自定义目标计划</button
+              ><button class="button primary wide" id="execute-target">
+                执行预览目标
+              </button>
+            </article>
+            <article class="panel motion-presets">
+              <div class="panel-title">
+                <h2>预编程动作</h2>
+                <span class="subtle">计划与执行分开</span>
+              </div>
+              <label class="field-label" for="preset-gripper-speed">同时闭合空爪 · 软件参考速度上限 · mm/s</label>
+              <div class="inline-field preset-gripper-speed">
+                <input id="preset-gripper-speed" type="number" min="0.1" max="10" step="0.1" value="10" /><span>默认 10 mm/s；独立于六关节的 °/s。实际夹爪速度未验收。</span>
+              </div>
+              <div class="preset-grid">
+                <div>
+                  <span class="mini-tag">TRAINING READY</span>
+                  <h3>起始中位数</h3>
+                  <code id="ready-vector"
+                    >15.872 / 56.431 / −36.060 / 8.216 / 35.394 / −4.867</code
+                  >
+                  <p>25 段稳定训练示范 · 旧坐标兼容性待核对</p>
+                  <label class="preset-close-option">准备位夹爪<select id="ready-close-gripper"><option value="no">保持当前开度</option><option value="yes" selected>同时闭合空爪</option></select></label>
+                  <p class="footnote" id="ready-gripper">准备阶段夹爪目标尚未核对；不改变模型运行中的夹爪动作。</p>
+                  <div class="button-row">
+                    <button class="button" data-pose="ready" data-motion="plan">
+                      查看准备位＋闭爪计划</button
+                    ><button
+                      class="button primary"
+                      data-pose="ready"
+                      data-motion="apply"
+                    >
+                      准备位＋闭合夹爪
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <span class="mini-tag">JOINT ZERO</span>
+                  <h3>六关节数值零位</h3>
+                  <code>0 / 0 / 0 / 0 / 0 / 0</code>
+                  <p>这不是零点校准，不是已验证可靠支撑停放位。</p>
+                  <label class="preset-close-option">零位夹爪<select id="zero-close-gripper"><option value="no" selected>保持当前开度</option><option value="yes">同时闭合空爪</option></select></label>
+                  <p class="footnote" id="zero-gripper">未勾选：只发送六关节数值零位目标。</p>
+                  <div class="button-row">
+                    <button class="button" data-pose="zero" data-motion="plan">
+                      查看六关节零位计划</button
+                    ><button
+                      class="button"
+                      data-pose="zero"
+                      data-motion="apply"
+                    >
+                      移动到六零位
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+        <section class="page" id="page-deploy">
+            <div class="inline-note" role="status">
+              <span class="pill neutral" id="gripper-health-deploy">夹爪独立状态未核对</span>
+              <p id="gripper-health-detail-deploy">准备闭合前独立核对夹爪驱动；六关节模式正常不能替代。</p>
+            </div>
+
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">04 / POLICY DEPLOYMENT</div>
+              <h1>先确认模型，再运行真实闭环。</h1>
+              <p>
+                加载与预热不移动机械臂。影子推理只看预测；实机运行有独立入口和完整回执。
+              </p>
+            </div>
+            <span class="pill neutral" id="policy-pill">模型状态未知</span>
+          </div>
+          <div class="page-readiness" id="deploy-readiness" aria-live="polite"></div>
+          <div class="action-error" id="deploy-action-error" role="alert" hidden></div>
+          <article class="panel precision-panel" aria-labelledby="precision-title">
+            <div class="panel-title"><h2 id="precision-title">模型与任务</h2><span id="precision-pill" class="pill neutral">等待4090实际状态</span></div>
+            <p class="panel-copy">选择路线和检查点，加载后验证，再点击运行。每轮独立录制与保存，完成后可再次点击；不会自动重复或自动回零。</p>
+            <div class="precision-fields">
+              <div><label class="field-label" for="precision-mode">部署路线</label><select id="precision-mode"><option value="BF16">BF16 + 轨迹优化</option><option value="FP32">FP32 + RTC</option><option value="V2_FP32">FP32 + Realtime-VLA V2</option></select></div>
+              <div><label class="field-label" for="precision-step">模型检查点</label><select id="precision-step"><option value="5000">step 5000</option><option value="10000">step 10000</option><option value="15000">step 15000</option><option value="20000">step 20000</option><option value="2000">step 2000 · 历史候选</option></select></div>
+              <div><label class="field-label" for="precision-duration">运行秒数 · 最长1800</label><input id="precision-duration" type="number" min="1" max="1800" step="0.1" value="30" /><div id="precision-duration-presets" hidden><select id="precision-duration-preset" aria-label="选择常用运行秒数"><option value="">自定义秒数</option><option value="40">40秒</option><option value="60">60秒 · 1分钟</option><option value="300">300秒 · 5分钟</option><option value="600">600秒 · 10分钟</option><option value="1800">1800秒 · 30分钟</option></select></div></div>
+            </div>
+            <section id="v2-speed-panel" class="v2-speed-panel" aria-labelledby="v2-speed-title" hidden>
+              <div class="v2-speed-heading"><h3 id="v2-speed-title">运行中调速 · V2</h3><span id="v2-speed-run" class="muted">等待运行器</span></div>
+              <div id="v2-speed-feedback" class="v2-speed-feedback" data-state="idle" data-confirmed="false" role="status" aria-live="polite" aria-atomic="true">
+                <div class="v2-speed-feedback-main"><span id="v2-speed-feedback-label">当前参考目标</span><strong id="v2-speed-feedback-value">—</strong></div>
+                <div class="v2-speed-feedback-explanation"><strong id="v2-speed-feedback-badge">等待V2运行</strong><p id="v2-speed-feedback-detail">运行开始后，点击挡位或输入倍率并应用。</p></div>
+              </div>
+              <ol id="v2-speed-progress" class="v2-speed-progress" aria-label="当前调速请求进度" data-fresh="false"><li id="v2-speed-stage-1" data-done="false">① 已请求</li><li id="v2-speed-stage-2" data-done="false">② 已提交参考</li><li id="v2-speed-stage-3" data-done="false">③ 已生效</li></ol>
+              <div class="v2-speed-actions">
+                <div class="v2-speed-presets" role="group" aria-label="直接应用目标参考倍率">
+                  <button type="button" class="button" data-v2-speed="0.5" disabled>0.5×</button>
+                  <button type="button" class="button" data-v2-speed="0.8" disabled>0.8×</button>
+                  <button type="button" class="button" data-v2-speed="1" disabled>1×</button>
+                  <button type="button" class="button" data-v2-speed="1.5" disabled>1.5×</button>
+                  <button type="button" class="button" data-v2-speed="2" disabled>2×</button>
+                  <button type="button" class="button" data-v2-speed="3" disabled>3×</button>
+                  <button type="button" class="button" data-v2-speed="4" disabled>4×</button>
+                </div>
+                <label class="v2-speed-input" for="v2-speed-input"><span class="field-label">目标参考倍率 · 0.5～4×</span><input id="v2-speed-input" type="number" min="0.5" max="4" step="any" value="1" inputmode="decimal" disabled /></label>
+                <button type="button" id="v2-speed-apply" class="button primary" disabled>应用倍率</button>
+              </div>
+              <dl class="v2-speed-metrics" aria-live="polite">
+                <div><dt>运行器请求目标</dt><dd id="v2-speed-target">未读取</dd></div>
+                <div><dt>已提交参考目标</dt><dd id="v2-speed-applied">未提交</dd></div>
+                <div><dt>参考已生效目标</dt><dd id="v2-speed-effective">未生效</dd></div>
+                <div><dt>浏览器提交往返</dt><dd id="v2-speed-rtt">未测</dd></div>
+                <div><dt>后台→运行器确认</dt><dd id="v2-speed-ack">未测</dd></div>
+                <div><dt>运行器收到→参考切换</dt><dd id="v2-speed-switch">未测</dd></div>
+              </dl>
+              <section id="v2-teaching" class="v2-teaching" data-state="unavailable" aria-labelledby="v2-teaching-title">
+                <h4 id="v2-teaching-title">人工调速示教 · 自动采集</h4>
+                <p id="v2-teaching-status" role="status">等待采集运行器；不自动启动运动。</p>
+                <strong id="v2-teaching-count">尚无确认记录</strong>
+                <p id="v2-teaching-model">神经网络速度模型待训练；当前仅由你调速。</p>
+                <p>采集时，开始后先点击一次1×作为第一条人工标签，再按场景调速。记录时刻与实际生效时刻分别保存。</p>
+                <details><summary id="v2-teaching-file-label">等待最终保存回执</summary>
+                  <code id="v2-teaching-path">未确认</code>
+                  <button type="button" id="v2-teaching-copy" class="button" disabled>复制U盘文件路径</button>
+                  <span id="v2-teaching-copy-result" role="status"></span>
+                  <p>自动保存人工倍率、接收/提交/生效时间、模型身份和原始录像关联。失败和未生效请求如实保留；默认1×不冒充人工示教。</p>
+                </details>
+              </section>
+              <p id="v2-speed-status" class="v2-speed-status" role="status">只在可调速的V2运行窗口中接受命令。</p>
+              <p id="v2-speed-error" class="v2-speed-error" role="alert" hidden></p>
+              <p class="v2-speed-copy">快捷键点击即发送；输入框编辑后需点击应用。倍率相对18 Hz基准，是时间优化的目标偏好，1×保留原规划范围；其他挡位按需扩展时间规划范围。实际局部速度由规划器决定，不保证机械臂物理倍速。尚未执行的参考尾段接续生效；50 Hz发送频率和部署时长不变。停止请使用原“停止运行”入口。</p>
+            </section>
+            <p id="precision-route-note" class="panel-copy" aria-live="polite" hidden></p>
+            <p id="precision-v2-result" class="panel-copy" aria-live="polite" hidden></p>
+            <p id="precision-loaded" class="panel-copy" aria-live="polite">实际加载尚未核实；选择菜单不会自动加载。</p>
+            <label class="field-label" for="precision-prompt">任务提示词 Prompt</label>
+            <input id="precision-prompt" type="text" maxlength="200" value="右臂将红色方块放入绿色桶" autocomplete="off" />
+            <p class="footnote">点击运行时固定本轮Prompt和时长；运行中编辑只影响下一轮。三条路线均支持1～1800秒；启动录制、停止和保存另计。V2的30秒无运动验收不代表已完成30分钟真机验证。</p>
+            <p id="precision-validation" class="panel-copy">等待当前模型与无运动验收记录。</p>
+            <div class="confirmation-box">
+              
+              
+            </div>
+            <div class="button-row"><button class="button" id="precision-load">加载模型</button><button class="button" id="precision-acceptance">无运动验收</button><button class="button primary" id="precision-start">开始运行</button><button class="button stop" id="precision-stop">■ 停止后续新目标</button><button class="button" id="precision-release">释放显存</button><span id="v2-speed-dock" class="v2-speed-dock" data-state="idle" hidden>V2 · 等待运行</span></div>
+            <p id="precision-next" class="panel-copy" aria-live="polite">读取实时条件后显示下一步。</p>
+            <p id="precision-job" class="panel-copy" aria-live="polite">尚未从本入口提交任务。</p>
+            <details><summary>查看精度服务与本轮回执</summary><pre id="precision-receipt" class="data-output">尚无数据。</pre></details>
+          <details id="h50-details" class="compact-details"><summary>FP32参数与历史回执</summary>
+            <div class="panel-title"><h2 id="h50-deployment-title">FP32运行记录</h2>
+<p class="muted">七维上下限修正器：模型采用段与最终下发共用实际关节范围，高于上限映射到上限、低于下限映射到下限；夹爪保持−1.3～100 mm转换。完整保存原始预测、每轴修正前后值及差值。夹爪固定软件开合速度上限已关闭；加速度仍为0.1m/s²，关节50°/s²。模型FP32/H50、RTC、18Hz播放、50Hz发送及控制器模式保持原设定。</p><span id="h50-model-pill" class="pill neutral">等待 manager 状态</span></div>
+            <p class="panel-copy">PC 操作，4090 计算。加载和影子不发送运动；“开始正式部署”会向真实右臂发送关节与夹爪目标。每次新建独立 USB 录制会话，可在回执完成后重复实验或切换 checkpoint。</p>
+            
+            
+            <p id="h50-model-detail" class="panel-copy">所选 5000；4090 实际加载候选尚未核实。</p>
+            
+            
+            <div class="button-row" aria-label="任务提示词预设">
+              <button class="button" type="button" data-h50-prompt="右臂将红色方块放入绿色桶">红色方块 · 原任务</button>
+              <button class="button" type="button" data-h50-prompt="右臂将蓝色方块放入绿色桶">蓝色方块</button>
+              <button class="button" type="button" data-h50-prompt="右臂将圆柱盒子放入绿色桶">圆柱盒子</button>
+            </div>
+            <p class="footnote">修改文字或选择预设只编辑下一次实验，不启动推理或运动。影子检查与人工实验使用这里的原文，每次开始后固定并随模型输入、视频和动作记录保存到本次USB。可选性能验收仍使用原任务；其他任务的语言服从能力未验证。</p>
+            <p id="h50-contract-detail" class="panel-copy">等待后端真实异步/RTC配置；参数启用不代表模型能力或验收已通过。</p>
+            <p id="h50-rtc-detail" class="panel-copy">RTC冻结/已知窗口、延迟截止与队列余量尚未核对。</p>
+            <p id="h50-governor-detail" class="panel-copy">关节与夹爪参考限制尚未核对。</p>
+            <p id="h50-trial-detail" class="panel-copy">每次独立试验的seed、索引与前后录制时长尚未核对。</p>
+            <p id="h50-storage-detail" class="panel-copy">等待有界RAM与USB最终保存合同。</p>
+            <p id="h50-save-detail" class="panel-copy" aria-live="polite">本轮USB保存状态尚未核对。</p>
+            <details id="h50-config-details">
+              <summary>查看完整批准参数</summary>
+              <pre id="h50-config-output" class="data-output">尚未收到后端真实H50配置。</pre>
+            </details>
+            <p id="h50-admission-detail" class="panel-copy">RTC FP32审计及无运动性能验收尚无通过记录；正式运动阻止。</p>
+            <details id="h50-admission-details">
+              <summary>查看验收原始回执</summary>
+              <pre id="h50-admission-output" class="data-output">尚无可核对的验收证据。</pre>
+            </details>
+            
+            <div class="confirmation-box">
+              
+              
+              <small>直接从本次人工确认的当前姿态启动，不调用旧25条示范准备位。训练与当前实物零点的独立对应仍有未验收风险；不把软件单位一致视为物理标定通过。</small>
+            </div>
+            <div class="button-row"><button class="button" id="h50-shadow">所选模型影子检查 · 3次</button><button class="button primary" id="h50-start">开始人工实验 · 会真实运动</button></div>
+            <p class="footnote">人工实验入口按你的明确选择跳过100次无运动性能验收，回执记录“未验收人工实验”，不生成虚假PASS。仍需先加载所选模型，并通过当前现场确认、真实反馈、位置范围、故障和STOP检查。训练标签30Hz，动作播放18Hz，每14点重规划，目标发送50Hz，600ms提交截止不变。CAN保留原内核整数时间戳；视频、关节、原始预测、转换记录及实际命令全部保存并读回核验到本次核验USB后才完成。无运动性能验收保留为可选操作。</p>
+            <p class="footnote">独立 USB 前录制 → 当前姿态异步 H50/RTC 策略 → 原地结束并后录制；不自动使能、设零或回位。停止为软件锁存，不是硬件急停；下一轮不会自动清 STOP。旧 4060/H15 的 RTC 不作为新入口已验依据。</p>
+            <p id="h50-run-prompt" class="panel-copy" aria-live="polite">尚无本轮实验提示词记录。</p>
+            <pre id="h50-output" class="data-output">尚无本入口的完整任务回执。</pre>
+          </details></article>
+
+          
+          <article class="panel supervisor-readiness" aria-labelledby="supervisor-readiness-title">
+            <div class="panel-title"><div><div class="eyebrow">JEV / STARTLUX · OBSERVER ONLY</div><h2 id="supervisor-readiness-title">状态监督器准备度</h2></div><span class="pill neutral">仅显示 · 不发控制指令</span></div>
+            <div class="supervisor-readiness-grid"><div><strong>✓ 离线验证已完成</strong><p>任务阶段与人员／人手结果已同屏验证；历史录像需对应 U 盘在本机可读。</p></div><div><strong>○ 实时监督未接入</strong><p>当前相机流尚未接入 StartLux；未在现场持续识别人手，不会据此暂停或恢复机器人。</p></div><div><strong>○ 新 H50 协同未完成</strong><p>4090 FP32/H50 的加载与影子状态见下方独立入口；Jev 与新策略的实时协同尚未验收。</p></div></div>
+          </article>
+          <p class="footnote" id="model-loading-detail" aria-live="polite">尚未核对模型进程；启动回执与模型就绪分别显示。</p>
+          <div class="mode-link-strip"><span>VLA 执行通路 · 底层模式：<strong data-mode-summary>UNKNOWN · 未知</strong></span><button class="button quiet" data-open-page="connect" data-open-mode>查看模式诊断与切换 →</button></div>
+          <article class="panel task-workspace" id="task-workspace" aria-labelledby="task-workspace-title">
+            <div class="panel-title">
+              <div><div class="eyebrow">TASK / EXECUTION &amp; EVIDENCE</div><h2 id="task-workspace-title">本次任务进程</h2></div>
+              <span class="pill neutral" id="task-freshness">等待任务数据</span>
+            </div>
+            <div class="task-current">
+              <div><label>当前阶段 · 来自任务协调器</label><strong id="task-phase" aria-live="polite">未知</strong></div>
+              <p id="task-source">尚无任务身份和时间证据</p>
+            </div>
+            <ol class="task-flow" id="task-flow" aria-label="任务阶段状态树"><li class="task-node unknown">等待有来源的任务状态</li></ol>
+            <p class="footnote">节点表示收到的阶段记录；不把到达某个阶段、程序结束或夹爪闭合视为抓放成功。</p>
+            <div class="task-outcomes" aria-label="四类独立结果">
+              <div><label>物理抓放</label><strong id="task-result-physical">未确认</strong><small id="task-result-physical-source">需要独立证据</small></div>
+              <div><label>程序执行</label><strong id="task-result-execution">未知</strong></div>
+              <div><label>机械臂回位</label><strong id="task-result-return">未知</strong></div>
+              <div><label>录制保存</label><strong id="task-result-recording">未知</strong></div>
+            </div>
+            <div class="task-details">
+              <section><h3>抓持与放置证据</h3><p id="task-grasp">是否持物：未知</p><p id="task-placement">是否已放置：未知</p><ul id="task-evidence"><li>尚无有效证据。</li></ul><p class="task-failure" id="task-failure">失败原因：尚无可核对记录</p></section>
+              <section><h3>恢复条件</h3><p id="task-recovery-mode">恢复能力待核对</p><ul id="task-recovery-blockers"><li>尚无恢复条件记录。</li></ul></section>
+            </div>
+            <details class="task-history"><summary>查看任务阶段记录</summary><ol id="task-history"><li>尚无事件</li></ol></details>
+            <div class="task-review">
+              <label class="field-label" for="task-review-note">人工复核依据 · 描述现场观察或录像时间点</label>
+              <textarea id="task-review-note" rows="2" maxlength="256" placeholder="例如：第 14 秒红块已释放入桶，夹爪离开后方块仍在桶内。"></textarea>
+              <div class="button-row"><button class="button" id="task-review-success" data-task-review="success" disabled>复核本次成功</button><button class="button" id="task-review-failure" data-task-review="failure" disabled>复核本次失败</button></div>
+              <p class="footnote" id="task-review-help">仅记录你对指定任务的人工判断，不发送机械臂指令，不改变执行、回位或保存结果。需要已有任务身份及非空依据。</p>
+            </div>
+          </article>
+          <article class="panel stage-observer" id="stage-observer-panel">
+            <div class="panel-title">
+              <div><div class="eyebrow">LIVE / OBSERVATION</div><h2>阶段观察器</h2></div>
+              <span class="pill neutral" id="observer-freshness">等待真实数据</span>
+            </div>
+            <p class="panel-copy observer-intro">复用头部、右腕 RGB 与右臂关节反馈，独立观察抓放线索。只读，不修改模型动作，也不向 CAN 发送指令。</p>
+            <div class="observer-grid">
+              <section class="observer-current" aria-labelledby="observer-phase-title">
+                <label id="observer-phase-title">当前观测阶段 · 不是模型口述</label>
+                <strong id="observer-phase" aria-live="polite">无法判断</strong>
+                <p id="observer-age">尚未收到观察器数据</p>
+                <div class="observer-outcomes">
+                  <div><label>程序执行 · 任务回执</label><span id="observer-program">暂无实机部署回执</span></div>
+                  <div><label>抓放结果 · 需要复核</label><span id="observer-result">未确认</span></div>
+                </div>
+              </section>
+              <section class="observer-evidence" aria-labelledby="observer-evidence-title">
+                <h3 id="observer-evidence-title">判断依据</h3>
+                <ul id="observer-evidence"><li>等待共享监控的真实图像和关节反馈。</li></ul>
+                <p class="footnote" id="observer-method">方法未核对</p>
+              </section>
+              <section class="observer-timeline" aria-labelledby="observer-history-title">
+                <h3 id="observer-history-title">观测变化 · 最近 8 条</h3>
+                <ol id="observer-history"><li class="observer-empty">尚无真实观测记录</li></ol>
+              </section>
+            </div>
+            <div class="observer-disclosure">
+              <p id="observer-limitations">颜色线索不等于已抓住；夹爪闭合、程序结束都不能证明抓放成功。遮挡或反馈过期时显示“无法判断”。</p>
+              <p>当前 π₀.₅ 仅输出动作，不输出语言阶段。此观察器不代表 VLM 的思考，也不自动触发失败恢复。</p>
+              <button class="button quiet" data-open-page="teleop">查看原始相机与录制 →</button>
+            </div>
+          </article>
+          <article class="panel recovery-panel" id="recovery-panel" aria-labelledby="recovery-title">
+            <div class="panel-title">
+              <div><div class="eyebrow">RECOVERY / EVIDENCE</div><h2 id="recovery-title">失败线索与恢复记录</h2></div>
+              <span class="pill neutral" id="recovery-freshness">等待监测数据</span>
+            </div>
+            <p class="panel-copy">目前只监测疑似无进展与抓取线索，不自动停止、退让或重抓。恢复状态记录需要真实执行回执，不能从观察阶段直接认定恢复成功。</p>
+            <div class="recovery-grid">
+              <section class="recovery-status">
+                <label>最近核对的恢复状态</label>
+                <strong id="recovery-state" aria-live="polite">尚无记录</strong>
+                <p id="recovery-source">尚未收到恢复监测数据</p>
+                <dl>
+                  <div><dt>运行方式</dt><dd id="recovery-mode">只读监测 · 自动退让重抓未启用</dd></div>
+                  <div><dt>实际重试回执</dt><dd id="recovery-retries">未核对</dd></div>
+                  <div><dt>抓放结果</dt><dd>未确认 · 须独立复核</dd></div>
+                </dl>
+              </section>
+              <section>
+                <h3>线索与待补证据</h3>
+                <ul id="recovery-evidence"><li>未运行时不累计失败线索。</li></ul>
+                <ul id="recovery-missing"><li>等待真实监测数据。</li></ul>
+              </section>
+              <section>
+                <h3>恢复事件 · 最近 6 条</h3>
+                <ol id="recovery-history"><li>尚无恢复事件记录</li></ol>
+              </section>
+            </div>
+            <p class="footnote recovery-limits" id="recovery-limits">自动恢复尚不可用：退让路径、目标空间位置与独立持物判定尚未验收。没有自动恢复运动按钮。</p>
+          </article>
+          <article class="panel perception-panel" id="perception-panel" aria-labelledby="perception-title">
+            <div class="panel-title"><div><div class="eyebrow">PERCEPTION / READ ONLY</div><h2 id="perception-title">对准证据与感知方案</h2></div><span class="pill neutral" id="perception-freshness">等待感知数据</span></div>
+            <p class="panel-copy">复用原始头部与右腕图像。像素误差只表示图像关系；没有标定时不换算毫米，也不直接产生运动指令。</p>
+            <p class="footnote" id="perception-source">尚无真实感知来源</p>
+            <div class="perception-cameras" id="perception-cameras"><p>等待两路相机的实际对准证据。</p></div>
+            <div class="perception-providers" id="perception-providers"><p>感知模块是否可用尚未核对。</p></div>
+            <p class="footnote">OpenCV 提供几何线索；SAM2 提供分割；HIL-SERL 式分类器需要独立权重与标签验收。视觉伺服卡展示实际选择的 ViSP 或 OpenCV/NumPy 后端，目前仅影子计算、未授权运动。已配置、依赖可用和已加载是不同状态；任何网络输出都不能自行确认抓放成功。</p>
+          </article>
+          <div class="grid cols-3">
+            <article class="panel span-2">
+              <div class="panel-title">
+                <h2>旧 4060 / H15 · 右臂动作通路</h2>
+                <span class="mini-tag">STEP 4000 / ORIGINAL</span>
+              </div>
+              <div class="model-hero">
+                <div class="model-symbol">π</div>
+                <div>
+                  <h3>红色方块 → 绿色桶</h3>
+                  <p>
+                    视觉语言主干 BF16 · 动作专家 FP32<br />头部 + 右腕图像 ·
+                    右臂状态与动作
+                  </p>
+                </div>
+              </div>
+              <div class="parameter-grid">
+                <div>
+                  <label>动作块</label><strong id="param-horizon">H15</strong>
+                </div>
+                <div>
+                  <label>执行动作时间尺度</label
+                  ><strong id="param-action-hz">未核对</strong>
+                </div>
+                <div>
+                  <label>CAN 目标发送</label
+                  ><strong id="param-can-hz">50 Hz</strong>
+                </div>
+                <div>
+                  <label>速度 / 加速度</label
+                  ><strong id="param-speed">30°/s · 50°/s²</strong>
+                </div>
+                <div>
+                  <label>RTC 延迟 / 额外点</label
+                  ><strong id="param-rtc">8 / 3</strong>
+                </div>
+                <div>
+                  <label>实际推理延迟</label
+                  ><strong id="param-latency">尚未测量</strong>
+                </div>
+                <div>
+                  <label>仅准备阶段 · 夹爪目标</label
+                  ><strong id="param-ready-gripper">未核对</strong>
+                </div>
+              </div>
+              <div class="timing-summary" aria-label="动作与 RTC 配置时间预算">
+                <p id="param-clock-summary">模型训练标签 30 Hz · 执行动作未核对</p>
+                <dl class="timing-grid">
+                  <div><dt>完整动作块 · H / 执行 Hz</dt><dd id="param-block-window">未核对</dd></div>
+                  <div><dt>RTC 提交窗口 · delay / 执行 Hz</dt><dd id="param-commit-window">未核对</dd></div>
+                  <div><dt>相邻观测间隔预算 · (H − delay) / 执行 Hz</dt><dd id="param-observation-budget">未核对</dd></div>
+                  <div><dt>源观测到安装预算 · delay / 执行 Hz − 1 / CAN Hz</dt><dd id="param-install-budget">未核对</dd></div>
+                </dl>
+                <p class="footnote">执行 Hz 是动作播放的时间尺度，不是每秒推理次数。这里由配置计算预算；实际耗时、余量及验收结果以任务回执为准。</p>
+              </div>
+              <p class="footnote">
+                上方默认数值来自当前配置，不代表本轮实机已通过。实际运行以已核对的服务器参数与回执为准。
+              </p>
+              <div class="button-row">
+                <button class="button" data-action="model_plan">
+                  核对模型计划</button
+                ><button class="button" data-action="model_stage">
+                  准备原始权重</button
+                ><button class="button primary" id="model-start">
+                  加载模型服务</button
+                ><button class="button" data-action="model_status">
+                  模型状态</button
+                ><button class="button" data-action="model_stop">
+                  停止模型服务
+                </button>
+              </div>
+            </article>
+            <article class="panel">
+              <div class="panel-title"><h2>旧通路部署设置 · 非 4090 H50</h2></div>
+              <label class="field-label">部署方案</label
+              ><select id="deployment-route">
+                <option value="edge">AgileX RTX 4060 · 现有本地通路</option>
+                <option value="a100" disabled>
+                  远程 A100 · 本网页尚未接通
+                </option></select
+              ><label class="field-label" for="sampler-steps"
+                >去噪采样步数</label
+              ><select id="sampler-steps">
+                <option value="5">5 · 优化候选</option>
+                <option value="10">10 · 原始参考</option></select
+              ><label class="field-label" for="deployment-duration"
+                >运行时长 · 秒</label
+              ><input
+                id="deployment-duration"
+                type="number"
+                min="1"
+                max="300"
+                value="30"
+              />
+              <div class="confirmation-box">
+                <small>后端仍会检查真实反馈与控制器状态。</small>
+              </div>
+              <button class="button wide" data-action="deploy_plan">
+                查看完整部署计划</button
+              ><button class="button primary wide" id="deploy-start">
+                开始限时实机部署
+              </button>
+            </article>
+            <article class="panel span-2">
+              <div class="panel-title">
+                <h2>影子推理</h2>
+                <span class="pill neutral">不发送运动目标</span>
+              </div>
+              <p class="panel-copy">
+                用真实相机和关节状态运行模型，检查预测角度、动作块和延迟。不会将预测发送给机械臂。
+              </p>
+              <div class="button-row">
+                <button
+                  class="button primary"
+                  data-action="shadow"
+                  data-params='{"samples":3}'
+                >
+                  运行 3 次影子推理</button
+                ><button
+                  class="button"
+                  data-action="shadow"
+                  data-params='{"samples":10}'
+                >
+                  运行 10 次影子推理
+                </button>
+                <button class="button primary" data-action="shadow_fp32" data-params='{"count":3}'>4090 FP32/H50 影子联调（不发动作）</button>
+              </div>
+              <p class="panel-copy"><span id="fp32-shadow-pill" class="pill neutral">4090 FP32/H50 · 尚未核对</span> · 默认3次，实际任务提示词由配置原样传递，不修改旧模型状态。</p>
+              <p id="fp32-shadow-detail" class="panel-copy">独立4090服务；PC影子路由，运动未授权。</p>
+              <pre id="fp32-shadow-output" class="data-output">尚无 4090 FP32/H50 影子任务回执。</pre>
+              <pre id="shadow-output" class="data-output">
+旧 4060 / H15 通路尚无推理结果。</pre>
+            </article>
+            <article class="panel">
+              <div class="panel-title"><h2>旧 4060/H15 通路任务顺序</h2></div>
+              <ol class="stage-list">
+                <li>
+                  <b>开始独立录制</b><span>视频、关节、目标与运行事件</span>
+                </li>
+                <li>
+                  <b>进入七维起始状态</b><span>六关节默认 10°/s 到位，再准备空载夹爪；均核对真实反馈</span>
+                </li>
+                <li><b>限时 RTC 运行</b><span>预热完成后开始任务计时</span></li>
+                <li>
+                  <b>正常结束后回位</b><span>六关节零位，路径审核后执行</span>
+                </li>
+              </ol>
+              <p class="footnote">
+                故障、停止或失联不盲目追加回位。网页停止新目标不是硬件急停，不关闭电机。
+              </p>
+            </article>
+          </div>
+        </section>
+        <section class="panel event-panel">
+          <div class="panel-title">
+            <h2>任务与事件</h2>
+            <div class="button-row">
+              <button class="button quiet" data-action="clear_stop">
+                清除停止锁存</button
+              ><button class="button quiet" id="show-details">
+                查看原始回执
+              </button>
+            </div>
+          </div>
+          <div id="job-summary" class="job-summary">
+            当前没有本网页提交的任务。
+          </div>
+          <div class="event-log" id="event-log" aria-live="polite">
+            <div class="event-row">
+              <time>—</time><span class="event-dot"></span
+              ><span>页面已就绪，等待真实后端状态。</span>
+            </div>
+          </div>
+          <details id="raw-details">
+            <summary>完整状态 / 任务回执</summary>
+            <pre id="raw-state">{}</pre>
+          </details>
+        </section>
+      </main>
+      <footer>
+        真实状态优先 · 鼠标编辑只预览 · 任务结果以实际反馈为准
+        <span id="connection-source">本地页面 / 尚未连接机器人</span>
+      </footer>
+    </div>
+    <div id="toast" role="status" hidden></div>
+    <dialog id="confirm-dialog">
+      <form method="dialog">
+        <div class="eyebrow">EXECUTION REVIEW</div>
+        <h2 id="confirm-title">确认任务</h2>
+        <p id="confirm-copy"></p>
+        <pre id="confirm-params"></pre>
+        <div id="takeover-review" class="confirmation-box" hidden>
+          
+          <small
+            >页面无法证明其他对话或程序的录制状态；不确认则返回，不进行接管。</small
+          >
+        </div>
+        <div id="mode-review" class="confirmation-box" hidden>
+          <p id="mode-review-copy">点击提交即确认现场条件。</p>
+          <small>提交只创建一次显式任务；浏览器不会自动重试切换或复位。任务结果与新的真实反馈需分别核对。</small>
+        </div>
+        <p class="footnote">
+          本次点击将提交真实任务。执行成功由后端反馈确认；预览画面不构成运动验收。
+        </p>
+        <div class="button-row">
+          <button class="button" value="cancel" formnovalidate>返回</button
+          ><button class="button primary" value="apply">提交执行</button>
+        </div>
+      </form>
+    </dialog>
+    <link rel="stylesheet" href="./semantic-workspace.css" />
+    <script type="module" src="./app.js"></script>
+    <script type="module" src="./semantic-workspace.js"></script>
+    <link rel="stylesheet" href="./presence-replay.css" />
+    <script type="module" src="./presence-replay.js"></script>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./emerge-theme.css" />
+    
+    <link rel="stylesheet" href="./recording-layout.css" />
+    <script type="module" src="./recording-layout.js"></script>
+  <link rel="stylesheet" href="./workbench-compact.css?v=20261023-compact1" />
+<link rel="stylesheet" href="./manual-speed-control.css?v=20261025-speed1" />
+<script type="module" src="./workbench-layout.js?v=20261023-single1"></script>
+</body>
+</html>
+

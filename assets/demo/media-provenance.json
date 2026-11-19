@@ -1,0 +1,42 @@
+{
+  "schema": "cobot-recorded-review-v1",
+  "episode_id": "2026-10-24-15-53-08-episode-c908a02c",
+  "date": "2026-10-24",
+  "model": {
+    "precision": "FP32",
+    "checkpoint": 10000,
+    "route": "Realtime-VLA V2"
+  },
+  "requested_run_s": 360,
+  "native_episode_duration_s": 47.02908510099951,
+  "source_run_outcome": "FAILED_RETAINED",
+  "source_run_error": "V2 evidence queue full; long-window evidence incomplete",
+  "native_recording_status": "RECORDED_NATIVE_REVIEW_REQUIRES_QC",
+  "task_outcome": "not scored",
+  "video_fps": 30,
+  "video_frames": 1405,
+  "video_duration_s": 46.833333333333336,
+  "native_frames": {
+    "front": 1352,
+    "right": 1344
+  },
+  "state_records": 1405,
+  "camera_references_verified": 2810,
+  "alignment": "Each displayed state selects its recorded front/right frame references; 30 fps presentation uses previous recorded state.",
+  "hardware_exposure_synchronization": false,
+  "largest_camera_to_state_offset_ms": 57.880611,
+  "source_hashes": {
+    "front-0000.bin": "bd4c5e43e794434f4d0b65e7dcd948516d508a4dea67cae9cd401d2a91e7934d",
+    "right-0000.bin": "c9c2ba3b33708b8ea2f7c0ec98f7d27f84079c532b05762cdd03c567c8ba9092",
+    "state-0000.bin": "9f498bf87fe1ea3148f6b9ba3d01cd3054fad32a729a0529105527b9a4a4ad97",
+    "can-right-0000.bin": "9e92594c55fc1cdfc269bd4efe0923a27040b75eb294e602e9857a9f98a1f6ea",
+    "operation.json": "c98e405d7d22849bb1f563fde15fa3187220b108f56593270fe734920ea9c438"
+  },
+  "public_fields": [
+    "relative time",
+    "J1-J6 degrees",
+    "G millimetres"
+  ],
+  "data_file": "recorded-joints.json",
+  "video": "workbench-recorded-dual-view.mp4"
+}

@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 624" role="img" aria-label="Data paths for observation, inference, execution and review">
+<style>text{font-family:Segoe UI,Arial,sans-serif}</style>
+<rect width="100%" height="100%" fill="white"/>
+<text x="24" y="34" fill="#627183" font-size="14" font-weight="600" text-anchor="start">DATA LINK</text>
+<text x="24" y="76" fill="#172331" font-size="16" font-weight="600" text-anchor="start">OBSERVE</text>
+<polyline points="24,88 338,88" fill="none" stroke="#dce2e9" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="422" y="76" fill="#172331" font-size="16" font-weight="600" text-anchor="start">DECIDE &amp; VALIDATE</text>
+<polyline points="422,88 736,88" fill="none" stroke="#dce2e9" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="820" y="76" fill="#172331" font-size="16" font-weight="600" text-anchor="start">EXECUTE &amp; REVIEW</text>
+<polyline points="820,88 1136,88" fill="none" stroke="#dce2e9" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="24" y="115" width="314" height="70" rx="8" fill="#f7f9fc" stroke="#dce2e9" stroke-width="1.4"/>
+<rect x="24" y="115" width="4" height="70" rx="0" fill="#087e75" stroke="#087e75" stroke-width="1.4"/>
+<text x="42" y="143" fill="#172331" font-size="19" font-weight="600" text-anchor="start">Front + wrist cameras</text>
+<text x="42" y="166" fill="#627183" font-size="14" font-weight="400" text-anchor="start">Frames, timestamps, camera identity</text>
+<rect x="24" y="211" width="314" height="70" rx="8" fill="#f7f9fc" stroke="#dce2e9" stroke-width="1.4"/>
+<rect x="24" y="211" width="4" height="70" rx="0" fill="#087e75" stroke="#087e75" stroke-width="1.4"/>
+<text x="42" y="239" fill="#172331" font-size="19" font-weight="600" text-anchor="start">Joint + gripper feedback</text>
+<text x="42" y="262" fill="#627183" font-size="14" font-weight="400" text-anchor="start">Measured state and freshness</text>
+<rect x="422" y="115" width="314" height="70" rx="8" fill="#f7f9fc" stroke="#dce2e9" stroke-width="1.4"/>
+<rect x="422" y="115" width="4" height="70" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="1.4"/>
+<text x="440" y="143" fill="#172331" font-size="19" font-weight="600" text-anchor="start">Operator or learned policy</text>
+<text x="440" y="166" fill="#627183" font-size="14" font-weight="400" text-anchor="start">Task, checkpoint, prompt, action chunk</text>
+<rect x="422" y="241" width="314" height="70" rx="8" fill="#f7f9fc" stroke="#dce2e9" stroke-width="1.4"/>
+<rect x="422" y="241" width="4" height="70" rx="0" fill="#7c3aed" stroke="#7c3aed" stroke-width="1.4"/>
+<text x="440" y="269" fill="#172331" font-size="19" font-weight="600" text-anchor="start">Planning + admission</text>
+<text x="440" y="292" fill="#627183" font-size="14" font-weight="400" text-anchor="start">Limits, source, owner, model identity</text>
+<rect x="820" y="241" width="316" height="70" rx="8" fill="#f7f9fc" stroke="#dce2e9" stroke-width="1.4"/>
+<rect x="820" y="241" width="4" height="70" rx="0" fill="#2563eb" stroke="#2563eb" stroke-width="1.4"/>
+<text x="838" y="269" fill="#172331" font-size="19" font-weight="600" text-anchor="start">Local robot executor</text>
+<text x="838" y="292" fill="#627183" font-size="14" font-weight="400" text-anchor="start">Targets via CAN / MOVEJ</text>
+<polyline points="338,150 390,150 390,150 422,150" fill="none" stroke="#087e75" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="422.00,150.00 413.71,153.50 413.71,146.50" fill="#087e75"/>
+<polyline points="338,246 370,246 370,190 402,190 402,150 422,150" fill="none" stroke="#087e75" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="422.00,150.00 413.71,153.50 413.71,146.50" fill="#087e75"/>
+<polyline points="580,185 580,241" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="580.00,241.00 576.50,232.71 583.50,232.71" fill="#7c3aed"/>
+<text x="598" y="219" fill="#627183" font-size="14" font-weight="400" text-anchor="start">Proposed actions</text>
+<polyline points="736,276 820,276" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="820.00,276.00 811.71,279.50 811.71,272.50" fill="#2563eb"/>
+<text x="778" y="257" fill="#2563eb" font-size="12" font-weight="600" text-anchor="middle">Accepted</text>
+<polyline points="978,311 978,354 181,354 181,281" fill="none" stroke="#087e75" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="181.00,281.00 184.50,289.29 177.50,289.29" fill="#087e75"/>
+<text x="580" y="346" fill="#087e75" font-size="14" font-weight="400" text-anchor="middle">Measured feedback closes the loop</text>
+<rect x="820" y="115" width="316" height="70" rx="8" fill="#f7f9fc" stroke="#dce2e9" stroke-width="1.4"/>
+<rect x="820" y="115" width="4" height="70" rx="0" fill="#d97706" stroke="#d97706" stroke-width="1.4"/>
+<text x="838" y="143" fill="#172331" font-size="19" font-weight="600" text-anchor="start">Operator STOP</text>
+<text x="838" y="166" fill="#627183" font-size="14" font-weight="400" text-anchor="start">Independent of model inference</text>
+<polyline points="978,185 978,241" fill="none" stroke="#d97706" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="978.00,241.00 974.50,232.71 981.50,232.71" fill="#d97706"/>
+<rect x="24" y="395" width="712" height="124" rx="8" fill="#f8fafc" stroke="#dce2e9" stroke-width="1.4"/>
+<text x="46" y="429" fill="#172331" font-size="20" font-weight="600" text-anchor="start">Verified recording</text>
+<text x="46" y="460" fill="#627183" font-size="17" font-weight="400" text-anchor="start">Raw video · measured joints · model predictions · sent commands</text>
+<text x="46" y="489" fill="#627183" font-size="16" font-weight="400" text-anchor="start">Record identity + timestamps bind every stream to the trial.</text>
+<polyline points="180,354 180,395" fill="none" stroke="#d97706" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="180.00,395.00 176.50,386.71 183.50,386.71" fill="#d97706"/>
+<polyline points="973,311 1138,311 1138,554 756,554 756,455 736,455" fill="none" stroke="#d97706" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="736.00,455.00 744.29,451.50 744.29,458.50" fill="#d97706"/>
+<rect x="820" y="409" width="316" height="70" rx="8" fill="#f7f9fc" stroke="#dce2e9" stroke-width="1.4"/>
+<rect x="820" y="409" width="4" height="70" rx="0" fill="#2563eb" stroke="#2563eb" stroke-width="1.4"/>
+<text x="838" y="437" fill="#172331" font-size="19" font-weight="600" text-anchor="start">Replay + human review</text>
+<text x="838" y="460" fill="#627183" font-size="14" font-weight="400" text-anchor="start">Check outcome and failure evidence</text>
+<polyline points="736,455 820,455" fill="none" stroke="#d97706" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="820.00,455.00 811.71,458.50 811.71,451.50" fill="#d97706"/>
+<polyline points="978,479 978,579 579,579" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 5"/>
+<polygon points="579.00,579.00 587.29,575.50 587.29,582.50" fill="#7c3aed"/>
+<text x="24" y="585" fill="#7c3aed" font-size="13" font-weight="600" text-anchor="start">PLANNED</text>
+<text x="117" y="585" fill="#7c3aed" font-size="17" font-weight="400" text-anchor="start">Correction labels → dataset aggregation → retraining (DAgger)</text>
+</svg>

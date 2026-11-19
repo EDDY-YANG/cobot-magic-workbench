@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 680" role="img" aria-label="System architecture and hardware roles">
+<rect width="1160" height="680" fill="white"/>
+<style>text{font-family:Segoe UI,Arial,sans-serif}</style>
+<text x="24" y="34" font-size="14" fill="#627183" font-weight="600">SYSTEM ARCHITECTURE</text>
+<rect x="24" y="87" width="282" height="170" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>
+<text x="45" y="122" font-size="25" fill="#172331" font-weight="600">Operator PC</text>
+<g aria-label="Operator PC icon">
+<rect x="252" y="105" width="34" height="23" rx="2" fill="none" stroke="#627183" stroke-width="1.7"/>
+<polyline points="249,133 289,133 285,128 253,128 249,133" fill="none" stroke="#627183" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="265,130.5 273,130.5" fill="none" stroke="#627183" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="45" y="151" font-size="16" fill="#627183" font-weight="400">Windows + OpenSSH</text>
+<text x="45" y="187" font-size="18" fill="#172331" font-weight="600">Browser / thin client</text>
+<text x="45" y="217" font-size="15" fill="#627183" font-weight="400">Inspect · choose · start · stop</text>
+<rect x="412" y="87" width="282" height="170" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>
+<text x="433" y="122" font-size="25" fill="#172331" font-weight="600">GPU host</text>
+<g aria-label="GPU host icon">
+<rect x="646" y="100" width="26" height="38" rx="3" fill="none" stroke="#627183" stroke-width="1.7"/>
+<circle cx="659" cy="111" r="6" fill="none" stroke="#627183" stroke-width="1.7"/>
+<polyline points="653,126 665,126" fill="none" stroke="#627183" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="653,131 665,131" fill="none" stroke="#627183" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="659" cy="111" r="1.4" fill="none" stroke="#627183" stroke-width="1.7"/>
+</g>
+<text x="433" y="151" font-size="16" fill="#627183" font-weight="400">RTX 4090 + Ubuntu</text>
+<text x="433" y="187" font-size="18" fill="#172331" font-weight="600">Web, API and inference</text>
+<text x="433" y="217" font-size="15" fill="#627183" font-weight="400">Releases, weights and jobs</text>
+<polyline points="306,171 412,171" fill="none" stroke="#2563eb" stroke-width="2"/>
+<polygon points="412,171 403.71045105397405,174.50476508077784 403.71045105397405,167.49523491922216" fill="#2563eb"/>
+<text x="339" y="155" font-size="15" fill="#2563eb" font-weight="600">SSH</text>
+<text x="320" y="196" font-size="13" fill="#627183" font-weight="400">LAN / VPN</text>
+<rect x="412" y="356" width="282" height="174" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>
+<text x="433" y="391" font-size="23" fill="#172331" font-weight="600">Robot computer</text>
+<g aria-label="Robot computer icon">
+<rect x="639" y="381" width="40" height="23" rx="4" fill="none" stroke="#627183" stroke-width="1.7"/>
+<polyline points="644,381 649,374 671,374 676,381" fill="none" stroke="#627183" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="646" y="390" width="8" height="5" rx="1" fill="none" stroke="#627183" stroke-width="1.7"/>
+<rect x="659" y="390" width="8" height="5" rx="1" fill="none" stroke="#627183" stroke-width="1.7"/>
+<circle cx="673" cy="393" r="1" fill="none" stroke="#627183" stroke-width="1.7"/>
+</g>
+<text x="433" y="419" font-size="16" fill="#627183" font-weight="400">AgileX NUC</text>
+<text x="433" y="454" font-size="18" fill="#172331" font-weight="600">Shared device agent</text>
+<text x="433" y="482" font-size="14" fill="#627183" font-weight="400">Local control + camera / CAN</text>
+<polyline points="552,257 552,356" fill="none" stroke="#087e75" stroke-width="2"/>
+<polygon points="552,356 548.4952349192222,347.71045105397405 555.5047650807778,347.71045105397405" fill="#087e75"/>
+<text x="570" y="299" font-size="15" fill="#087e75" font-weight="600">Ethernet</text>
+<text x="570" y="321" font-size="13" fill="#627183" font-weight="400">Private link</text>
+<rect x="24" y="356" width="282" height="174" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>
+<text x="45" y="391" font-size="23" fill="#172331" font-weight="600">Verified USB</text>
+<g aria-label="Verified USB icon">
+<rect x="261" y="380" width="18" height="25" rx="4" fill="none" stroke="#627183" stroke-width="1.7"/>
+<polyline points="264,380 264,369 276,369 276,380" fill="none" stroke="#627183" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="268,373 268,376" fill="none" stroke="#627183" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="272,373 272,376" fill="none" stroke="#627183" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="270" cy="396" r="2" fill="none" stroke="#627183" stroke-width="1.7"/>
+</g>
+<text x="45" y="419" font-size="16" fill="#627183" font-weight="400">Trial-bound recording</text>
+<text x="45" y="454" font-size="17" fill="#172331" font-weight="600">Video + measured joints</text>
+<text x="45" y="482" font-size="14" fill="#627183" font-weight="400">Predictions + sent commands</text>
+<polyline points="412,444 306,444" fill="none" stroke="#d97706" stroke-width="2"/>
+<polygon points="306,444 314.28954894602595,440.4952349192221 314.28954894602595,447.5047650807779" fill="#d97706"/>
+<text x="333" y="428" font-size="14" fill="#d97706" font-weight="600">Save</text>
+<rect x="769" y="87" width="367" height="508" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>
+<text x="790" y="122" font-size="25" fill="#172331" font-weight="600">COBOT MAGIC</text>
+<text x="790" y="151" font-size="15" fill="#627183" font-weight="400">Four-arm mobile platform</text>
+<rect x="791" y="185" width="322" height="85" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>
+<text x="807" y="220" font-size="19" fill="#172331" font-weight="600">Leader arms</text>
+<text x="807" y="247" font-size="14" fill="#627183" font-weight="400">Human demonstrations</text>
+<rect x="791" y="295" width="322" height="85" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>
+<text x="807" y="330" font-size="19" fill="#172331" font-weight="600">Follower arms</text>
+<text x="807" y="357" font-size="14" fill="#627183" font-weight="400">Local device commands</text>
+<rect x="791" y="405" width="322" height="85" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>
+<text x="807" y="440" font-size="19" fill="#172331" font-weight="600">Cameras + mobile base</text>
+<text x="807" y="467" font-size="14" fill="#627183" font-weight="400">Installed platform hardware</text>
+<text x="790" y="555" font-size="16" fill="#172331" font-weight="600">Whole-machine reference</text>
+<text x="790" y="579" font-size="12" fill="#627183" font-weight="400">Official upstream asset linked separately</text>
+<polyline points="694,444 769,444" fill="none" stroke="#087e75" stroke-width="2"/>
+<polygon points="769,444 760.710451053974,447.5047650807779 760.710451053974,440.4952349192221" fill="#087e75"/>
+<text x="706" y="423" font-size="13" fill="#087e75" font-weight="600">CAN</text>
+<text x="701" y="471" font-size="12" fill="#627183" font-weight="400">Cameras</text>
+<text x="24" y="610" font-size="15" fill="#627183" font-weight="400">Software roles and physical data links</text>
+<text x="24" y="640" font-size="14" fill="#627183" font-weight="400">Reference diagram; not a calibrated geometric model.</text>
+</svg>

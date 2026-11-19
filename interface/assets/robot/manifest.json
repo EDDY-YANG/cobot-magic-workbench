@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "model": "AgileX PiPER (official ROS description; mounted rig correspondence not yet verified)",
+  "upstream": "https://github.com/agilexrobotics/piper_ros",
+  "commit": "ac41fcbcdda598f01b51cf6175ed9a24d0dacadc",
+  "urdf": "piper_description.urdf",
+  "mesh_package": "piper_description",
+  "mesh_directory": "meshes",
+  "coordinate_convention": "URDF SI meters/radians; base Z up; RPY fixed-axis roll-pitch-yaw; joint axis in joint local frame. Degrees are converted to radians only for joint position.",
+  "firmware_note": "Official default URDF for firmware >= S-V1.6-3. Local historical audit reports S-V1.7-3, not a live firmware or calibration validation.",
+  "model_match_verified": false,
+  "collision_validated": false,
+  "joint_order": [
+    "joint1",
+    "joint2",
+    "joint3",
+    "joint4",
+    "joint5",
+    "joint6"
+  ],
+  "gripper_joints": [
+    "joint7",
+    "joint8"
+  ],
+  "gripper_mapping": "candidate symmetric half opening from measured width, meters; physical mapping not yet verified",
+  "licenses": [
+    "LICENSE-piper_ros.txt",
+    "vendor/LICENSE-three.txt"
+  ],
+  "files": [
+    {
+      "path": "piper_description.urdf",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/urdf/piper_description.urdf",
+      "sha256": "c1a5c29ae9b91160557ed02bddd47365a71f0eb1653abb4997eb34f124021486",
+      "bytes": 13435,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "LICENSE-piper_ros.txt",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/LICENSE",
+      "sha256": "e32d78fd3761052ab0b2bb42fef8a7a9ad3f298d315d305333c349d2aff1f134",
+      "bytes": 1065,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/base_link.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/base_link.STL",
+      "sha256": "fd4a3d6d0266205fe3f725f048645be66592c23564db22e08b0807d5569b2c64",
+      "bytes": 607384,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/gripper_base.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/gripper_base.STL",
+      "sha256": "2895bfa6f1eef2d0ad2cb9dfdedd5f6c760ec07388bcde2b4d1e412e1189c9cb",
+      "bytes": 649484,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/link1.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/link1.STL",
+      "sha256": "9ee6e1d67c0241f42a0dbaf5c676d19230375ed078ee1943bb8c4c37ab303d14",
+      "bytes": 447784,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/link2.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/link2.STL",
+      "sha256": "0d37675b699b643f2e15348de99aed535fac10dc5f09a79b8e4b0acfaf4e0378",
+      "bytes": 3658384,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/link3.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/link3.STL",
+      "sha256": "e8ae51f17c0c7f6d67b753922e2cc269f5e8372a65734f859231639a64fe8fad",
+      "bytes": 1845784,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/link4.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/link4.STL",
+      "sha256": "efa33022976218f246f736a6133494b5d0e5486e8b50b52900c42f285ae85558",
+      "bytes": 877984,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/link5.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/link5.STL",
+      "sha256": "a1c69d1c7f6f8c60e2c82331c0f444725200ed4053d3e5ec23aa82cb5db5b29f",
+      "bytes": 833684,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/link6.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/link6.STL",
+      "sha256": "88374973bc3bd9e7389b5853cd6e555af9731c30b658b1ee6f85be34a126cb92",
+      "bytes": 58884,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/link7.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/link7.STL",
+      "sha256": "475a7d8db056524d7659fadf5a2c307d62791047b6214d733dfc7846ed1c613d",
+      "bytes": 104384,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "meshes/link8.STL",
+      "source": "https://raw.githubusercontent.com/agilexrobotics/piper_ros/ac41fcbcdda598f01b51cf6175ed9a24d0dacadc/src/piper_description/meshes/link8.STL",
+      "sha256": "3f88d534a85e28a33ef7d2061adacbd1d25214aa9325f9e464aad0f9e4b74606",
+      "bytes": 104384,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "vendor/three.module.js",
+      "source": "https://unpkg.com/three@0.160.1/build/three.module.js",
+      "sha256": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
+      "bytes": 1272972,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "vendor/OrbitControls.js",
+      "source": "https://unpkg.com/three@0.160.1/examples/jsm/controls/OrbitControls.js",
+      "sha256": "1a26c7e8e7ac703a81f1938902eebf45c0ceecf4c6012dda11f90582064e8a4e",
+      "bytes": 30985,
+      "local_import_rewrite": true
+    },
+    {
+      "path": "vendor/STLLoader.js",
+      "source": "https://unpkg.com/three@0.160.1/examples/jsm/loaders/STLLoader.js",
+      "sha256": "3b4bcbccae8ea29cb31202ff2d8900dbd36be7e7eb763b17b8a0c0b9f2ed181e",
+      "bytes": 10041,
+      "local_import_rewrite": true
+    },
+    {
+      "path": "vendor/LICENSE-three.txt",
+      "source": "https://unpkg.com/three@0.160.1/LICENSE",
+      "sha256": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
+      "bytes": 1081,
+      "local_import_rewrite": false
+    },
+    {
+      "path": "vendor/TransformControls.js",
+      "source": "https://unpkg.com/three@0.160.1/examples/jsm/controls/TransformControls.js",
+      "sha256": "aafcd1f4b92066e1955281a2227fc6db1ace9d0ce9e87e0f701055ef351e7640",
+      "bytes": 40585,
+      "local_import_rewrite": true
+    }
+  ]
+}
