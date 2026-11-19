@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 480" role="img" aria-label="Operator workflow from connection to recorded trial review">
+<style>text{font-family:Segoe UI,Arial,sans-serif}</style>
+<rect width="100%" height="100%" fill="white"/>
+<text x="24" y="34" fill="#627183" font-size="14" font-weight="600" text-anchor="start">OPERATOR WORKFLOW</text>
+<rect x="24" y="90" width="316" height="126" rx="8" fill="#fbfcfe" stroke="#dce2e9" stroke-width="1.4"/>
+<text x="46" y="125" fill="#172331" font-size="23" font-weight="600" text-anchor="start">Connect</text>
+<text x="46" y="159" fill="#627183" font-size="17" font-weight="400" text-anchor="start">SSH + host identity</text>
+<text x="46" y="188" fill="#627183" font-size="15" font-weight="400" text-anchor="start">PC → GPU host → robot</text>
+<rect x="422" y="90" width="316" height="126" rx="8" fill="#fbfcfe" stroke="#dce2e9" stroke-width="1.4"/>
+<text x="444" y="125" fill="#172331" font-size="23" font-weight="600" text-anchor="start">Inspect</text>
+<text x="444" y="159" fill="#627183" font-size="17" font-weight="400" text-anchor="start">CAN, cameras, feedback</text>
+<text x="444" y="188" fill="#627183" font-size="15" font-weight="400" text-anchor="start">Verified USB + active owner</text>
+<rect x="820" y="90" width="316" height="126" rx="8" fill="#fbfcfe" stroke="#dce2e9" stroke-width="1.4"/>
+<text x="842" y="125" fill="#172331" font-size="23" font-weight="600" text-anchor="start">Choose</text>
+<text x="842" y="159" fill="#627183" font-size="17" font-weight="400" text-anchor="start">Teleoperation or policy</text>
+<text x="842" y="188" fill="#627183" font-size="15" font-weight="400" text-anchor="start">Task, route, checkpoint</text>
+<rect x="820" y="285" width="316" height="126" rx="8" fill="#fbfcfe" stroke="#dce2e9" stroke-width="1.4"/>
+<text x="842" y="320" fill="#172331" font-size="23" font-weight="600" text-anchor="start">Validate &amp; start</text>
+<text x="842" y="354" fill="#627183" font-size="17" font-weight="400" text-anchor="start">Fresh state + operator action</text>
+<text x="842" y="383" fill="#627183" font-size="15" font-weight="400" text-anchor="start">One trial, one recording</text>
+<rect x="422" y="285" width="316" height="126" rx="8" fill="#fbfcfe" stroke="#dce2e9" stroke-width="1.4"/>
+<text x="444" y="320" fill="#172331" font-size="23" font-weight="600" text-anchor="start">Record &amp; stop</text>
+<text x="444" y="354" fill="#627183" font-size="17" font-weight="400" text-anchor="start">Observe progress</text>
+<text x="444" y="383" fill="#627183" font-size="15" font-weight="400" text-anchor="start">STOP remains available</text>
+<rect x="24" y="285" width="316" height="126" rx="8" fill="#fbfcfe" stroke="#dce2e9" stroke-width="1.4"/>
+<text x="46" y="320" fill="#172331" font-size="23" font-weight="600" text-anchor="start">Review &amp; iterate</text>
+<text x="46" y="354" fill="#627183" font-size="17" font-weight="400" text-anchor="start">Replay + quality checks</text>
+<text x="46" y="383" fill="#627183" font-size="15" font-weight="400" text-anchor="start">Save a versioned result</text>
+<polyline points="340,153 422,153" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="422.00,153.00 413.71,156.50 413.71,149.50" fill="#2563eb"/>
+<polyline points="738,153 820,153" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="820.00,153.00 811.71,156.50 811.71,149.50" fill="#2563eb"/>
+<polyline points="978,216 978,285" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="978.00,285.00 974.50,276.71 981.50,276.71" fill="#2563eb"/>
+<polyline points="820,348 738,348" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="738.00,348.00 746.29,344.50 746.29,351.50" fill="#2563eb"/>
+<polyline points="422,348 340,348" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polygon points="340.00,348.00 348.29,344.50 348.29,351.50" fill="#2563eb"/>
+<polyline points="181,285 181,254 580,254 580,216" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 5"/>
+<polygon points="580.00,216.00 583.50,224.29 576.50,224.29" fill="#7c3aed"/>
+<text x="380" y="244" fill="#7c3aed" font-size="14" font-weight="400" text-anchor="middle">Inspect again after a change</text>
+<text x="24" y="454" fill="#627183" font-size="16" font-weight="400" text-anchor="start">A failed condition returns to inspection; a new action requires a fresh request.</text>
+</svg>

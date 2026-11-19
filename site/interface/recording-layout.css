@@ -1,0 +1,89 @@
+/* Recording ergonomics only. No new control states or camera producers. */
+#page-teleop.capture-layout-ready { --capture-sticky-top: 84px; }
+#page-teleop.capture-layout-ready .page-heading.emerge-heading { display:flex; flex-wrap:wrap; gap:12px; margin-bottom:14px; padding:0; }
+#page-teleop.capture-layout-ready .page-heading > div:first-child { flex:1 1 380px; }
+#page-teleop.capture-layout-ready .page-heading h1 { font-size:24px; margin:4px 0; }
+#page-teleop.capture-layout-ready .page-heading .emerge-life { display:none; }
+#page-teleop.capture-layout-ready .page-heading p { font-size:10px; }
+#page-teleop.capture-layout-ready .page-readiness { padding:10px 12px; margin:10px 0 14px; }
+.topbar-right .capture-focus-button { flex-shrink:0; font-size:11px; padding:7px 10px; min-height:34px; }
+.capture-live-workspace { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,350px); gap:18px; align-items:start; scroll-margin-top:var(--capture-sticky-top); }
+.capture-camera-rail { position:sticky; top:var(--capture-sticky-top); min-width:0; align-self:start; }
+.capture-rail-title { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:0 0 10px; font-size:13px; }
+.capture-rail-title span { color:#555; font-size:10px; }
+#page-teleop .capture-camera-rail .camera-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:10px; }
+#page-teleop .capture-camera-rail .camera-heading { padding:10px 11px; gap:6px; }
+#page-teleop .capture-camera-rail .camera-heading b { font-size:12px; }
+#page-teleop .capture-camera-rail .camera-heading span { font-size:9px; }
+#page-teleop .capture-camera-rail .camera-frame { max-height:min(360px,calc(100dvh - var(--capture-sticky-top) - 145px)); min-height:125px; }
+#page-teleop .capture-camera-rail .camera-footer { padding:7px 10px; font-size:8px; }
+#page-teleop .capture-camera-rail .camera-empty { gap:5px; font-size:24px; }
+#page-teleop .capture-camera-rail .camera-empty span { font-size:10px; }
+.capture-extra-camera { margin:0 0 10px; }
+.capture-extra-camera .camera-panel { max-width:420px; margin:8px 0 0; }
+#page-teleop .capture-camera-rail .collection-progress { margin:10px 0 0; padding:11px 13px; }
+#page-teleop .capture-camera-rail .collection-counts { grid-template-columns:repeat(4,minmax(0,1fr)); margin-top:8px; gap:7px; }
+#page-teleop .capture-camera-rail .collection-counts span { min-width:0; }
+#page-teleop .capture-camera-rail .collection-progress .footnote { font-size:9px; margin:6px 0 0; }
+#page-teleop .capture-camera-rail .collection-progress progress { margin:7px 0; }
+#page-teleop .capture-recording-console { position:sticky; top:var(--capture-sticky-top); padding:0; min-width:0; display:flex; flex-direction:column; max-height:calc(100dvh - var(--capture-sticky-top) - 12px); overflow:hidden; }
+.capture-action-deck { background:#fff; flex:0 0 auto; padding:13px 14px 10px; border-bottom:2px solid #111; }
+#page-teleop .capture-action-deck .panel-title { gap:8px; margin:0; padding-bottom:8px; align-items:center; }
+#page-teleop .capture-action-deck h2 { font-size:14px; }
+#page-teleop .capture-action-deck #recording-state { font-size:9px; max-width:60%; white-space:normal; text-align:right; }
+.capture-timer-row { display:flex; align-items:center; justify-content:space-between; margin:7px 0; color:#555; font-size:10px; }
+#page-teleop .capture-timer-row .recording-timer { padding:0; font-size:22px; line-height:1.25; color:#111; letter-spacing:1px; }
+.capture-trial-fields { display:grid; grid-template-columns:110px minmax(0,1fr); gap:9px; }
+.capture-trial-field { min-width:0; }
+#page-teleop .capture-trial-field .field-label { margin:3px 0 5px; font-size:9px; }
+#page-teleop .capture-trial-field input,#page-teleop .capture-trial-field select { min-width:0; padding:7px; font-size:10px; color-scheme:light; }
+.capture-primary-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; margin-top:11px; }
+#page-teleop .capture-primary-actions .button { margin:0; width:100%; padding:9px 6px; min-height:35px; font-size:10px; white-space:normal; line-height:1.35; }
+#page-teleop .capture-primary-actions #record-start,#page-teleop .capture-primary-actions #collection-record-stop { min-height:44px; font-size:13px; font-weight:700; }
+#page-teleop .capture-primary-actions #collection-record-stop { border-width:2px; }
+#page-teleop .capture-action-deck #collection-recording-detail { margin:8px 0 6px; font-size:9px; line-height:1.5; max-height:4.5em; overflow:auto; }
+#page-teleop .capture-critical-stats { margin:5px 0 0; }
+#page-teleop .capture-critical-stats > div { padding:4px 0; grid-template-columns:76px minmax(0,1fr); font-size:9px; }
+#page-teleop .capture-critical-stats dd { max-height:3.2em; overflow:auto; }
+.capture-settings-scroll { flex:0 0 auto; min-height:0; padding:9px 13px; }
+.capture-open-setup { width:100%; min-height:34px; font-size:11px; }
+.capture-setup-dialog { width:min(620px,calc(100vw - 36px)); max-height:calc(100dvh - 40px); padding:0; background:#fff; color:#111; border:2px solid #111; overflow:auto; }
+.capture-setup-dialog::backdrop { background:rgba(0,0,0,.35); }
+.capture-setup-header { position:sticky; top:0; z-index:1; display:flex; justify-content:space-between; align-items:center; gap:15px; background:#fff; padding:15px 18px; border-bottom:1px solid #111; }
+.capture-setup-header h2 { margin:0; font-size:17px; }
+.capture-setup-dialog .capture-session-settings { padding:0 20px 20px; border:0; }
+.capture-setup-dialog .footnote { font-size:11px; line-height:1.7; }
+.capture-setup-dialog .button-row { flex-wrap:wrap; }
+.capture-setup-dialog .field-label { margin:14px 0 6px; }
+.capture-extra-stats > .collection-live-stats { padding:8px 16px; }
+.capture-disclosure { min-width:0; background:#fff; border:1px solid #bbb; }
+.capture-disclosure > summary { padding:10px 12px; font-size:11px; font-weight:600; cursor:pointer; line-height:1.5; }
+.capture-disclosure > summary:focus-visible { outline:2px dashed #111; outline-offset:-4px; }
+.capture-disclosure[open] > summary { border-bottom:1px solid #ddd; }
+.capture-settings-scroll .footnote { font-size:9px; line-height:1.6; }
+.capture-settings-scroll .field-label { margin:12px 0 5px; }
+.capture-settings-scroll .collection-fields-row { gap:8px; }
+.capture-settings-scroll .button-row { gap:7px; flex-wrap:wrap; }
+.capture-settings-scroll .button { font-size:10px; padding:7px 8px; }
+.capture-settings-scroll input,.capture-settings-scroll select { padding:8px; font-size:11px; }
+.capture-secondary { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; margin-top:20px; }
+.capture-secondary .panel { border:0; margin:0; }
+#page-teleop[data-tight-capture-viewport="true"] .capture-camera-rail,#page-teleop[data-tight-capture-viewport="true"] .capture-recording-console { position:static; }
+#page-teleop[data-tight-capture-viewport="true"] .capture-recording-console { max-height:620px; }
+@media(min-width:1700px) { .capture-live-workspace { grid-template-columns:minmax(0,1fr) 380px; } }
+@media(max-width:1050px) {
+  .capture-live-workspace { grid-template-columns:minmax(0,1fr) 300px; gap:12px; }
+  .capture-rail-title { align-items:flex-start; flex-direction:column; gap:2px; }
+  #page-teleop .capture-camera-rail .collection-counts { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .capture-action-deck { padding:10px; }
+}
+@media(max-width:780px) {
+  .topbar-right .capture-focus-button { display:none; }
+  .capture-live-workspace { grid-template-columns:minmax(0,1fr); }
+  .capture-camera-rail { position:static; }
+  #page-teleop .capture-recording-console { position:static; max-height:650px; }
+  #page-teleop .capture-camera-rail .camera-frame { max-height:220px; min-height:100px; }
+  #page-teleop .capture-camera-rail .camera-grid { gap:8px; }
+  #page-teleop .capture-action-deck .panel-title { flex-wrap:nowrap; }
+  .capture-primary-actions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}

@@ -1,0 +1,10 @@
+[project]
+name = "tiger-agilex-unified-control"
+version = "0.1.0"
+description = "Explicit USB-backed Piper control, shared sensors and authentic pi0.5 inference"
+requires-python = ">=3.11"
+dependencies = []
+
+# This describes the source library; do not pip install it into the OEM environment.
+# Robot commands use the two existing absolute interpreter paths in config.json.
+# Standard-library transport on Windows; runtime imports are scoped to each command.

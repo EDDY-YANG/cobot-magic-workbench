@@ -1,0 +1,8 @@
+{
+  "schema": "agilex-client-config-v1",
+  "ssh_target": "agilex-server",
+  "ssh_config": "~/.ssh/config",
+  "remote_port": 8910,
+  "local_port": 8875,
+  "ssh_executable": "ssh"
+}

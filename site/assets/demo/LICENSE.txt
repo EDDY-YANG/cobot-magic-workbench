@@ -1,0 +1,5 @@
+Recorded demo export: Creative Commons Attribution 4.0 International (CC BY 4.0).
+Copyright 2026 Yang Taige, Ye Hanzhi / Emerge Robotics.
+https://creativecommons.org/licenses/by/4.0/
+Credit the authors and project, link this license, and indicate modifications.
+PiPER geometry used in the kinematic render remains under its upstream MIT license (Copyright 2024 RosenYin).

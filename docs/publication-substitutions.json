@@ -1,0 +1,105 @@
+{
+  "purpose": "Documentation example paths replace installation-specific values. Rebind on each installation; no runtime PASS distributed.",
+  "files": [
+    {
+      "file": "lab_stack/2026-10-06-14-05-agilex.py",
+      "source_sha256": "68fe024ec3b772634b2a1d67d3d81d2433d9cc68ef60f879bb2fe6d0c5927d05",
+      "public_sha256": "375e906a421cd5f168374da9fd206b0a08b4a075d3596ceae9903be1ad8bf4d4"
+    },
+    {
+      "file": "lab_stack/agilex_control/precision_services.py",
+      "source_sha256": "d63b8d4cbaaa74cef85a53afedf42c584bc69c8ec64170accb9b410cc9a0ca67",
+      "public_sha256": "f5c63af94626a83bca97ee3a75e9e5cccfaec1654304e76acfbaeab8a830ea4b"
+    },
+    {
+      "file": "lab_stack/agilex_control/v2_web_services.py",
+      "source_sha256": "652d7d38064dbacb61d078806f6b2f0c431bd3c3ae55288ca4ed5b373a74a8c7",
+      "public_sha256": "b66b17f4b8b25b3d9d5445440d791bc9b3af3919cbf72fac0700a2fa08ea8ff9"
+    },
+    {
+      "file": "controllers/realtime_v2/scripts/prepare_apply_environment.py",
+      "source_sha256": "6bcc79f7a21067787665000e0ded427c6c8a35153b2a6e66e89d6232a04e8d7f",
+      "public_sha256": "f1416647960e26d16e589ab2438371e0b5c01c35b0e69ea4cc58355ca16a4794"
+    },
+    {
+      "file": "controllers/realtime_v2/scripts/prepare_robot_environment.py",
+      "source_sha256": "fa11973706f1912173d09e037a0d68febb4f5963535ac830366f44a5a445d0b5",
+      "public_sha256": "32ec545a17e81f4c6bd1fc96dc7ef27e3e9b47285490d1e0ae32be5571d260e8"
+    },
+    {
+      "file": "controllers/realtime_v2/scripts/prepare_server_environment.py",
+      "source_sha256": "63ed80ed3e2e91172db958ae56bbef8a47e2458894892708063b67d534d8b0e5",
+      "public_sha256": "3d70226d7c730c3bc15f5eb3a4edb0c90d01a065b83ce11260cb5aa33920919d"
+    },
+    {
+      "file": "inference/bf16/CODEX_HANDOFF.md",
+      "source_sha256": "cdadd051970cb38b5daa603c2db3919ba54090288d12d8d95d0b99912a23a160",
+      "public_sha256": "9bded5775dc3037f52a7151a87f337cd951fce8fe30478ec8368ac233ba3ca88"
+    },
+    {
+      "file": "inference/bf16/README.md",
+      "source_sha256": "709342727882f0baefc26c0ee3a1b0395dc81b194d2eb01115970a59c193fa02",
+      "public_sha256": "d36b03847cd3f3ecd775684ce479310c742ce0a3d97f903d76cb8a45b6132bba"
+    },
+    {
+      "file": "inference/bf16/frozen/fp32_loader.py",
+      "source_sha256": "a1024dc360b3e79bcfde21a33f2badbf5bbdd114d2a8379dbd943a999e882ba4",
+      "public_sha256": "775c1dce4d249cc885ff4599a3753e17b56ac66c873fc477e67002a77f575f5e"
+    },
+    {
+      "file": "inference/bf16/frozen/production_launch_supervisor.py",
+      "source_sha256": "17c10a33491f765e0ccd5a04fc976ae8f026290df0873611db54975baf8e4882",
+      "public_sha256": "97098ba628d35febac2aaab8981915874a0fd85aab0ae7ffc54dc1ea7b7c74c0"
+    },
+    {
+      "file": "inference/bf16/frozen/production_model_supervisor.py",
+      "source_sha256": "5b735103daa14a2a065db3ea7b361b844301ed7926ddd704cab55352bd9b7cb8",
+      "public_sha256": "4a1c996e06cf66f2e0fb043c6d136e71c85011181073c4bc2bd00989dfdc3547"
+    },
+    {
+      "file": "inference/bf16/frozen/production_supervisor_control.py",
+      "source_sha256": "50d8cb5214216bb38e8df6b39abc501605b2e1c6bb5902b2f4548124255396c9",
+      "public_sha256": "346978a9bb0dde87c87464ff0641465df096f1035b7c26fd1258ead8b823dc3e"
+    },
+    {
+      "file": "inference/bf16/frozen/production_worker_entry.py",
+      "source_sha256": "ef834e2a766f92c226312d15717bb7c2d3662c0fdef79cd538cd19e18d2ed21d",
+      "public_sha256": "bef5a86f4b8cef0b46ca489635f9550ac56b2edb7404082ccb91069ca59aeea9"
+    },
+    {
+      "file": "inference/bf16/frozen/run_gpu_window.py",
+      "source_sha256": "49f3597a878fa4edd7b698dd54bbe297b038a3043fcf3d1c7644c23fcaa68196",
+      "public_sha256": "5a57bf0e721c5612b745bde77e33cf75ba06c30e196067ef72ceb9ed6fbace95"
+    },
+    {
+      "file": "inference/bf16/service/backend.py",
+      "source_sha256": "2a2acfe2d62550121f3630b2ea1afd999cc2bc055f6cc61b149bd75dd7e80d82",
+      "public_sha256": "05e89525fb4059deadc7e9a8fcd1e4d20fbce68ff6c5a73140ad1eda85fc49cb"
+    },
+    {
+      "file": "inference/fp32/launch_supervisor.py",
+      "source_sha256": "17c10a33491f765e0ccd5a04fc976ae8f026290df0873611db54975baf8e4882",
+      "public_sha256": "97098ba628d35febac2aaab8981915874a0fd85aab0ae7ffc54dc1ea7b7c74c0"
+    },
+    {
+      "file": "inference/fp32/model_supervisor.py",
+      "source_sha256": "5b735103daa14a2a065db3ea7b361b844301ed7926ddd704cab55352bd9b7cb8",
+      "public_sha256": "4a1c996e06cf66f2e0fb043c6d136e71c85011181073c4bc2bd00989dfdc3547"
+    },
+    {
+      "file": "inference/fp32/prepare_supervisor.py",
+      "source_sha256": "b1a4742ad6903f3b3c147c15c4771c506f30402a1a993fab4ef5ac319bdd4439",
+      "public_sha256": "7e1c6c461095520b14fe78b47cd41a34ffdafc096b4e20d444c62b1b3bf927ef"
+    },
+    {
+      "file": "inference/fp32/supervisor_control.py",
+      "source_sha256": "50d8cb5214216bb38e8df6b39abc501605b2e1c6bb5902b2f4548124255396c9",
+      "public_sha256": "346978a9bb0dde87c87464ff0641465df096f1035b7c26fd1258ead8b823dc3e"
+    },
+    {
+      "file": "inference/fp32/worker_entry.py",
+      "source_sha256": "ef834e2a766f92c226312d15717bb7c2d3662c0fdef79cd538cd19e18d2ed21d",
+      "public_sha256": "bef5a86f4b8cef0b46ca489635f9550ac56b2edb7404082ccb91069ca59aeea9"
+    }
+  ]
+}

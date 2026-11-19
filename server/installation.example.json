@@ -1,0 +1,28 @@
+{
+  "schema": "agilex-installation-v1",
+  "legacy_root": "<absolute path to reviewed legacy control source>",
+  "legacy_launcher_root": "<absolute path to reviewed legacy launcher source>",
+  "timeqp_root": "<absolute path to reviewed TimeQP runtime>",
+  "expected_host": "<verified management hostname>",
+  "expected_robot_host": "<verified robot hostname>",
+  "robot_ssh_alias": "<existing pinned SSH alias>",
+  "server_origin": "http://127.0.0.1:8910",
+  "legacy_origin": "http://127.0.0.1:8873",
+  "expected_timeqp_implementation": "<reviewed 64 character implementation SHA256>",
+  "approved_sources": {
+    "launcher": {
+      "local_backend.py": "<SHA256>",
+      "boot_binding_startup.py": "<SHA256>",
+      "boot_rebind_remote.py": "<SHA256>",
+      "boot_rebind_inspector.py": "<SHA256>"
+    },
+    "legacy": {
+      "agilex_control/<each py or json file>": "<SHA256>"
+    },
+    "timeqp": {
+      "src/<each py or json file>": "<SHA256>",
+      "scripts/<each py or json file>": "<SHA256>",
+      "vendor/<each py or json file>": "<SHA256>"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "official_repo": "https://github.com/dexmal/realtime-vla-v2",
+  "official_commit": "a36d02a7b241de1129af2048e749de58f95ead9c",
+  "sha256": {
+    "bootstrap_alignment.py": "fb5630fab27f7afb0a404fd0b5b2b31b7d842ad5615ac6862a8b5b476164098a",
+    "client_time_queue.py": "14dacc5776897711979516a65843006f44b9492be1005943eed5eaba57ce2b91",
+    "pinned_components.py": "2fadbab24fad437a4df49595926527a1d3718641aa1fe133f49e25b8c19802f8",
+    "portable_backend.py": "05e34ffc2518cdf92cf12fcba33df8936a0a2c658e130b4a8482a6416b72c364",
+    "frozen/bootstrap_alignment.py": "f82856767c3fba388cdb9db56161d3db2d8d1e8015ff48a133ee2bcca672a768",
+    "frozen/client_time_queue.py": "bbf8a51bff32b2095c5a6ba3ac520d46ea62370e695389f4774c50a6473114f0",
+    "frozen/command_limits.py": "b1077442980b89addefa4d316fc13a70b96567464557171091ac372efb647c6f",
+    "frozen/executor.py": "0868ea33399d6492fb3d154cfdd060214065364aebddd74c9d365ce26d25d121",
+    "frozen/frozen_rtc_core.py": "5f2a4f959f3d72991d04bda0c6198861636bb6f7022dfa33dd26f4f10d8759e4",
+    "frozen/LICENSE": "00bc280d800dce50bd7b2ab54bb4216d2101f521039c643509d950d00219f7c4",
+    "frozen/official_backend.py": "1e589ae48a6ec12851d47772a579c13fbb16b501c7559f09386120e258a60feb",
+    "frozen/optimizer.py": "63028ebfecb8093a22f5c4b78a7d2f8ebd64850eed31c518cb2ea89b7ecdcb81"
+  },
+  "modifications": {
+    "client_time_queue.py": "800ms result deadline; derived execution cut15 separate from model wire freeze12/known35; low water20; preserve overdue R14 request slots; frozen sources unchanged. Owned pause response draining preserves context; physical response drain is explicit; recovered R14 dispatch follows actual fresh observation without phase/state reset. Capture starts one label ahead of the nominal R14 slot; paused recovery binds a fresh observation to the frozen phase and requires the full existing RTC prefix.",
+    "bootstrap_alignment.py": "Portable imports/live response binding and optional fixed-instance remote TimeQP factory; official math/parameters unchanged. Original in frozen/. First result deadline follows explicit800ms client contract.",
+    "portable_backend.py": "Official classes via AST; build paths portable; NO_SEND restores actual command history after counterfactual solve; failed solves latch instead of fallback."
+  }
+}

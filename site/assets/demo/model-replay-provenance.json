@@ -1,0 +1,28 @@
+{
+  "schema": "cobot-kinematic-review-v1",
+  "engine": "MuJoCo 3.3.7",
+  "frames": 1405,
+  "fps": 30,
+  "duration_s": 46.833333333333336,
+  "q_source": "recorded-joints.json; degrees converted to radians",
+  "joints_replayed": [
+    "joint1",
+    "joint2",
+    "joint3",
+    "joint4",
+    "joint5",
+    "joint6"
+  ],
+  "joint_value_clipping": false,
+  "physics_rollout": false,
+  "contact_validated": false,
+  "gripper": "Recorded opening shown numerically; finger mapping not calibrated; source zero finger pose retained.",
+  "asset_source": "agilexrobotics/piper_ros",
+  "asset_commit": "ac41fcbcdda598f01b51cf6175ed9a24d0dacadc",
+  "license": "MIT",
+  "source_urdf_sha256": "c1a5c29ae9b91160557ed02bddd47365a71f0eb1653abb4997eb34f124021486",
+  "source_data_sha256": "f86d29b2ca532e11835011ee926b9ff08e68335f69259e688c5f8e6cb2b1c3a2",
+  "video_sha256": "8232ee0db686238102347825a0ace8d41dcb64a42483ad4bb03b5e0847708fdf",
+  "visual_model_changes": "Visual meshes retained and recolored slate for clarity; collision geoms removed for rendering; a reference ground plane and lights added.",
+  "physical_installation_mapping": "Joint-name and unit mapping only; calibrated as-built geometry not established."
+}

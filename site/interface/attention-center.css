@@ -1,0 +1,70 @@
+/* Message emphasis uses contrast, words and borders, never colour alone. */
+.attention-center { position: sticky; top: var(--attention-topbar-height, 73px); z-index: 7; margin: 0 0 16px; min-width: 0; max-height: calc(100vh - var(--attention-topbar-height, 73px)); overflow-y: auto; color: #111; background: #fff; }
+.attention-context { display: flex; align-items: flex-start; gap: 16px; padding: 13px 30px; border-bottom: 1px solid #111; }
+.attention-eyebrow { flex: 0 0 auto; display: block; margin-top: 2px; border: 1px solid #111; padding: 2px 5px; font-size: 10px; font-weight: 700; line-height: 1.5; }
+.attention-context-copy { min-width: 0; }
+.attention-context strong { display: block; font-size: 14px; line-height: 1.5; }
+.attention-context p { margin: 3px 0 0; font-size: 11px; line-height: 1.6; color: #444; overflow-wrap: anywhere; }
+.attention-context[data-kind="error"] { background: #111; color: #fff; }
+.attention-context[data-kind="error"] p { color: #eee; }
+.attention-context[data-kind="error"] .attention-eyebrow { border-color: #fff; }
+.attention-open-button { white-space: nowrap; min-height: 34px; border: 2px solid #111 !important; font-weight: 700; }
+.attention-open-button[data-urgent="true"] { color: #fff !important; background: #111 !important; }
+.attention-open-button[data-urgent="true"]::before { content: "! "; }
+.attention-banner { display: flex; align-items: center; gap: 18px; justify-content: space-between; padding: 16px 30px; border-bottom: 3px double #111; background: #f1f1f1; }
+.attention-banner-copy { min-width: 0; }
+.attention-banner-title { display: block; font-size: 17px; line-height: 1.5; overflow-wrap: anywhere; }
+.attention-banner-time { display: block; margin-top: 3px; font-size: 10px; line-height: 1.5; }
+.attention-banner-message { margin: 5px 0 0; max-height: 5.5em; overflow-y: auto; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; white-space: pre-wrap; }
+.attention-banner-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-shrink: 0; }
+.attention-banner[data-kind="error"] { background: #111; color: #fff; border: 3px solid #111; }
+.attention-banner[data-kind="error"] .button { color: #fff; background: #111; border-color: #fff; }
+.attention-banner[data-kind="error"] .attention-ack { color: #111; background: #fff; font-weight: 700; }
+.attention-banner[data-kind="warn"] { border-left: 7px solid #111; border-top: 2px dashed #111; }
+.attention-banner[data-kind="running"] { border-left: 7px double #111; }
+.attention-banner[data-kind="success"] { background: #fff; border-left: 7px solid #777; }
+.attention-read-failure { margin: 0; padding: 7px 30px; font-size: 10px; line-height: 1.6; background: #f1f1f1; border-bottom: 1px dashed #777; overflow-wrap: anywhere; }
+.attention-drawer { padding: 15px 30px 20px; border-bottom: 2px solid #111; max-height: 35vh; overflow-y: auto; overscroll-behavior: contain; }
+.attention-drawer-heading { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.attention-drawer-heading h2 { margin: 0 auto 0 0; font-size: 16px; }
+.attention-drawer-heading .button { min-height: 30px; font-size: 10px; padding: 5px 9px; }
+.attention-history-note, .attention-empty { margin: 10px 0; font-size: 11px; line-height: 1.7; color: #444; }
+.attention-message-list { list-style: none; margin: 12px 0 0; padding: 0; }
+.attention-message-item { margin: 0; padding: 11px 0; border-top: 1px solid #aaa; }
+.attention-message-row { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+.attention-message-row strong { font-size: 12px; min-width: 0; overflow-wrap: anywhere; }
+.attention-message-row time { margin-left: auto; flex: 0 0 auto; font-size: 10px; line-height: 1.8; color: #555; }
+.attention-kind { padding: 1px 4px; border: 1px solid #111; font-size: 10px; line-height: 1.5; flex: 0 0 auto; }
+.attention-message-item[data-kind="error"] .attention-kind { color: #fff; background: #111; }
+.attention-message-item > p { margin: 7px 0; font-size: 11px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.attention-message-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.attention-read-state { font-size: 10px; font-weight: 700; }
+.attention-message-item[data-read="true"] .attention-read-state { color: #666; font-weight: 400; }
+.attention-message-actions .button { padding: 3px 7px; min-height: 26px; font-size: 10px; }
+.attention-center button:focus-visible, .attention-open-button:focus-visible { outline: 2px dashed currentColor; outline-offset: 3px; }
+.page-readiness > details { margin-top: 10px; border-top: 1px dashed #999; padding-top: 7px; }
+.page-readiness > details > summary { cursor: pointer; padding: 3px 0; font-size: 11px; font-weight: 700; overflow-wrap: anywhere; }
+.page-readiness > details > summary:focus-visible { outline: 2px dashed #111; outline-offset: 2px; }
+.page-readiness > details > :not(summary) { font-size: 11px; line-height: 1.7; }
+@media (max-width: 800px) {
+  .attention-context, .attention-banner { padding: 13px 18px; }
+  .attention-drawer { padding: 14px 18px; }
+  .attention-read-failure { padding: 7px 18px; }
+}
+@media (max-width: 480px) {
+  .attention-context { gap: 9px; padding: 11px 12px; }
+  .attention-eyebrow { font-size: 9px; }
+  .attention-context strong { font-size: 12px; }
+  .attention-context p { font-size: 10px; }
+  .attention-banner { display: block; padding: 13px 12px; }
+  .attention-banner-title { font-size: 15px; }
+  .attention-banner-message { font-size: 11px; }
+  .attention-banner-actions { margin-top: 11px; }
+  .attention-banner-actions .button { min-height: 30px; font-size: 10px; }
+  .attention-open-button { padding: 4px 7px; min-height: 30px; font-size: 10px; }
+  .attention-read-failure { padding: 7px 12px; }
+  .attention-drawer { padding: 12px; }
+  .attention-message-row { flex-wrap: wrap; gap: 5px; }
+  .attention-message-row strong { flex: 1 1 65%; }
+  .attention-message-row time { width: 100%; }
+}

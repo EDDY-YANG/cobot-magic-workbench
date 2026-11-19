@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#111318">
+  <title>Emerge · AgileX 控制中心</title>
+  <link rel="stylesheet" href="/platform-assets/platform.css">
+  <script type="module" src="/platform-assets/platform.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="Emerge 控制中心首页"><span class="brand-symbol" aria-hidden="true">E</span><span>emerge<span class="brand-sub">ROBOTICS</span></span></a>
+      <div class="workspace-label">AGILEX WORKSPACE</div>
+      <nav class="navigation" aria-label="控制中心导航">
+        <a href="#overview" data-tab="overview"><span class="nav-icon" aria-hidden="true">▦</span>运行总览</a>
+        <a href="#deployment" data-tab="deployment"><span class="nav-icon" aria-hidden="true">◫</span>版本与更新</a>
+        <a href="#diagnostics" data-tab="diagnostics"><span class="nav-icon" aria-hidden="true">≡</span>状态诊断</a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-context"><span class="context-dot"></span>4090 中央管理<span>页面 · 版本 · 模型</span></div>
+      <div class="sidebar-footer"><span>控制权</span><strong>共用既有设备 owner</strong><small>PC 仅通过 SSH 访问</small></div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="breadcrumbs"><span>Emerge Robotics</span><span aria-hidden="true">/</span><strong>AgileX 控制中心</strong></div>
+        <div class="connection-info"><span id="connection-badge" class="pill neutral">等待状态</span><span id="sync-time" class="sync-time">尚未收到快照</span></div>
+      </header>
+      <main id="main-content" tabindex="-1">
+        <div class="page-heading">
+          <div><p class="eyebrow">WORKSPACE / <span id="section-number">01</span></p><h1 id="page-title">运行总览</h1><p id="page-description" class="page-description">查看当前链路与运行条件，在同一工作台继续模型和设备操作。</p></div>
+          <div class="heading-actions"><button id="refresh-button" class="button button-secondary" type="button"><span aria-hidden="true">↻</span> 刷新状态</button><a id="workbench-link" class="button button-primary" href="/workbench/#deploy" aria-disabled="true">打开模型与设备工作台 <span aria-hidden="true">↗</span></a></div>
+        </div>
+        <div id="announcement" class="screen-reader-only" aria-live="polite"></div>
+        <div id="content"><div class="loading-state"><span class="loading-line"></span><h2>正在读取 4090 状态</h2><p>尚未获得实时数据，模型、设备与验收状态均未判定。</p></div></div>
+      </main>
+      <footer class="page-footer"><span>页面与后台源自 4090 · 设备操作进入原工作台</span><span>自动刷新 1 秒 · 状态失效即标为未知</span></footer>
+    </div>
+  </div>
+  <noscript><div class="noscript">请启用 JavaScript 读取实时状态。此页面无法在脚本关闭时确认设备状态。</div></noscript>
+</body>
+</html>
