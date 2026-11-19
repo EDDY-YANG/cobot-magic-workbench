@@ -1,0 +1,117 @@
+/* Same typography, borders and monochrome vocabulary as the Emerge workbench. */
+.nav-item { text-decoration:none; color:inherit }
+.nav-item.active { color:#111 }
+.review-main { padding:26px 30px 18px; max-width:1920px; margin:auto }
+.review-heading { margin-bottom:20px; padding:0 0 6px }
+.review-heading h1 { font-size:28px; margin:5px 0 10px; letter-spacing:-.6px }
+.review-heading p { max-width:760px; margin-bottom:0 }
+.review-main .panel { margin:0; padding:20px; min-width:0 }
+.mode-tabs { display:flex; gap:0; border-bottom:1px solid #111; margin-bottom:0 }
+.mode-tab { border:1px solid transparent; border-bottom:0; background:transparent; padding:13px 23px; cursor:pointer; font-weight:600; color:#555 }
+.mode-tab.active { background:#111; border-color:#111; color:#fff }
+.mode-tab span { font:11px var(--mono); margin-left:10px; padding:2px 5px; border:1px solid #999 }
+.summary-strip { display:flex; border:1px solid #111; border-top:0; background:#fff; margin-bottom:22px; min-height:70px; align-items:stretch }
+.summary-item { padding:13px 22px; border-right:1px solid #d6d6d6; display:flex; align-items:baseline; gap:10px }
+.summary-item strong { font:24px var(--mono); font-weight:600 }
+.summary-item span { color:#555; font-size:11px }
+.summary-item:last-child { border:0; margin-left:auto; max-width:310px; align-items:center; font-size:11px; color:#555; line-height:1.7 }
+.review-layout { display:grid; grid-template-columns:294px minmax(0,1fr); gap:20px; align-items:start }
+.record-library { position:sticky; top:14px }
+.library-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px }
+.library-title h2 { font-size:15px; margin:0 }
+.mono { font-family:var(--mono) }
+.search-wrap { display:block; margin-bottom:13px }
+.review-main input:not([type=range]):not([type=checkbox]),.review-main select,.review-main textarea,dialog textarea { border:1px solid #b7b7b7; background:#fff; padding:9px 10px; border-radius:0; min-width:0; color:#111; width:100%; font:12px/1.6 var(--font) }
+.review-main input:focus,.review-main textarea:focus,.review-main select:focus { border-color:#111; outline:1px solid #111; outline-offset:1px }
+.review-main textarea { resize:vertical; display:block }
+.filter-grid { display:grid; grid-template-columns:1fr 1fr; gap:11px 10px }
+.filter-grid label,.evaluation-grid label,.taxonomy-grid label { color:#444; display:grid; gap:6px; font-size:11px }
+.filter-grid select { padding:7px 5px; font-size:11px }
+.only-pending { display:flex; align-items:center; gap:6px; margin:14px 0; font-size:11px; color:#555 }
+.record-list { max-height:660px; overflow-y:auto; margin:0 -10px; scrollbar-width:thin }
+.record-card { text-align:left; display:block; width:100%; background:#fff; border:1px solid transparent; border-bottom-color:#ddd; padding:13px 10px; cursor:pointer; font-size:11px; color:#111 }
+.record-card:hover { background:#f6f6f6 }
+.record-card.selected { border-color:#111; background:#eeeeee }
+.record-card .card-top { display:flex; justify-content:space-between; align-items:center; gap:5px; margin-bottom:5px }
+.record-card .card-time { font-weight:600; font-size:12px }
+.card-id { color:#777; margin:4px 0; font-size:10px; word-break:break-all }
+.card-bottom { display:flex; justify-content:space-between; color:#555; gap:7px; margin-top:6px; font-size:10px }
+.card-review { font-size:10px; padding:1px 4px; border:1px solid #999; flex-shrink:0; background:#fff }
+.card-review.reviewed { color:#fff; background:#111; border-color:#111 }
+.record-workspace { display:grid; gap:20px; min-width:0 }
+.record-heading { display:flex; gap:10px; justify-content:space-between; align-items:flex-start }
+.record-heading h2 { font-size:20px; margin:5px 0 6px; letter-spacing:-.5px }
+.record-heading p { margin:0; color:#555; font-size:11px }
+.record-heading .pill { flex-shrink:0; margin-top:5px }
+.task-line { font-size:12px; line-height:1.6; margin:15px 0; border-left:2px solid #111; padding-left:10px; overflow-wrap:anywhere }
+.video-topline { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 0; color:#555; font:10px var(--mono) }
+.video-topline label { display:flex; gap:7px; align-items:center; font:10px var(--font); max-width:55% }
+.review-main .video-topline select { padding:3px 6px; font:10px var(--mono); max-width:270px }
+.video-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.video-card { border:1px solid #111; background:#131313; min-width:0; overflow:hidden; position:relative }
+.video-label { display:flex; justify-content:space-between; align-items:center; padding:8px 10px; color:#eee; font:10px var(--mono); border-bottom:1px solid #444; letter-spacing:.5px }
+.video-card video { width:100%; display:block; aspect-ratio:4/3; background:#111; object-fit:contain }
+.video-card .video-state { color:#aaa; font-size:10px; position:absolute; top:44px; left:12px; pointer-events:none; background:#111b; padding:3px 5px }
+.video-card .video-state:empty { display:none }
+.no-video { grid-column:1/-1; background:#f7f7f7; padding:45px 20px; text-align:center; border:1px dashed #aaa; font-size:12px; color:#666 }
+.no-video strong { display:block; font-size:15px; color:#222; margin-bottom:10px }
+.transport { display:flex; gap:8px; align-items:center; padding:14px 0 0 }
+.transport .button { padding:7px 10px; min-height:34px; white-space:nowrap; font-size:11px }
+.transport input { flex:1; width:80px; accent-color:#111; min-width:30px }
+.transport #clock { white-space:nowrap; font-size:11px }
+.review-main .transport select { width:65px; padding:5px; font-size:11px }
+.markers { display:flex; flex-wrap:wrap; gap:6px }
+.marker-item { display:flex; align-items:center; gap:5px; padding:5px 8px; border:1px solid #bbb; background:#f6f6f6; font-size:11px }
+.marker-item button { border:0; background:transparent; cursor:pointer; font:inherit; color:#111 }
+.marker-item .marker-text { max-width:240px; overflow-wrap:anywhere }
+.evidence-facts { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid #ddd; margin-top:16px; padding:13px 0 0; gap:12px }
+.evidence-facts label { color:#666; display:block; font-size:10px; margin-bottom:4px }
+.evidence-facts strong { font:12px var(--mono); color:#222; overflow-wrap:anywhere }
+.source-details,.coverage { border-top:1px solid #ddd; margin-top:16px; padding-top:12px; font-size:11px }
+summary { cursor:pointer; color:#444; user-select:none; font-size:11px }
+.source-details pre { font:10px/1.6 var(--mono); white-space:pre-wrap; overflow-wrap:anywhere; max-height:360px; overflow:auto; background:#f7f7f7; padding:10px }
+.attachment-links { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px }
+.attachment-links a { font-size:10px; color:#222; text-decoration:underline; overflow-wrap:anywhere }
+.source-warning { font-size:11px; padding:9px 11px; border:1px dashed #777; background:#f4f4f4; white-space:pre-line }
+.evaluation-panel .panel-title { align-items:center; margin-bottom:18px }
+.evaluation-panel .panel-title h2 { margin:4px 0 0; font-size:18px }
+.evaluation-grid { display:grid; grid-template-columns:minmax(0,1fr) 220px; gap:24px }
+.evaluation-fields { display:grid; gap:14px }
+.two-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px }
+.verdict-column { border-left:1px solid #ddd; padding-left:22px; display:flex; flex-direction:column; gap:10px }
+.verdict-buttons { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:7px }
+.verdict-button { padding:8px 6px; background:#fff; border:1px solid #b5b5b5; cursor:pointer; font-size:12px; color:#222 }
+.verdict-button.selected { background:#111; border-color:#111; color:#fff }
+.verdict-column .footnote { margin:0; font-size:10px; line-height:1.8 }
+.save-state { font-size:11px; color:#555; text-align:right }
+.save-state.dirty { border-bottom:1px dashed #555 }
+.save-row { display:flex; justify-content:space-between; border-top:1px solid #ddd; padding-top:17px; margin-top:20px; gap:8px }
+.save-row > div { display:flex; gap:8px }
+.history { margin-top:14px; padding-top:10px; border-top:1px solid #eee }
+.history-entry { font-size:11px; margin-top:10px; border-left:1px solid #888; padding-left:10px }
+.empty-state,.empty-workspace { text-align:center; padding:40px 16px; color:#666; font-size:12px }
+.empty-workspace { min-height:500px; display:flex; flex-direction:column; align-items:center; justify-content:center }
+.empty-workspace h2 { font-size:21px; color:#222 }
+.empty-workspace p { max-width:400px; line-height:2 }
+.review-error { border:1px dashed #111; background:#efefef; padding:12px; margin:12px 0; font-size:12px; white-space:pre-wrap; overflow-wrap:anywhere }
+.coverage { font-size:10px; line-height:1.8 }
+.coverage section { border-bottom:1px solid #ddd; padding:10px 0 }
+.coverage pre { white-space:pre-wrap; overflow-wrap:anywhere; font:9px/1.6 var(--mono) }
+.coverage .coverage-error { border-left:2px solid #555; padding-left:7px; margin:7px 0; overflow-wrap:anywhere }
+.review-footer { display:flex; justify-content:space-between; gap:12px; margin-top:22px; font-size:9px; color:#666; overflow-wrap:anywhere }
+.inline-label { display:flex; align-items:center; gap:12px; margin-top:12px; font-size:11px }
+.inline-label select { max-width:400px }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0 }
+dialog { max-width:850px; width:calc(100vw - 48px); padding:28px; background:#fff; border:1px solid #111; color:#111; font:13px/1.8 var(--font) }
+dialog::backdrop { background:#0006 }
+dialog h2 { margin:7px 0 14px; font-size:25px }
+.taxonomy-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-top:20px }
+.dialog-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:20px }
+.export-options { display:flex; flex-wrap:wrap; gap:12px; margin:22px 0 }
+.export-options a { text-decoration:none }
+#toast { position:fixed; bottom:25px; right:28px; background:#111; color:#fff; border:1px solid #fff; padding:11px 18px; font-size:12px; z-index:30 }
+@media(min-width:1700px) { .review-layout { grid-template-columns:330px minmax(0,1fr) } .record-list { max-height:850px } }
+@media(max-width:1350px) { .review-main { padding:23px 20px } .review-layout { grid-template-columns:255px minmax(0,1fr); gap:14px } .review-main .panel { padding:16px } .evaluation-grid { grid-template-columns:minmax(0,1fr) 180px; gap:16px } .verdict-column { padding-left:15px } .transport { flex-wrap:wrap } .transport input { min-width:90px } .summary-item { padding:12px 13px } }
+@media(max-width:1100px) { .review-layout { grid-template-columns:220px minmax(0,1fr) } .filter-grid { grid-template-columns:1fr } .evaluation-grid { grid-template-columns:1fr } .verdict-column { border-left:0; border-top:1px solid #ddd; padding:15px 0 0 } .verdict-buttons { grid-template-columns:repeat(3,1fr) } .summary-item:last-child { display:none } .video-grid { grid-template-columns:1fr } .video-card video { aspect-ratio:4/3; max-height:350px } }
+@media(max-width:800px) { .review-main { padding:16px 12px } .review-heading { flex-direction:column; align-items:flex-start; gap:12px } .review-heading h1 { font-size:23px } .review-layout { grid-template-columns:1fr } .record-library { position:static } .record-list { display:flex; max-height:185px; overflow-x:auto; overflow-y:auto; margin-top:10px } .record-card { min-width:210px; max-width:240px; flex-shrink:0; border-right:1px solid #ddd } .filter-grid { grid-template-columns:1fr 1fr } .record-library .coverage { margin-top:12px } .summary-strip { flex-wrap:wrap } .summary-item { flex:1; padding:12px 10px } .summary-item strong { font-size:20px } .summary-item span { font-size:10px } .video-grid { grid-template-columns:1fr 1fr } .video-topline { align-items:flex-start } .topbar-right #source-status { display:none } .topbar-right .button { padding:6px; font-size:10px } .topbar { padding:12px } .topbar .breadcrumb { font-size:11px } .review-footer { flex-direction:column } }
+@media(max-width:550px) { .video-grid,.two-fields,.taxonomy-grid { grid-template-columns:1fr } .summary-item { flex-direction:column; gap:2px } .evidence-facts { grid-template-columns:1fr 1fr } .mode-tab { padding:12px 10px; font-size:11px } .mode-tab span { margin-left:4px } .save-row .button { font-size:11px; padding:8px } }

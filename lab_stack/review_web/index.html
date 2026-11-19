@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Emerge Robotics · 数据复核</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/workbench.css"><link rel="stylesheet" href="/emerge-theme.css"><link rel="stylesheet" href="/style.css">
+</head>
+<body class="emerge-workbench">
+  <aside class="sidebar">
+    <a class="brand" href="http://127.0.0.1:8873/#connect" target="_blank" rel="noopener" aria-label="Emerge Robotics 工作台"><span class="brand-mark"><svg class="emerge-brand-mark" viewBox="0 0 26 26" aria-hidden="true"><path fill="currentColor" d="M9 2h6v6H9zM16 9h6v6h-6zM2 16h6v6H2zM9 16h6v6H9zM16 16h6v6h-6z"/></svg></span><span class="emerge-brand-name">Emerge<span class="brand-sub">Robotics</span></span></a>
+    <div class="nav-label">AGILEX / PIPER</div>
+    <nav aria-label="主页面">
+      <a class="nav-item" href="http://127.0.0.1:8873/#connect" target="_blank" rel="noopener"><span class="nav-icon">⌘</span><span>连接与零点校准<small>连接、诊断、坐标基准</small></span><span class="nav-number">01</span></a>
+      <a class="nav-item" href="http://127.0.0.1:8873/#teleop" target="_blank" rel="noopener"><span class="nav-icon">◉</span><span>遥操作与采集<small>实时画面、分段录制</small></span><span class="nav-number">02</span></a>
+      <a class="nav-item" href="http://127.0.0.1:8873/#motion" target="_blank" rel="noopener"><span class="nav-icon">◇</span><span>运动测试<small>实际姿态、目标预览</small></span><span class="nav-number">03</span></a>
+      <a class="nav-item" href="http://127.0.0.1:8873/#deploy" target="_blank" rel="noopener"><span class="nav-icon">↗</span><span>模型部署<small>影子推理、实机运行</small></span><span class="nav-number">04</span></a>
+      <a class="nav-item active" href="/" aria-current="page"><span class="nav-icon">▤</span><span>数据复核<small>示范质量、部署评价</small></span><span class="nav-number">05</span></a>
+    </nav>
+    <div class="sidebar-bottom"><span class="pill neutral">HUMAN REVIEW</span><p>先看真实记录<br>再留下你的判断</p><span class="version">UNIFIED CONTROL / v1</span></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar"><div class="breadcrumb">工作台 <span>/</span> <b>数据复核</b></div><div class="topbar-right"><span id="source-status">读取数据目录…</span><button class="button quiet" id="rescan">↻ 更新目录</button><button class="button" id="settings-open">编辑分类</button><button class="button primary" id="export-open">导出评价 ↗</button></div></header>
+    <main class="review-main">
+      <div class="page-heading review-heading"><div><div class="eyebrow">05 / DATA & PERFORMANCE REVIEW</div><h1>每一条记录，都有你的判断。</h1><p>查看真实录像，记录测试目的与评价。完成后导出，作为后续性能复核与报告的依据。</p></div><span class="chip" id="scope-chip">π0.5 · 全量微调 · STEP 5000</span></div>
+      <div class="mode-tabs" role="tablist" aria-label="复核数据类型"><button class="mode-tab active" role="tab" aria-selected="true" data-mode="deployment">部署真机数据 <span id="deployment-count">—</span></button><button class="mode-tab" role="tab" aria-selected="false" data-mode="teleop">遥操作数采数据 <span id="teleop-count">—</span></button></div>
+      <div id="global-error" class="review-error" role="alert" hidden></div>
+      <div class="summary-strip" id="summary" aria-live="polite"></div>
+      <div class="review-layout">
+        <section class="panel record-library" aria-label="记录列表">
+          <div class="library-title"><h2>复核队列</h2><span id="filtered-count" class="mono">—</span></div>
+          <label class="search-wrap"><span class="sr-only">搜索记录</span><input id="search" type="search" placeholder="搜索时间、编号、评论或测试项…"></label>
+          <div class="filter-grid"><label>模型检查点<select id="step"><option value="5000">5000 · 全量微调</option><option value="all">全部检查点 / 未知</option></select></label><label>人工结果<select id="verdict-filter"><option value="all">全部结果</option><option value="pending">待复核</option><option value="success">成功</option><option value="failure">失败</option><option value="partial">部分成功</option><option value="uncertain">待确认</option><option value="excluded">不计入</option></select></label><label>记录范围<select id="kind-filter"><option value="physical">部署与部署尝试</option><option value="deployment">正式部署（APPLY）</option><option value="deployment_attempt">早期 / 执行未确认</option><option value="no_motion">无运动 / 影子验收</option><option value="all">全部相关记录</option></select></label><label>数据来源<select id="source-filter"><option value="all">全部已登记U盘</option><option value="robot-usb">AgileX 录制U盘</option><option value="pc-archive-usb">PC 历史归档U盘</option></select></label></div>
+          <label class="only-pending"><input type="checkbox" id="only-video">仅显示有录像的记录</label>
+          <div class="record-list" id="record-list"><div class="empty-state">正在读取目录索引…</div></div>
+          <details class="coverage"><summary>目录覆盖与读取状态</summary><div id="coverage"></div></details>
+        </section>
+        <div class="record-workspace" id="record-workspace" hidden>
+          <section class="panel playback-panel">
+            <div class="record-heading"><div><div class="eyebrow" id="record-eyebrow">DEPLOYMENT RECORD</div><h2 id="record-title"></h2><p id="record-subtitle"></p></div><span class="pill neutral" id="record-verdict">待复核</span></div>
+            <p id="task" class="task-line"></p>
+            <div id="source-copy-wrap" hidden><label class="inline-label">查看副本<select id="source-copy"></select></label></div>
+            <div class="video-topline"><span>历史录像 / RECORDED VIDEO</span><label>证据版本<select id="video-group"></select></label></div>
+            <div class="video-grid" id="video-grid"></div>
+            <div class="transport" id="transport"><button class="button primary" id="play">▶ 播放</button><button class="button quiet" id="back-five" aria-label="回退5秒">−5s</button><input id="seek" type="range" min="0" max="1" step="0.01" value="0" aria-label="录像时间"><span id="clock" class="mono">00:00 / —</span><select id="speed" aria-label="播放速度"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select><button class="button" id="mark">＋ 标记此刻</button></div>
+            <p class="footnote" id="sync-note">双路按导出录像时间联动，不能据此认定硬件曝光同步。</p>
+            <div id="media-error" class="review-error" role="alert" hidden></div>
+            <div id="markers" class="markers"></div>
+            <div class="evidence-facts" id="facts"></div>
+            <p class="source-warning" id="source-warning" hidden></p>
+            <details class="source-details"><summary>程序结果与原始证据</summary><p class="footnote">程序执行结果、文件保存结果和人工任务评价分别保留。目录更新不会覆盖人工评价。</p><pre id="program-detail"></pre><div id="attachments" class="attachment-links"></div><button class="button quiet" id="show-metadata">查看源记录摘要</button><pre id="metadata" hidden></pre></details>
+          </section>
+          <section class="panel evaluation-panel" aria-labelledby="evaluation-heading">
+            <div class="panel-title"><div><div class="eyebrow">YOUR OBSERVATION</div><h2 id="evaluation-heading">人工评价</h2></div><span class="save-state" id="save-state" role="status">尚无评价</span></div>
+            <div class="evaluation-grid"><div class="evaluation-fields">
+              <div class="two-fields"><label>测试类型<input id="test-type" list="test-types" placeholder="选择或自行输入"><datalist id="test-types"></datalist></label><label>测哪一项功能<input id="function" list="functions" placeholder="例如：放置后停止"><datalist id="functions"></datalist></label></div>
+              <label>预期行为 / 成功判据<textarea id="expected" rows="2" placeholder="这次希望验证什么？怎样才算通过？"></textarea></label>
+              <label>评论与观察<textarea id="comments" rows="4" placeholder="记录实际表现、失败过程、现场补充；可在播放时标记具体秒数。"></textarea></label>
+              <div class="two-fields"><label>失败 / 异常原因<input id="failure-reason" list="failure-reasons" placeholder="可多项，用顿号分隔"><datalist id="failure-reasons"></datalist></label><label>标签<input id="tags" placeholder="例如：偏左位置、抓取后掉落"></label></div>
+            </div><div class="verdict-column"><label class="field-label">实际任务结果</label><div class="verdict-buttons" id="verdict-buttons" role="radiogroup" aria-label="实际任务结果"></div><label>复核人<input id="reviewer" maxlength="80" placeholder="填写实际复核人"></label><p class="footnote" id="verdict-note">尚未评价的记录保持“待复核”，不计入成功率。</p></div></div>
+            <div class="save-row"><button class="button quiet" id="previous">← 上一条</button><div><button class="button" id="save">保存评价</button><button class="button primary" id="save-next">保存并下一条 →</button></div></div><div id="save-error" class="review-error" role="alert" hidden></div>
+            <details class="history"><summary>查看评价修改历史</summary><div id="history-content">选择记录后点击查看。</div></details>
+          </section>
+        </div>
+        <div class="panel empty-workspace" id="empty-workspace"><div class="eyebrow">REVIEW QUEUE</div><h2>没有符合当前筛选的记录。</h2><p>调整模型、数据类型或人工结果筛选，也可以更新目录。</p></div>
+      </div>
+      <footer class="review-footer"><span id="db-location"></span><span>原始数据保留在原盘 · 人工评价独立保存</span></footer>
+    </main>
+  </div>
+  <dialog id="settings-dialog"><div class="eyebrow">REVIEW CATEGORIES</div><h2>编辑复核分类</h2><p>每行一个候选；评价时也可以输入新分类。修改候选不会改动已有评价。</p><div class="taxonomy-grid"><label>测试类型<textarea id="taxonomy-types" rows="10"></textarea></label><label>测试功能<textarea id="taxonomy-functions" rows="10"></textarea></label><label>异常原因<textarea id="taxonomy-failures" rows="10"></textarea></label></div><p id="settings-error" role="alert"></p><div class="dialog-actions"><button class="button" id="settings-cancel">返回</button><button class="button primary" id="settings-save">保存分类</button></div></dialog>
+  <dialog id="marker-dialog"><div class="eyebrow">VIDEO OBSERVATION</div><h2>标记这一刻。</h2><label class="field-label" for="marker-seconds">录像时间 / 秒</label><input id="marker-seconds" type="number" min="0" max="86400" step="0.01"><label class="field-label" for="marker-observation">这个时间点的观察</label><textarea id="marker-observation" rows="4" maxlength="2000" placeholder="例如：已抓起方块，但在移动途中掉落。"></textarea><p id="marker-error" role="alert"></p><div class="dialog-actions"><button class="button" id="marker-cancel">返回</button><button class="button primary" id="marker-save">保存时间标记</button></div></dialog>
+  <dialog id="export-dialog"><div class="eyebrow">REVIEW HANDOFF</div><h2>带走你的评价。</h2><p>JSON 包含人工评价、修改历史、源路径、控制配置及来源指纹。将它交回此对话，即可继续做证据复核与性能报告。</p><p id="export-scope"></p><p class="footnote">导出当前筛选队列，保留未评价记录作为分母核对依据。CSV 方便在 Excel 中筛选；不会夹带原始视频。</p><div class="export-options"><a class="button primary" id="export-json" href="/api/export.json" download>下载当前队列 JSON ↗</a><a class="button" id="export-csv" href="/api/export.csv" download>下载当前队列 CSV ↗</a></div><div class="dialog-actions"><button class="button" id="export-close">返回</button></div></dialog>
+  <div id="toast" role="status" hidden></div>
+  <script type="module" src="/app.js"></script>
+<link rel="stylesheet" href="/operator-theme.css"><script defer src="/operator-theme.js"></script>
+</body></html>

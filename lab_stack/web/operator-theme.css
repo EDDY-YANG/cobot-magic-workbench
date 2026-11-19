@@ -1,0 +1,103 @@
+/* Workbench appearance only: component semantics and state classes come from the native UI. */
+.operator-themed body.emerge-workbench {
+  --paper:#fff;--ink:#172331;--muted:#627183;--line:#dce2e9;--accent:#1c5aa6;
+  --compact-nav:198px;--compact-header:59px;
+  background:#fff!important;color:#172331!important;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei UI",Arial,sans-serif!important;
+}
+.operator-themed body .sidebar {background:#f8fafc!important;border-right:1px solid #dce2e9!important;color:#172331!important;}
+.operator-themed body .workspace,.operator-themed body main,.operator-themed body .topbar {background-color:white!important;color:#172331;}
+.operator-themed body .brand {color:#172331!important;}
+.operator-themed body .brand-mark {color:#2563eb!important;}
+.operator-themed body .sidebar .nav-item {border:1px solid transparent!important;border-radius:5px!important;background:transparent!important;color:#40556c!important;}
+.operator-themed body .sidebar .nav-item.active,.operator-themed body .sidebar .nav-item[aria-current=page] {background:#e7effc!important;border-color:#ccdcf6!important;color:#174f94!important;}
+.operator-themed body .sidebar .nav-item:hover {background:#edf2f7!important;}
+.operator-themed body .section-head,.operator-themed body .panel-title {color:#172331;}
+.operator-themed body .panel,.operator-themed body article.panel,.operator-themed body .review-panel,.operator-themed body dialog,.operator-themed body .dg-panel,.operator-themed body .dg-summary {background:#fff!important;border:1px solid #dce2e9!important;border-radius:7px!important;box-shadow:none!important;}
+.operator-themed body .panel,.operator-themed body article.panel {padding:clamp(14px,1.45vw,22px);}
+.operator-themed body .button,.operator-themed body .dg-footer button,.operator-themed body .action,.operator-themed body button:not(.nav-item):not(.attention-bell):not(.capture-focus-button) {border-radius:5px;}
+.operator-themed body .button.primary,.operator-themed body button.primary,.operator-themed body #dg-enter:not(:disabled) {background:#1c5aa6!important;color:white!important;border-color:#1c5aa6!important;}
+.operator-themed body .button.stop {color:#8d2430!important;border-color:#bf6670!important;background:#fff5f5!important;}
+.operator-themed body button:disabled {cursor:not-allowed;}
+.operator-themed body .command-dock {background:#fbfcfe!important;border-top:1px solid #cdd7e1!important;box-shadow:0 -2px 12px #17233109!important;}
+.operator-themed body input:not([type=range]):not([type=checkbox]):not([type=radio]),.operator-themed body select,.operator-themed body textarea {border-color:#c5d1dd!important;border-radius:4px!important;}
+.operator-themed body :focus-visible {outline:2px solid #2563eb!important;outline-offset:2px;}
+.operator-themed body main h1,.operator-themed body .page-heading h1 {color:#172331!important;font-family:inherit!important;}
+.operator-themed body [data-ui-en]::before {
+  content:attr(data-ui-en);display:block;position:static!important;
+  font:650 14px/1.2 "Segoe UI",Arial,sans-serif;letter-spacing:-.014em;
+  margin:0 0 2px;white-space:normal;text-transform:none;
+}
+.operator-themed body h1[data-ui-en],.operator-themed body .page-heading h1[data-ui-en],.operator-themed body #dagger-heading[data-ui-en] {font-size:14px!important;line-height:1.45!important;color:#627183!important;font-weight:500!important;letter-spacing:0!important;}
+.operator-themed body h1[data-ui-en]::before {font-size:clamp(27px,3vw,41px);line-height:1.12;letter-spacing:-.045em;color:#172331;}
+.operator-themed body h2[data-ui-en],.operator-themed body h3[data-ui-en] {font:500 12px/1.3 "Segoe UI","Microsoft YaHei UI",sans-serif!important;letter-spacing:0!important;color:#627183!important;}
+.operator-themed body h2[data-ui-en]::before {font-size:20px;color:#172331;}
+.operator-themed body h3[data-ui-en]::before {font-size:16px;color:#172331;}
+.operator-themed body button[data-ui-en],.operator-themed body label[data-ui-en],.operator-themed body summary[data-ui-en],.operator-themed body th[data-ui-en],.operator-themed body .nav-item [data-ui-en] {font-size:11px!important;line-height:1.25!important;letter-spacing:0!important;text-transform:none!important;}
+.operator-themed body button[data-ui-en]:not([hidden]),.operator-themed body .pill[data-ui-en]:not([hidden]) {flex-direction:column;align-items:center;justify-content:center;}
+.operator-themed body button[data-ui-en]::before,.operator-themed body .nav-item [data-ui-en]::before {font-size:14px;}
+.operator-themed body summary[data-ui-en]::before,.operator-themed body label[data-ui-en]::before,.operator-themed body th[data-ui-en]::before {font-size:13px;color:#30485f;}
+.operator-themed body .pill,.operator-themed body .mode-enable {border-radius:5px!important;}
+.operator-themed body :is(.pill,.mode-enable).good,.operator-themed body .stop-latch-banner.good {
+  background:#dcf6e7!important;color:#115031!important;border:1px solid #94cfa9!important;border-inline-start:4px solid #197044!important;
+}
+.operator-themed body :is(.pill,.mode-enable).error,.operator-themed body .stop-latch-banner.error,.operator-themed body .page-refresh-notice[data-health=error] {
+  background:#ffe5e5!important;color:#891b27!important;border:1px solid #e9aaaa!important;border-inline-start:4px solid #b42332!important;
+}
+.operator-themed body :is(.pill,.mode-enable).warn,.operator-themed body .stop-latch-banner.warn {
+  background:#fff2d6!important;color:#684306!important;border:1px solid #e3c183!important;border-inline-start:4px solid #89570c!important;
+}
+.operator-themed body :is(.pill,.mode-enable).neutral {background:#f2f5f8!important;color:#495766!important;border-color:#d6dfe8!important;}
+.operator-themed body .pill[data-ui-en] {font-size:10px!important;line-height:1.2;}
+.operator-themed body .system-state,.operator-themed body .global-status {border-color:#dce2e9!important;}
+.operator-themed body .sidebar-bottom .pill {padding:7px 9px;}
+.operator-themed body :is(.pill,.stop-latch-banner).good [data-ui-en]::before,.operator-themed body .pill.good[data-ui-en]::before {color:#115031;}
+.operator-themed body footer,.operator-themed body .footnote {color:#627183;}
+.operator-themed body .appearance-review {display:inline-flex;align-items:center;gap:6px;font:600 12px/1.2 "Segoe UI","Microsoft YaHei UI",sans-serif;color:#315b91;background:#eef4fb;border:1px solid #c6d7ee;border-radius:5px;padding:5px 8px;}
+@media(max-width:800px){
+  .operator-themed body.emerge-workbench {--compact-nav:56px;}
+  .operator-themed body .topbar {flex-wrap:wrap;height:auto;min-height:42px;}
+  .operator-themed body .appearance-review {font-size:10px;}
+  .operator-themed body .command-dock {max-height:42vh;overflow:auto;}
+  .operator-themed body .command-actions {flex-wrap:wrap;}
+  .operator-themed body button[data-ui-en]::before {font-size:12px;}
+  .operator-themed body .page {min-width:0;}
+}
+
+.operator-themed body .operator-page-title{display:block;font:650 clamp(26px,2.8vw,39px)/1.15 "Segoe UI",Arial,sans-serif;letter-spacing:-.04em;color:#172331;margin:4px 0 18px}
+.operator-themed body .panel-title,.operator-themed body .topbar,.operator-themed body .global-status{border-color:#dce2e9!important}
+.operator-themed body .button:not(.primary):not(.stop):not(:disabled){border-color:#c5d1dc!important;color:#20364c!important;background:#fff!important}
+.operator-themed body :is(button,select,input,textarea,.button){box-shadow:none!important}
+.operator-themed body [data-ui-tone]{display:inline-block;padding:5px 9px;border-radius:4px;border-inline-start:4px solid;font-weight:650}
+.operator-themed body [data-ui-tone=error]{background:#ffe5e5!important;color:#891b27!important;border-color:#b42332!important}
+.operator-themed body [data-ui-tone=good]{background:#dcf6e7!important;color:#115031!important;border-color:#197044!important}
+.operator-themed body [data-ui-tone=warn]{background:#fff2d6!important;color:#684306!important;border-color:#89570c!important}
+.operator-themed body .dg-th span[data-ui-en],.operator-themed body #dg-policy[data-ui-en],.operator-themed body #dg-record[data-ui-en]{font-size:11px}
+.operator-themed body .dg-footer #dg-enter:disabled,.operator-themed body .dg-footer #dg-finish:disabled{color:#5e7180!important;background:#edf1f5!important;border-color:#ccd6df!important;opacity:1}
+.operator-themed body main .precision-panel{max-width:none}
+.operator-themed body .sidebar .nav-item [data-ui-en] {text-align:left}
+.operator-themed body .review-tabs .active,.operator-themed body button[role=tab][aria-selected=true]{background:#e7effc!important;color:#174f94!important;border-color:#c4d7f1!important}
+@media(max-width:800px){.operator-themed body .topbar-right{flex-wrap:wrap}.operator-themed body .appearance-review{max-width:85px}}
+
+@media(max-width:800px){
+  .operator-themed body .sidebar {position:relative!important;inset:auto!important;height:auto!important;width:100%!important;max-width:100%;padding:6px 10px!important;display:block;overflow:visible;border:0!important;border-bottom:1px solid #dce2e9!important}
+  .operator-themed body .sidebar .brand,.operator-themed body .sidebar .nav-label,.operator-themed body .sidebar .sidebar-bottom{display:none!important}
+  .operator-themed body .sidebar nav{display:flex;flex-direction:row;overflow-x:auto;gap:4px;max-width:100%}
+  .operator-themed body .sidebar .nav-item{width:auto!important;min-width:76px;flex:0 0 auto;display:flex;align-items:center;justify-content:flex-start;gap:5px;padding:5px 8px!important}
+  .operator-themed body .sidebar .nav-item>span[data-ui-en]{display:block!important;font-size:10px!important}
+  .operator-themed body .sidebar .nav-item>span[data-ui-en]::before{font-size:12px}
+  .operator-themed body .workspace {margin-left:0!important;width:100%;min-width:0}
+  .operator-themed body .command-dock{left:0!important;right:0!important;width:auto!important}
+  .operator-themed body main .grid,.operator-themed body .review-layout,.operator-themed body .compact-motion-core{min-width:0}
+  .operator-themed body th[data-ui-en]::before{font-size:10px}
+}
+
+.operator-themed body .operator-footnote{border-top:1px solid #dce2e9;margin:22px 0 0;padding:12px 0;color:#627183;font-size:12px}
+.operator-themed body .review-heading h1[data-ui-en]{font-size:0!important}
+.operator-themed body .review-heading h1[data-ui-en]::after{content:"数据复核";display:block;font:500 14px/1.4 "Segoe UI","Microsoft YaHei UI",sans-serif;color:#627183}
+
+.operator-themed body .operator-page-title small{display:block;margin:5px 0 0;color:#627183;font:500 14px/1.35 "Segoe UI","Microsoft YaHei UI",sans-serif;letter-spacing:0}
+.operator-themed body #usb-status[data-ui-en]{font-size:10px!important}
+.operator-themed body #usb-status[data-ui-en]::before{font-size:12px}
+
+.operator-themed body .appearance-native{color:#203c61;background:#edf3fc;border-color:#afc4e1}

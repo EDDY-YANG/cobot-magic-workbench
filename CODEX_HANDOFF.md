@@ -41,3 +41,9 @@ Release v0.1.0: operator workbench source, bilingual Pages, portable Windows cli
 
 * Do not add private profiles, raw trials, weights, credentials or runtime acceptance to Git.
 * Do not present single-arm kinematic replay as a calibrated full-machine simulator.
+
+## v0.1.2 appearance publication
+
+English-first bilingual labels and original state colors are now integrated into the lab web source. See docs/release-v0.1.2.md. Production appearance serving uses external source pins and the existing application entry points. The public preview includes the independent review UI. Device/controller and native recording changes from the DAgger branch are outside this release.
+
+Validation before publication includes 48 Python tests, 14 UI state tests, original JavaScript hash and button-payload comparisons, and browser checks of the generated source preview. Physical validation remains pending while the robot link is unavailable.

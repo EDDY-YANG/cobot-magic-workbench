@@ -3,7 +3,7 @@
 **Yang Taige · Ye Hanzhi — Emerge Robotics**  
 HKU Faculty of Engineering · Tam Wing Fam Innovation Wing
 
-[Project page](https://eddy-yang.github.io/cobot-magic-workbench/) · [User manual](https://eddy-yang.github.io/cobot-magic-workbench/manual.html) · [Windows SDK](https://github.com/EDDY-YANG/cobot-magic-workbench/releases/tag/v0.1.1) · [中文手册](docs/USER_GUIDE.zh.md)
+[Project page](https://eddy-yang.github.io/cobot-magic-workbench/) · [User manual](https://eddy-yang.github.io/cobot-magic-workbench/manual.html) · [Windows SDK](https://github.com/EDDY-YANG/cobot-magic-workbench/releases/tag/v0.1.2) · [中文手册](docs/USER_GUIDE.zh.md)
 
 A browser workspace linking a Windows operator PC, an RTX 4090 edge host and COBOT MAGIC: device status, teleoperation, recording, policy deployment, controller selection and experiment review.
 

@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from client.gateway import Config,Tunnel,make_server,existing_client
 
-VERSION='0.1.1'
+VERSION='0.1.2'
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--port',type=int,default=8926)
