@@ -4,7 +4,7 @@ import re, shutil
 from build_project_page import ROOT, SITE, t, p, h, top, frame, footer, figure
 
 REPO='https://github.com/EDDY-YANG/cobot-magic-workbench'
-DOWNLOAD=REPO+'/releases/download/v0.1.0/cobot-magic-sdk-windows-x64.zip'
+DOWNLOAD=REPO+'/releases/download/v0.1.1/cobot-magic-sdk-windows-x64.zip'
 
 def player(full=False):
     body='<section class="replay" id="replay"><div class="section-heading">'+h('One recording, three views','同一次录制，三个视图')
@@ -20,7 +20,7 @@ def build():
     body=top()+'<main><header class="hero"><p class="eyebrow">EMERGE ROBOTICS · OPEN OPERATOR WORKSPACE</p><h1>COBOT MAGIC Workbench</h1><div class="authors"><span>Yang Taige</span><span>Ye Hanzhi</span></div><p class="affiliation">HKU Faculty of Engineering · Tam Wing Fam Innovation Wing</p>'
     body+=p('Connect. Demonstrate. Deploy. Review.','连接、示教、部署、复核。','hero-line')
     body+=p('One browser workspace for COBOT MAGIC, an RTX 4090 edge host and your Windows PC.','面向 COBOT MAGIC、RTX 4090 端侧主机与 Windows PC 的统一网页工作台。','lede')
-    body+='<div class="hero-links"><a class="button primary" href="'+DOWNLOAD+'">'+t('Download Windows SDK','下载 Windows SDK')+'</a><a class="button" href="replay.html">'+t('Open recorded demo','打开记录回放')+'</a><a class="button" href="manual.html">'+t('User manual','使用手册')+'</a><a class="button" href="'+REPO+'">GitHub</a></div>'+p('v0.1.0 · Research release. The Windows package opens offline; live operation connects to your authorized lab server.','v0.1.0 · 研究版本。Windows 包可离线打开；真机操作连接到你已获授权的实验室服务器。','scope')+'</header>'
+    body+='<div class="hero-links"><a class="button primary" href="'+DOWNLOAD+'">'+t('Download Windows SDK','下载 Windows SDK')+'</a><a class="button" href="replay.html">'+t('Open recorded demo','打开记录回放')+'</a><a class="button" href="manual.html">'+t('User manual','使用手册')+'</a><a class="button" href="'+REPO+'">GitHub</a></div>'+p('v0.1.1 · Research release. The Windows package opens offline; live operation connects to your authorized lab server.','v0.1.1 · 研究版本。Windows 包可离线打开；真机操作连接到你已获授权的实验室服务器。','scope')+'</header>'
     body+=player()
     body+='<section id="capabilities"><div class="section-heading">'+h('The controls you need, together','把需要的操作放在一起')+'</div><div class="features">'
     for a,b,c,d in [
@@ -35,7 +35,7 @@ def build():
     body+=p('Complete-machine reference: <a href="https://github.com/agilexrobotics/mobile_aloha_sim/tree/f799ae0192c0c2bbd502ec4d9bbec8c2633acd1a">AgileX mobile_aloha_sim</a>. Its v2 asset terms are incomplete; those meshes and derived renders are not distributed here.','整机参考：<a href="https://github.com/agilexrobotics/mobile_aloha_sim/tree/f799ae0192c0c2bbd502ec4d9bbec8c2633acd1a">AgileX mobile_aloha_sim</a>。该 v2 资产许可文本不完整，本发布不分发其网格及衍生渲染。','note')+'</section>'
     body+='<section id="workflow">'+h('Use it in six steps','六步完成一次试验')+figure('workflow','Connect inspect select start record review','An explicit operator click starts a trial. Reconnecting SSH never repeats a command.','试验由操作员明确点击开始，SSH 重连不会重发命令。')+'</section>'
     body+='<section id="data">'+h('Trace the data','追踪数据链路')+figure('data-link','Images and feedback to inference, local execution and storage','Video, feedback, predictions and commands retain their timestamps and identities.','视频、反馈、预测和命令保留各自时间戳与身份。')+'</section>'
-    body+='<section class="download-band">'+h('Start with the recorded demo','从离线回放开始')+p('Extract the Windows ZIP and double-click Start-Workbench.cmd. Python and OpenSSH are included. Use Connect for an already configured 4090 server; no model weights or private machine profiles are bundled.','解压 Windows ZIP，双击 Start-Workbench.cmd，内置 Python 与 OpenSSH。在 Connect 页面接入已配置的 4090 服务；不包含模型权重或私有机器配置。')+'<a class="button primary" href="'+DOWNLOAD+'">Windows x64 SDK</a> <a class="button" href="'+REPO+'/releases/tag/v0.1.0">'+t('Release & checksums','版本与校验和')+'</a></section></main>'+footer()
+    body+='<section class="download-band">'+h('Start with the recorded demo','从离线回放开始')+p('Extract the Windows ZIP and double-click Start-Workbench.cmd. Python and OpenSSH are included. Use Connect for an already configured 4090 server; no model weights or private machine profiles are bundled.','解压 Windows ZIP，双击 Start-Workbench.cmd，内置 Python 与 OpenSSH。在 Connect 页面接入已配置的 4090 服务；不包含模型权重或私有机器配置。')+'<a class="button primary" href="'+DOWNLOAD+'">Windows x64 SDK</a> <a class="button" href="'+REPO+'/releases/tag/v0.1.1">'+t('Release & checksums','版本与校验和')+'</a></section></main>'+footer()
     (SITE/'index.html').write_text(frame(body,'COBOT MAGIC Workbench | Emerge Robotics','COBOT MAGIC 工作台 | Emerge Robotics').replace('</body>','<script src="assets/replay.js" defer></script></body>'),encoding='utf8')
     replay=top()+'<main><header class="compact-heading"><p class="eyebrow">RECORDED SESSION · READ ONLY</p><h1>'+t('Experiment replay','实验回放')+'</h1>'+p('Recorded camera views, measured angles and model visualization on one timeline.','同一时间轴上的真实相机画面、实测角度与模型可视化。')+'</header>'+player(True)+'</main>'+footer()
     (SITE/'replay.html').write_text(frame(replay,'Recorded experiment | Emerge Robotics','实验回放 | Emerge Robotics').replace('</body>','<script src="assets/replay.js" defer></script></body>'),encoding='utf8')
