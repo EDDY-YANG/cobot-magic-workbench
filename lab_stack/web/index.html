@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light" />
     <title>Emerge Robotics · AgileX 工作台</title>
-  </head>
+  <link rel="stylesheet" href="/dagger.css"></head>
   <body class="pixel-workbench emerge-workbench compact-workbench">
     <aside class="sidebar">
       <a class="brand" href="#connect" aria-label="Emerge Robotics 工作台" title="Emerge Robotics">
@@ -34,6 +34,7 @@
           ><span>模型部署<small>影子推理、实机运行</small></span
           ><span class="nav-number">04</span>
         </button>
+      <button class="nav-item" data-page="dagger" aria-label="DAgger 人工介入"><span class="nav-icon">⇄</span><span>DAgger 介入</span></button>
       <a class="nav-item" href="http://127.0.0.1:8891/" target="_blank" rel="noopener" data-human-review-entry aria-label="数据复核">
           <span class="nav-icon">▤</span><span>数据复核<small>示范质量、部署评价</small></span><span class="nav-number">05</span>
         </a>
@@ -1109,7 +1110,20 @@
             <pre id="raw-state">{}</pre>
           </details>
         </section>
-      </main>
+      <section class="page" id="page-dagger" aria-labelledby="dagger-heading">
+  <div class="dagger-view">
+    <header class="dagger-heading"><h1 id="dagger-heading">DAgger 人工介入</h1><span id="dg-phase" role="status">读取状态中</span></header>
+    <div class="dg-summary"><div><label>等待时间</label><strong id="dg-time">—</strong></div><div><label>模型执行</label><b id="dg-policy">读取中</b></div><div><label>纠正录制</label><b id="dg-record">读取中</b></div></div>
+    <section class="dg-panel"><h2>双臂交接</h2><p>关节偏差取各侧六个关节中的最大值。读数来自原厂 CAN 目标与从臂反馈。</p>
+    <div class="dg-table"><div class="dg-row dg-th"><span>通道</span><span>关节偏差</span><span>夹爪偏差</span><span>反馈状态</span></div>
+    <div class="dg-row"><strong>左侧 <small>can_left</small></strong><span id="dg-left-q">—</span><span id="dg-left-g">—</span><span id="dg-left-s">等待读数</span></div>
+    <div class="dg-row"><strong>右侧 <small>can_right</small></strong><span id="dg-right-q">—</span><span id="dg-right-g">—</span><span id="dg-right-s">等待读数</span></div></div></section>
+    <div class="dg-message" id="dg-note" role="status">正在核对当前执行任务。</div>
+    <div class="dg-footer"><button id="dg-enter" class="button" disabled>失败介入</button><button id="dg-finish" class="button" disabled>结束并保存</button></div>
+    <p id="dg-error" role="alert" hidden></p>
+  </div>
+</section>
+</main>
       <footer>
         真实状态优先 · 鼠标编辑只预览 · 任务结果以实际反馈为准
         <span id="connection-source">本地页面 / 尚未连接机器人</span>

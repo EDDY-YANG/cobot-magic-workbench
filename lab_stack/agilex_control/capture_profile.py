@@ -8,7 +8,8 @@ import copy
 SCHEMA = 'tiger-capture-contract-v1'
 ALL = 'all_configured_v1'
 RIGHT = 'right_only_v1'
-PROFILES = frozenset((ALL, RIGHT))
+DAGGER = 'dagger_bimanual_v1'
+PROFILES = frozenset((ALL, RIGHT, DAGGER))
 
 
 def profile_name(cfg):
@@ -26,6 +27,8 @@ def contract(cfg, name=None):
     if not isinstance(registered_arms, dict) or not isinstance(registered_cameras, dict):
         raise ValueError('Capture profile requires registered devices')
     arms = list(registered_arms) if name == ALL else ['right']
+    if name == DAGGER:
+        arms = ['left', 'right']
     cameras = list(registered_cameras) if name == ALL else ['front', 'right']
     if any(role not in registered_arms for role in arms) or any(role not in registered_cameras for role in cameras):
         raise ValueError('Capture profile requires registered devices')

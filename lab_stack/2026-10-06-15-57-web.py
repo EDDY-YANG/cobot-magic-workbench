@@ -27,7 +27,8 @@ def main():
         from agilex_control.web_agent import run_agent
         run_agent(cfg, ROOT)
         return
-    from agilex_control.web_backend import WebApp, make_server
+    from agilex_control.web_backend import make_server
+    from agilex_control.dagger_workbench import DaggerWorkbench as WebApp
     workspace = None
     if args.semantic_config:
         from agilex_control.semantic_workspace import SemanticWorkspace

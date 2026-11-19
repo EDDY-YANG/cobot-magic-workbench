@@ -25,7 +25,7 @@ import time
 from .storage import Session, verify_usb
 
 from .recording_lifecycle import OWNED_RECORDING_STOP_PROTOCOL
-from .capture_profile import contract, ALL
+from .capture_profile import contract, ALL, DAGGER
 _UNSPECIFIED_STOP_OWNER = object()
 RECORDING_SOURCE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
@@ -227,10 +227,12 @@ class ChunkStream:
 
 
 class Recorder:
-    def __init__(self, cfg, snapshot, frames):
+    def __init__(self, cfg, snapshot, frames, *, dagger_job_id=None):
         self.cfg, self.snapshot, self.frames = copy.deepcopy(cfg), snapshot, frames
         self.source_cfg = cfg  # Detect device/profile changes without retargeting storage.
-        self.capture_contract = contract(self.cfg)
+        self.dagger_job_id = dagger_job_id
+        self.profile_override = DAGGER if dagger_job_id else None
+        self.capture_contract = contract(self.cfg, self.profile_override)
         self.arm_roles = self.capture_contract['required_arm_roles']
         self.camera_roles = self.capture_contract['required_camera_roles']
         self.lock = threading.Lock()
@@ -290,8 +292,8 @@ class Recorder:
         """Reject missing/stale configured inputs; never synthesize a sample."""
         if not self.arm_roles or not self.camera_roles:
             raise RuntimeError('Recording requires registered arm and camera inputs')
-        if (contract(self.cfg) != self.capture_contract or
-                contract(getattr(self, 'source_cfg', self.cfg)) != self.capture_contract):
+        if (contract(self.cfg, self.profile_override) != self.capture_contract or
+                contract(getattr(self, 'source_cfg', self.cfg), self.profile_override) != self.capture_contract):
             raise RuntimeError('Capture profile/devices changed; restart the sensor service before recording')
         images, sensors = self.frames(), self.snapshot()
         sample_monotonic_ns = time.monotonic_ns()
@@ -406,6 +408,12 @@ class Recorder:
                 optional_camera_source_index_schema="tiger-recorded-camera-source-index-v1",
                 source_timing_scope="producer metadata only; missing fields remain unknown; no common selection",
                 training_dataset_verified=False)
+            if self.dagger_job_id:
+                self.session.report['dagger'] = {
+                    'policy_job_id': self.dagger_job_id,
+                    'segment': 'correction_candidate', 'action_source': 'oem_bus_target',
+                    'expert_labels_verified': False,
+                    'sender_authenticated': False, 'physical_task_success': 'unreviewed'}
             if collection_v1 is not None:
                 self.session.report['collection_v1'] = copy.deepcopy(collection_v1)
             for field in ('capture_coordinate_reference', 'capture_image_reference'):
@@ -704,6 +712,7 @@ class Recorder:
                    max(0.,(time.monotonic() if finished is None else finished)-self.started_monotonic))
         busy = any(t is not None and t.is_alive() for t in (self.thread,self.sample_thread))
         return {"owned_stop_protocol":OWNED_RECORDING_STOP_PROTOCOL,
+                "dagger_job_id": self.dagger_job_id,
                 "recorder_io": self.io_metrics(),
                 "capture_profile": self.capture_contract['profile'],
                 "capture_contract": copy.deepcopy(self.capture_contract),

@@ -395,6 +395,13 @@ class RobotAgent:
             if receipt and len(json.dumps(receipt)) > 8192 and not bounded_collection_receipt(receipt):
                 job["result"] = {"report": receipt.get("report"), "details_in_usb_report": True,
                                  "result_keys": list(receipt.get("result", {}))}
+                if job.get('action') == 'record_stop':
+                    details = receipt.get('result') or {}
+                    final = details.get('finalization') or {}
+                    if details.get('dagger_job_id') and final:
+                        job['result']['finalization'] = {k:final.get(k) for k in (
+                            'owned_path', 'completed', 'healthy', 'failure')}
+
         # These filesystem checks retain their meaning but cannot hold the Hub
         # publication lock. Age the direct feedback after any filesystem delay,
         # including local submit() callers that do not pass through the PC.

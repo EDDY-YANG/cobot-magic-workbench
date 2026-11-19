@@ -41,3 +41,7 @@ Release v0.1.0: operator workbench source, bilingual Pages, portable Windows cli
 
 * Do not add private profiles, raw trials, weights, credentials or runtime acceptance to Git.
 * Do not present single-arm kinematic replay as a calibrated full-machine simulator.
+
+## DAgger feature branch
+
+The lab workbench exposes the two-button intervention view at `/#dagger`. See [DAgger behavior and device integration](docs/dagger.md). OEM shared-bus automatic handover and human-segment start remain blocked; deployed host UI and physical validation are tracked separately.

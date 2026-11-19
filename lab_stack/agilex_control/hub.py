@@ -482,17 +482,34 @@ class SensorHub:
                 "perception": self.perception_snapshot(),
                 "visual_servo": self.visual_servo_snapshot(),
                 "recording": self.recorder.status(), "preview_error": self.preview_error,
-                "recording_contract":{"collection_metadata_version":1,"expected_stop_path_supported":True,
+                "recording_contract":{"dagger_bimanual_v1":True,"collection_metadata_version":1,"expected_stop_path_supported":True,
                     "capture_contract": deepcopy(getattr(self, 'capture_contract', None))},
                 "camera_capture_requested_hz": 30, "rerun_image_display_max_hz": 5,
                 "single_camera_owner": True}
 
     def start_recording(self, data):
         """Bind a batch identity BEFORE capture, and replay a lost response safely."""
-        allowed={'task','batch_id','trial_id','category','notes'}
+        allowed={'task','batch_id','trial_id','category','notes','dagger_job_id'}
         if not isinstance(data,dict) or set(data)-allowed:
             raise ValueError('Unsupported recording request fields')
         with self.record_request_lock:
+            job_id = data.get('dagger_job_id')
+            if 'dagger_job_id' in data:
+                if (set(data) != {'task', 'dagger_job_id'} or not isinstance(job_id, str)
+                        or len(job_id) != 12 or any(c not in '0123456789abcdef' for c in job_id)):
+                    raise ValueError('DAgger recording requires the exact policy job ID')
+            if getattr(self.recorder, 'dagger_job_id', None) != job_id:
+                old = self.recorder
+                status = old.status()
+                if status['active'] or status['saving'] or (old.session and not status['finalized']):
+                    raise RuntimeError('Previous recording owner is still active or unresolved')
+                self.recorder = Recorder(self.cfg, self.record_state, self.record_frames, dagger_job_id=job_id)
+            if job_id:
+                if self.recorder.session:
+                    if self.recorder.session.report.get('task') != data['task']:
+                        raise ValueError('DAgger task changed for the same policy job')
+                    return self.recorder.status()
+                return self.recorder.start(data['task'])
             if 'batch_id' not in data:
                 if set(data)-{'task'}:
                     raise ValueError('Batch metadata requires a batch ID')
