@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "COBOT MAGIC Workbench Appearance",
+  "version": "1.0.0",
+  "description": "Presentation for the existing local operator workbench and data review.",
+  "content_scripts": [
+    {
+      "matches": [
+        "http://127.0.0.1/*",
+        "http://localhost/*"
+      ],
+      "css": [
+        "operator-theme.css"
+      ],
+      "js": [
+        "operator-theme.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
