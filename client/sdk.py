@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from client.gateway import Config,Tunnel,make_server,existing_client
 
-VERSION='0.1.0'
+VERSION='0.1.1'
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--port',type=int,default=8926)
@@ -51,8 +51,13 @@ def main():
                 cfg.validate()
                 if cfg.local_port==args.port:raise ValueError('Choose a different client port')
                 if active:raise ValueError('An SSH client is already running. Close this SDK process before changing its connection.')
-                if existing_client(cfg):return self.reply(200,{'url':f'http://127.0.0.1:{cfg.local_port}/','reused':True})
-                transport=Tunnel(cfg,start=False);server=make_server(transport,cfg.local_port)
+                transport=Tunnel(cfg,start=False)
+                # Bind first: an unbound Windows loopback port can time out before
+                # the OS reports ECONNREFUSED. Only probe an occupied port.
+                try:server=make_server(transport,cfg.local_port)
+                except OSError:
+                    if existing_client(cfg):return self.reply(200,{'url':f'http://127.0.0.1:{cfg.local_port}/','reused':True})
+                    raise ValueError('Client port unavailable; choose a free port')
                 transport.worker.start();threading.Thread(target=server.serve_forever,daemon=True).start();active.append(transport)
                 state_path.parent.mkdir(parents=True,exist_ok=True)
                 state_path.write_text(json.dumps({'ssh_target':cfg.ssh_target,'ssh_config':cfg.ssh_config or '','remote_port':cfg.remote_port,'local_port':cfg.local_port},indent=2),encoding='utf8')
