@@ -8,5 +8,5 @@ window.addEventListener("DOMContentLoaded",()=>{
  const style=document.createElement('style');style.textContent='#attention-center,#stop-latch-banner{display:none!important}';document.head.append(style);
  document.addEventListener("click",e=>{const button=e.target.closest("button");const a=e.target.closest("a");
  if(button&&!button.matches("[data-page],#show-details,#refresh-state,[data-attention-open],[data-attention-close]")){e.preventDefault();e.stopImmediatePropagation();}
- if(a&&a.getAttribute("href")&&!a.getAttribute("href").startsWith("#")){e.preventDefault();e.stopImmediatePropagation();}},true);
+ if(a&&a.getAttribute("href")&&!a.getAttribute("href").startsWith("#")&&!a.getAttribute("href").startsWith("./review/")&&!a.getAttribute("href").startsWith("../index.html")){e.preventDefault();e.stopImmediatePropagation();}},true);
 });

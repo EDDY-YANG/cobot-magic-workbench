@@ -1,0 +1,70 @@
+/* Emerge Robotics — monochrome, quiet mathematical structure, no control styles. */
+body.emerge-workbench {
+  background-color: #f7f7f7;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M12 10v4m-2-2h4' stroke='%23e6e6e6' stroke-width='.6'/%3E%3C/svg%3E");
+}
+.emerge-workbench .brand { gap: 11px; padding: 0 9px; letter-spacing: 0; }
+.emerge-workbench .brand-mark { flex: 0 0 38px; width: 38px; height: 38px; }
+.emerge-brand-mark { width: 23px; height: 23px; display: block; }
+.emerge-workbench .emerge-brand-name { font-size: 21px; line-height: 1.12; letter-spacing: -.7px; font-weight: 700; }
+.emerge-workbench .brand-sub { font-size: 9px; line-height: 1.8; letter-spacing: 3.3px; margin-top: 5px; text-transform: uppercase; }
+.emerge-workbench .sidebar { overflow: hidden; isolation: isolate; }
+.emerge-workbench .sidebar::after {
+  content: ""; position: absolute; left: 22px; right: 22px; bottom: 180px; height: 145px; opacity: .5; z-index: -1; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 210 145'%3E%3Cg fill='none' stroke='%23b6b6b6' stroke-width='.7'%3E%3Cpath d='M12 72h186M105 8v129' stroke-dasharray='2 5'/%3E%3Cellipse cx='105' cy='72' rx='70' ry='45'/%3E%3Cellipse cx='105' cy='72' rx='37' ry='63' transform='rotate(45 105 72)'/%3E%3Cpath d='M12 105C35 10 66 135 105 72S165 16 198 105'/%3E%3Cpath d='M99 8h12M99 137h12M12 66v12M198 66v12'/%3E%3C/g%3E%3Ccircle cx='105' cy='72' r='2.3' fill='%23444'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.emerge-workbench .topbar { background: #fff; }
+.emerge-workbench .page-heading.emerge-heading {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, 370px); gap: 12px 30px; padding: 8px 0 18px; align-items: center;
+}
+.emerge-heading > :not(.emerge-life) { grid-column: 1; }
+.emerge-heading > :is(.button, .chip, .button-row) { justify-self: start; align-self: start; }
+.emerge-heading > .emerge-life { grid-column: 2; grid-row: 1 / span 2; }
+.emerge-workbench .page-heading h1 { font-size: clamp(22px, 2.2vw, 31px); letter-spacing: -.65px; line-height: 1.35; }
+.emerge-workbench .page-heading .eyebrow::before { content: "+"; display: inline-block; margin-right: 9px; font-weight: 400; }
+.emerge-life { box-sizing: border-box; width: 100%; max-width: 430px; min-width: 0; border: 1px solid #c9c9c9; background: #fafafa; color: #202020; padding: 11px 13px 8px; overflow: hidden; contain: layout paint; }
+.emerge-life-top, .emerge-life-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 9px/1.5 var(--mono, monospace); }
+.emerge-life-top { color: #555; letter-spacing: 1px; border-bottom: 1px solid #e4e4e4; padding-bottom: 7px; }
+.emerge-life-rule { letter-spacing: 1px; white-space: nowrap; }
+.emerge-life-canvas { display: block; width: 100%; height: auto; aspect-ratio: 84 / 26; max-height: 130px; margin: 5px 0; image-rendering: pixelated; }
+.emerge-life-bottom { padding-top: 5px; border-top: 1px solid #e4e4e4; gap: 7px; }
+.emerge-life-generation { min-width: 56px; color: #222; }
+.emerge-life-note { color: #666; font-size: 9px; }
+.emerge-life-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.emerge-life-actions button { background: transparent; border: 0; color: #444; padding: 3px 2px; min-height: 24px; font: 9px var(--mono, monospace); cursor: pointer; white-space: nowrap; }
+.emerge-life-actions button:hover { color: #000; text-decoration: underline; text-underline-offset: 3px; }
+.emerge-life-actions button:focus-visible { outline: 1px dashed #111; outline-offset: 2px; }
+.emerge-workbench .sidebar-bottom .version::before { content: "∑ / "; }
+.emerge-workbench .panel-title { position: relative; }
+.emerge-workbench .panel-title::after { content: ""; position: absolute; right: -1px; bottom: -3px; width: 5px; height: 5px; background: #fff; border: 1px solid #777; pointer-events: none; }
+.emerge-results { color: #171717; background-color: #f7f7f7; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='.6' fill='%23d8d8d8'/%3E%3C/svg%3E"); }
+.emerge-results header { display: grid; grid-template-columns: minmax(0,1fr) minmax(290px,370px); gap: 22px; }
+.emerge-results header .badge { justify-self: start; grid-column: 1; border-color: #222; color: #222; }
+.emerge-results .tag, .emerge-results .note, .emerge-results .card span, .emerge-results th { color: #555; }
+.emerge-results .card strong, .emerge-results a { color: #111; }
+.emerge-results :is(.card, section, .badge, .images img) { border-radius: 0; border-color: #bbb; box-shadow: none; }
+.emerge-results .warning { background: #f1f1f1; border: 1px dashed #777; }
+.emerge-results h1 { letter-spacing: -.7px; }
+@media(max-width:1100px) {
+  .emerge-workbench .page-heading.emerge-heading { grid-template-columns: minmax(0,1fr) minmax(250px,300px); gap: 12px 18px; }
+  .emerge-life-note { display: none; }
+}
+@media(max-width:800px) {
+  .emerge-workbench .page-heading.emerge-heading, .emerge-results header { grid-template-columns: minmax(0,1fr); gap: 13px; }
+  .emerge-heading > .emerge-life { grid-column: 1; grid-row: auto; max-width: 430px; }
+  .emerge-workbench .emerge-brand-name { display: none; }
+  .emerge-workbench .brand { padding: 0; justify-content: center; }
+  .emerge-workbench .sidebar::after { display: none; }
+  .emerge-results .cards { grid-template-columns: 1fr 1fr; }
+  .emerge-results main { padding: 22px 18px; }
+  .emerge-results table { font-size: 11px; }
+  .emerge-results td, .emerge-results th { padding: 8px 5px; }
+}
+@media(max-width:420px) {
+  .emerge-life { padding: 8px 9px 5px; }
+  .emerge-life-top { font-size: 8px; letter-spacing: .4px; }
+  .emerge-results .cards, .emerge-results .images { grid-template-columns: 1fr; }
+}
+@media(prefers-reduced-motion:reduce) { .emerge-workbench .page.active { animation: none; } }
+@media(max-height:780px) { .emerge-workbench .sidebar::after { height: 68px; bottom: 178px; opacity: .4; } }
+@media(max-height:690px) { .emerge-workbench .sidebar::after { display: none; } }

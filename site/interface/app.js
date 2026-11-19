@@ -7,7 +7,9 @@
 import {createV2SpeedControl} from "./manual-speed-control.mjs?v=20261025-speed1";
 let v2SpeedControl = null;
 const $ = (id) => document.getElementById(id);
+import {bindDagger,displayDagger} from "./dagger-view.mjs";
 const pageNames = {
+  dagger: "DAgger 人工介入",
   connect: "连接与零点校准",
   teleop: "遥操作与采集",
   motion: "运动测试",
@@ -1191,6 +1193,7 @@ function feedbackDeliveryText(state, online) {
 }
 // FEEDBACK_DELIVERY_VIEW_END
 function renderState(state) {
+  displayDagger(state.dagger);
   lastState = state;
   renderDualFollowerTelemetry(state);
   const diagnostic = unwrap(state.status || {}),
@@ -2540,6 +2543,7 @@ function pageSnapshotWatchdog() {
 function pausePageRefresh(hidden, expired = false) {
   // Suspend only this tab's display and read requests, never the robot task.
   backendOnline = false;
+  displayDagger(null);
   renderUsbStorage(lastState.usb_storage, false);
   if (typeof collectionWorkbench !== "undefined") collectionWorkbench?.onConnection(false);
   actualFresh = false;
@@ -2638,6 +2642,7 @@ async function pollState() {
     if (backendOnline)
       addEvent("页面与后端连接中断：" + error.message, "error");
     backendOnline = false;
+  displayDagger(null);
     renderUsbStorage(lastState.usb_storage, false);
     if (typeof collectionWorkbench !== "undefined") collectionWorkbench?.onConnection(false);
     renderControllerMode(lastState);
@@ -2977,3 +2982,5 @@ else pollState();
 setInterval(pageSnapshotWatchdog, 50);
 export { taskStateView, perceptionView, reviewTaskParams };
 
+
+bindDagger(api);
