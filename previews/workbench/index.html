@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>COBOT MAGIC · 操作工作台预览</title><link rel="stylesheet" href="workbench.css"></head>
+<body>
+<a class="skip" href="#main">Skip to workspace / 跳到工作区</a>
+<header class="mast"><a class="brand" href="#deploy" aria-label="COBOT MAGIC 工作台"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>COBOT MAGIC</a><span class="mast-slash">/</span><span class="mast-title dual"><b>Workbench</b><small lang="zh-CN">操作工作台</small></span><span class="env"><i></i> <span class="dual"><b>Offline preview</b><small lang="zh-CN">离线预览</small></span></span><button id="stop-preview" class="global-stop" type="button"><i aria-hidden="true"></i><span class="dual"><b>Stop preview</b><small lang="zh-CN">停止预览</small></span></button></header>
+<div class="shell"><aside class="rail"><nav aria-label="工作台导航" id="navigation"></nav><div class="rail-foot"><span class="brand-mini"></span><span>Emerge Robotics</span></div></aside>
+<main id="main"><div class="page-head"><div><h1 id="heading"></h1><p id="kind" class="subtitle" lang="zh-CN"></p></div><div class="system-state"><i></i><span class="dual"><b>Disconnected</b><small lang="zh-CN">机器人未连接</small></span></div></div>
+<div id="layout"></div>
+<footer id="foot"></footer></main></div>
+<video id="source" muted playsinline preload="metadata" hidden></video>
+<dialog id="dialog"><form method="dialog"><div class="dialog-head"><h2 id="dialog-title"></h2></div><div id="dialog-body"></div><button class="primary" value="close"><span class="dual"><b>Close</b><small lang="zh-CN">关闭</small></span></button></form></dialog>
+<div id="notice" role="status" hidden></div><script src="workbench.js" defer></script></body></html>
