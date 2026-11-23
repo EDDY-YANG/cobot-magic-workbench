@@ -22,9 +22,9 @@ def main():
   shutil.copytree(ROOT/directory,stage/directory,ignore=shutil.ignore_patterns('__pycache__','*.local.json','*.log'))
  for file in ['LICENSE','THIRD_PARTY_NOTICES.md']:shutil.copyfile(ROOT/file,stage/file)
  (stage/'Start-Workbench.cmd').write_text('@echo off\r\ncd /d "%~dp0"\r\n"%~dp0runtime\\python\\python.exe" "%~dp0client\\sdk.py"\r\nif errorlevel 1 pause\r\n',encoding='ascii')
- (stage/'README.txt').write_text('COBOT MAGIC Workbench v0.1.2\n\nExtract the complete ZIP. Double-click Start-Workbench.cmd.\nOpen the recorded demo without a robot or a Python installation.\nConnect uses your own authorized SSH alias/config and verified host key.\nDefault SDK port: 8926. Live client: 8876. GPU management server: 8910.\nClosing the client does not stop a running physical trial. Use the workbench Stop action.\nThe package never starts a model, clears STOP or sends robot motion automatically.\nRuntime licenses are under runtime/python and runtime/openssh.\nOpenSSH vendor package tag: 10.4.0.0p1-Preview.\n\nAuthors: Yang Taige, Ye Hanzhi / Emerge Robotics\n',encoding='utf8')
+ (stage/'README.txt').write_text('COBOT MAGIC Workbench v0.1.3\n\nExtract the complete ZIP. Double-click Start-Workbench.cmd.\nOpen the recorded demo without a robot or a Python installation.\nConnect uses your own authorized SSH alias/config and verified host key.\nDefault SDK port: 8926. Live client: 8876. GPU management server: 8910.\nClosing the client does not stop a running physical trial. Use the workbench Stop action.\nThe package never starts a model, clears STOP or sends robot motion automatically.\nRuntime licenses are under runtime/python and runtime/openssh.\nOpenSSH vendor package tag: 10.4.0.0p1-Preview.\n\nAuthors: Yang Taige, Ye Hanzhi / Emerge Robotics\n',encoding='utf8')
  manifest={p.relative_to(stage).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in stage.rglob('*') if p.is_file()}
- (stage/'manifest.json').write_text(json.dumps({'version':'0.1.2','runtime_sources':SOURCES,'files':manifest},indent=2))
+ (stage/'manifest.json').write_text(json.dumps({'version':'0.1.3','runtime_sources':SOURCES,'files':manifest},indent=2))
  output=a.output/(stage.name+'.zip')
  with zipfile.ZipFile(output,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
   for f in sorted(stage.rglob('*')):

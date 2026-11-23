@@ -1,3 +1,4 @@
+import {bindDeviceModePanel} from "/api/device-view/panel.mjs";
 // Operator declarations: explicit-button-click, authorized by Tiger 2026-10-23.
 /* 通过项目工作台 HTTP 服务加载；不直接运行本文件。
  * 写入、录制和控制请求须来自明确按钮点击；恢复采集身份只发送只读回执核验。
@@ -47,6 +48,8 @@ const actionNames = {
   move_plan: "生成运动计划",
   move_ready: "移动到原准备位",
   move_zero: "移动到六关节零位",
+  move_zero_can: "全部 CAN/MOVEJ 臂六零位",
+  move_zero_can_plan: "查看全部 CAN/MOVEJ 臂六零位计划",
   move_target: "执行预览目标",
   move_gripper_plan: "查看G夹爪目标计划",
   move_gripper: "G夹爪开合",
@@ -72,6 +75,7 @@ const motionActions = new Set([
   "move_gripper",
   "move_ready",
   "move_zero",
+  "move_zero_can",
   "move_target",
   "deploy",
   "h50_deploy",
@@ -82,7 +86,7 @@ const knownUnavailable = new Set(["teleop_enter", "teleop_exit"]);
 const pageActions = {
   connect: ["connect", "diagnose", "mode_inspect", "mode_takeover", "mode_reset", "mode_high_follow", "mode_standby", "mode_disable", "limits", "gripper_inspect", "gripper_measure", "gripper_disable", "gripper_zero", "hub_start", "sync"],
   teleop: ["hub_start", "collection_create", "collection_list", "collection_review", "record_start", "record_retry", "record_stop", "record_list"],
-  motion: ["move_plan", "move_ready", "move_zero", "move_target", "move_gripper_plan", "move_gripper"],
+  motion: ["move_zero_can", "move_zero_can_plan", "move_plan", "move_ready", "move_zero", "move_target", "move_gripper_plan", "move_gripper"],
   deploy: ["precision_load","precision_acceptance","precision_deploy","precision_release","v2_acceptance","v2_deploy","h50_load", "h50_shadow", "h50_acceptance", "h50_deploy", "model_plan", "model_stage", "model_start", "shadow", "shadow_fp32", "deploy_plan", "deploy"],
 };
 const jointHistory = [];
@@ -115,6 +119,13 @@ let target = [0, 0, 0, 0, 0, 0],
 let gripperTargetInitialized = false;
 let taskDisplayReceivedAt = null, taskDisplayHub = {};
 let collectionWorkbench = null;
+const deviceModePanel = bindDeviceModePanel({
+  document,
+  capabilityFor: action => submitting
+    ? {available: false, reason: "正在提交操作，请等待回执。"}
+    : capability(action),
+  submit: (action, params) => submit(action, modeFieldConfirm(action, params)),
+});
 const isNumber = (x) => typeof x === "number" && Number.isFinite(x);
 const number = (v, n = 2) => (isNumber(v) ? v.toFixed(n) : "—");
 const object = (v) =>
@@ -543,6 +554,8 @@ function capability(action) {
   return { available: false, reason: "后端未提供此功能的就绪状态；请核对版本同步与连接" };
 }
 function refreshCapabilities() {
+  deviceModePanel.update(lastState, backendOnline);
+  zeroCanSummary();
   const setAvailability = (e, c, action) => {
     e.disabled = !c.available || submitting;
     e.title = submitting ? "正在审核或提交任务，请等待回执" : !c.available ? c.reason || "等待本地后端" : actionNames[action] || action;
@@ -570,9 +583,10 @@ function refreshCapabilities() {
   }
   for (const e of document.querySelectorAll("[data-motion]")) {
     const action =
-        e.dataset.motion === "plan" ? "move_plan" : "move_" + e.dataset.pose,
+        e.dataset.pose === "zero" ? zeroCanAction(e.dataset.motion === "plan") : e.dataset.motion === "plan" ? "move_plan" : "move_" + e.dataset.pose,
       c = capability(action);
-    if (["ready", "zero"].includes(e.dataset.pose)) {
+    if (e.dataset.pose === "zero") e.textContent = actionNames[action];
+    if (e.dataset.pose === "ready") {
       try {
         const options = presetGripperDraft(e.dataset.pose);
         e.textContent = presetMotionTitle(e.dataset.pose, options, e.dataset.motion === "plan");
@@ -692,6 +706,8 @@ async function review(action, params) {
         ? "本次把当前已失能夹爪位置设为零。坐标将改变；不会自动闭合、重新使能、移动六关节或修复驱动故障。请核对已登记的物理基准与旧模型坐标关系。"
       : action === "gripper_disable"
         ? "本次仅失能右夹爪；夹爪可能失去保持力。六关节不失能，不自动移动或设零；实际结果仍需新鲜夹爪反馈确认。"
+      : action === "move_zero_can"
+        ? "本次目标臂：" + params.arms.join("、") + "。逐臂发送六关节数值零位；夹爪保持，不自动使能或将其他模式纳入。六零位不是零点标定或安全停放证明。"
       : ["move_ready", "move_zero"].includes(action)
         ? "本次向真实右执行臂发送运动目标。" + presetMotionSummary(action.slice(5), params, object(lastState.config)) + (params.close_gripper ? "请再次核对夹爪空载、指尖无人手或物体；同时闭爪选项不是现场安全确认。" : "") + (action === "move_zero" ? "六关节数值零位是位置目标，不是零点标定。" : "")
        : action === "move_gripper"
@@ -708,6 +724,16 @@ async function review(action, params) {
     d.showModal();
   });
 }
+function zeroCanAction(plan) { return plan ? "move_zero_can_plan" : "move_zero_can"; }
+function zeroCanSummary() {
+  const cap = lastState.capabilities?.move_zero_can;
+  const list = cap?.targets || [];
+  const omitted = Object.entries(cap?.skipped || {}).map(([arm, why]) => arm + ": " + why);
+  text("zero-can-targets", "本轮目标：" + (list.join("、") || "无") +
+    "。按顺序逐臂六零位，夹爪保持；仅覆盖已登记的独立通道。" +
+    (omitted.length ? " 未纳入：" + omitted.join("；") : "") +
+    (cap?.reason ? "。当前阻挡：" + cap.reason : ""));
+}
 function motionParams(pose) {
   if (pose === "target" && !targetInitialized)
     throw new Error("目标草稿尚未完成。请读取真实姿态，或输入六个有效角度后再查看计划。");
@@ -716,6 +742,11 @@ function motionParams(pose) {
     throw new Error(
       "预编程位姿运动请输入 1–10°/s；默认 10°/s。模型运动限速另行展示。",
     );
+  if (pose === "zero") {
+    const cap = lastState.capabilities?.move_zero_can;
+    if (!cap?.available || !cap.targets?.length) throw new Error(cap?.reason || "没有可执行的CAN/MOVEJ臂");
+    return {arms: [...cap.targets], speed_deg_s: speed};
+  }
   return {
     pose,
     arm: "right",
@@ -754,7 +785,8 @@ function renderModeConfirmations() {
   text("mode-confirmation-state", "点击执行即确认现场条件；实际模式以反馈为准。");
 }
 function modeFieldConfirm(action, params) {
-  const result = { ...params, arm: "right" };
+  if (params.arm !== "right") throw new Error("该模式操作需要明确指定右执行臂 RE，目标臂未获支持。");
+  const result = { ...params };
   for (const [key] of modeConfirmationFields(action)) result[key] = true;
   return result;
 }
@@ -859,7 +891,7 @@ for (const button of document.querySelectorAll("[data-open-gripper]"))
 for (const button of document.querySelectorAll("[data-open-controller]"))
   button.addEventListener("click", () => {
     openPage("connect");
-    requestAnimationFrame(() => $("controller-mode-panel").scrollIntoView({block:"start", behavior:"smooth"}));
+    requestAnimationFrame(() => $("device-mode-panel").scrollIntoView({block:"start", behavior:"smooth"}));
   });
 $("gripper-panel-close").addEventListener("click", () => { $("gripper-calibration-panel").hidden = true; });
 for (const id of ["gripper-measure-label"])
@@ -882,7 +914,9 @@ for (const e of document.querySelectorAll("[data-motion]"))
     try {
       const pose = e.dataset.pose;
       let params = motionParams(pose);
-      if (e.dataset.motion === "plan") submit("move_plan", params);
+      if (pose === "zero") submit(zeroCanAction(e.dataset.motion === "plan"),
+        e.dataset.motion === "plan" ? params : fieldConfirm(params));
+      else if (e.dataset.motion === "plan") submit("move_plan", params);
       else submit("move_" + pose, fieldConfirm(params));
     } catch (error) {
       showActionError(error.message, currentPage, e.dataset.motion === "plan" ? "move_plan" : "move_" + e.dataset.pose);
@@ -2543,6 +2577,7 @@ function pageSnapshotWatchdog() {
 function pausePageRefresh(hidden, expired = false) {
   // Suspend only this tab's display and read requests, never the robot task.
   backendOnline = false;
+  deviceModePanel?.update(lastState,false);
   displayDagger(null);
   renderUsbStorage(lastState.usb_storage, false);
   if (typeof collectionWorkbench !== "undefined") collectionWorkbench?.onConnection(false);
@@ -2642,6 +2677,7 @@ async function pollState() {
     if (backendOnline)
       addEvent("页面与后端连接中断：" + error.message, "error");
     backendOnline = false;
+  deviceModePanel?.update(lastState,false);
   displayDagger(null);
     renderUsbStorage(lastState.usb_storage, false);
     if (typeof collectionWorkbench !== "undefined") collectionWorkbench?.onConnection(false);

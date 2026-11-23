@@ -4,7 +4,7 @@ import re, shutil
 from build_project_page import ROOT, SITE, t, p, h, top, frame, footer, figure
 
 REPO='https://github.com/EDDY-YANG/cobot-magic-workbench'
-DOWNLOAD=REPO+'/releases/download/v0.1.2/cobot-magic-sdk-windows-x64.zip'
+DOWNLOAD=REPO+'/releases/download/v0.1.3/cobot-magic-sdk-windows-x64.zip'
 
 def write_generated(path, content):
     existing = path.read_bytes() if path.exists() else b''
@@ -49,7 +49,7 @@ def build():
     body=top()+'<main><header class="hero"><p class="eyebrow">EMERGE ROBOTICS · OPEN OPERATOR WORKSPACE</p><h1>COBOT MAGIC Workbench</h1><div class="authors"><span>Yang Taige</span><span>Ye Hanzhi</span></div><p class="affiliation">HKU Faculty of Engineering · Tam Wing Fam Innovation Wing</p>'
     body+=p('Connect. Demonstrate. Deploy. Review.','连接、示教、部署、复核。','hero-line')
     body+=p('One browser workspace for COBOT MAGIC, an RTX 4090 edge host and your Windows PC.','面向 COBOT MAGIC、RTX 4090 端侧主机与 Windows PC 的统一网页工作台。','lede')
-    body+='<div class="hero-links"><a class="button primary" href="'+DOWNLOAD+'">'+t('Download Windows SDK','下载 Windows SDK')+'</a><a class="button" href="replay.html">'+t('Open recorded demo','打开记录回放')+'</a><a class="button" href="manual.html">'+t('User manual','使用手册')+'</a><a class="button" href="'+REPO+'">GitHub</a></div>'+p('v0.1.2 · Research release. The Windows package opens offline; live operation connects to your authorized lab server.','v0.1.2 · 研究版本。Windows 包可离线打开；真机操作连接到你已获授权的实验室服务器。','scope')+'</header>'
+    body+='<div class="hero-links"><a class="button primary" href="'+DOWNLOAD+'">'+t('Download Windows SDK','下载 Windows SDK')+'</a><a class="button" href="replay.html">'+t('Open recorded demo','打开记录回放')+'</a><a class="button" href="manual.html">'+t('User manual','使用手册')+'</a><a class="button" href="'+REPO+'">GitHub</a></div>'+p('v0.1.3 · Research release. The Windows package opens offline; live operation connects to your authorized lab server.','v0.1.3 · 研究版本。Windows 包可离线打开；真机操作连接到你已获授权的实验室服务器。','scope')+'</header>'
     body+=player()
     body+='<section id="capabilities"><div class="section-heading">'+h('The controls you need, together','把需要的操作放在一起')+'</div><div class="features">'
     for a,b,c,d in [
@@ -64,25 +64,40 @@ def build():
     body+=p('Source assembly: <a href="https://github.com/agilexrobotics/mobile_aloha_sim/tree/f799ae0192c0c2bbd502ec4d9bbec8c2633acd1a">AgileX mobile_aloha_sim · f799ae0</a>.','整机来源：<a href="https://github.com/agilexrobotics/mobile_aloha_sim/tree/f799ae0192c0c2bbd502ec4d9bbec8c2633acd1a">AgileX mobile_aloha_sim · f799ae0</a>。','note')+'</section>'
     body+='<section id="workflow">'+h('Use it in six steps','六步完成一次试验')+figure('workflow','Connect inspect select start record review','An explicit operator click starts a trial. Reconnecting SSH never repeats a command.','试验由操作员明确点击开始，SSH 重连不会重发命令。')+'</section>'
     body+='<section id="data">'+h('Trace the data','追踪数据链路')+figure('data-link','Images and feedback to inference, local execution and storage','Video, feedback, predictions and commands retain their timestamps and identities.','视频、反馈、预测和命令保留各自时间戳与身份。')+'</section>'
-    body+='<section class="download-band">'+h('Start with the recorded demo','从离线回放开始')+p('Extract the Windows ZIP and double-click Start-Workbench.cmd. Python and OpenSSH are included. Use Connect for an already configured 4090 server; no model weights or private machine profiles are bundled.','解压 Windows ZIP，双击 Start-Workbench.cmd，内置 Python 与 OpenSSH。在 Connect 页面接入已配置的 4090 服务；不包含模型权重或私有机器配置。')+'<a class="button primary" href="'+DOWNLOAD+'">Windows x64 SDK</a> <a class="button" href="'+REPO+'/releases/tag/v0.1.2">'+t('Release & checksums','版本与校验和')+'</a></section></main>'+footer()
+    body+='<section class="download-band">'+h('Start with the recorded demo','从离线回放开始')+p('Extract the Windows ZIP and double-click Start-Workbench.cmd. Python and OpenSSH are included. Use Connect for an already configured 4090 server; no model weights or private machine profiles are bundled.','解压 Windows ZIP，双击 Start-Workbench.cmd，内置 Python 与 OpenSSH。在 Connect 页面接入已配置的 4090 服务；不包含模型权重或私有机器配置。')+'<a class="button primary" href="'+DOWNLOAD+'">Windows x64 SDK</a> <a class="button" href="'+REPO+'/releases/tag/v0.1.3">'+t('Release & checksums','版本与校验和')+'</a></section></main>'+footer()
     write_generated(SITE/'index.html',frame(body,'COBOT MAGIC Workbench | Emerge Robotics','COBOT MAGIC 工作台 | Emerge Robotics').replace('</body>','<script src="assets/replay.js" defer></script><script type="module" src="assets/cobot-assembly.js"></script></body>'))
     replay=top()+'<main><header class="compact-heading"><p class="eyebrow">RECORDED SESSION · READ ONLY</p><h1>'+t('Experiment replay','实验回放')+'</h1>'+p('Recorded camera views, measured angles and model visualization on one timeline.','同一时间轴上的真实相机画面、实测角度与模型可视化。')+'</header>'+player(True)+'</main>'+footer()
     write_generated(SITE/'replay.html',frame(replay,'Recorded experiment | Emerge Robotics','实验回放 | Emerge Robotics').replace('</body>','<script src="assets/replay.js" defer></script></body>'))
 
 def interface_preview(src=None,dst=None):
     src=src or ROOT/'lab_stack/web';dst=dst or SITE/'interface'
-    shutil.copytree(src,dst,dirs_exist_ok=True,ignore=shutil.ignore_patterns('*.png','__pycache__'))
-    for file in dst.rglob('*'):
-        if file.suffix not in ('.html','.js','.mjs','.css'):continue
-        s=file.read_text(encoding='utf8')
+    for source in src.rglob('*'):
+        relative = source.relative_to(src)
+        if not source.is_file() or source.suffix.lower() == '.png' or '__pycache__' in relative.parts:
+            continue
+        file = dst/relative
+        file.parent.mkdir(parents=True, exist_ok=True)
+        if file.suffix not in ('.html','.js','.mjs','.css'):
+            shutil.copyfile(source, file)
+            continue
+        s = source.read_text(encoding='utf8')
         if file.suffix=='.html':
             s=re.sub(r'(src|href)="/(?!/)',r'\1="./',s)
             s=s.replace('href="http://127.0.0.1:8891/"', 'href="./review/index.html"')
+            if dst == SITE/'interface' and file.name == 'index.html':
+                s = s.replace('./api/device-view/panel.css', './device-mode-panel.css')
+                source = '<img id="device-top-image" src="./api/device-view/cobot-top.png" alt="COBOT MAGIC 四臂静态俯视布局">'
+                frame = '<iframe class="public-top-view" src="../assembly-top.html" title="COBOT MAGIC · 俯视布局" tabindex="-1" loading="lazy" referrerpolicy="no-referrer" style="width:100%;height:100%;position:absolute;inset:0;border:0;pointer-events:none"></iframe>'
+                if s.count(source) != 1:
+                    raise ValueError('Expected the installation top-view image in the arm overview')
+                s = s.replace(source, frame)
             if dst.name == 'review':
                 s=s.replace('href="http://127.0.0.1:8873/', 'href="../index.html')
             s=s.replace('<head>','<head><meta http-equiv="Content-Security-Policy" content="default-src \'self\' data: blob:; script-src \'self\'; style-src \'self\' \'unsafe-inline\'; connect-src \'self\'; form-action \'none\'; object-src \'none\'"><script src="preview-only.js"></script>')
         else:
             s=re.sub(r'([\'"`])/(assets/[^\'"`]+)',r'\1./\2',s)
+            if dst == SITE/'interface' and file.name == 'app.js':
+                s = s.replace('from "/api/device-view/panel.mjs"', 'from "./device-mode-panel.mjs"')
         write_generated(file,s)
     write_generated(dst/'preview-only.js','''"use strict";
 const nativeFetch=window.fetch.bind(window);
@@ -93,7 +108,7 @@ window.addEventListener("DOMContentLoaded",()=>{
  document.body.style.paddingTop="36px";
  const style=document.createElement('style');style.textContent='#attention-center,#stop-latch-banner{display:none!important}';document.head.append(style);
  document.addEventListener("click",e=>{const button=e.target.closest("button");const a=e.target.closest("a");
- if(button&&!button.matches("[data-page],#show-details,#refresh-state,[data-attention-open],[data-attention-close]")){e.preventDefault();e.stopImmediatePropagation();}
+ if(button&&!button.matches("[data-page],[data-device-id],.arm-select,#show-details,#refresh-state,[data-attention-open],[data-attention-close]")){e.preventDefault();e.stopImmediatePropagation();}
  if(a&&a.getAttribute("href")&&!a.getAttribute("href").startsWith("#")&&!a.getAttribute("href").startsWith("./review/")&&!a.getAttribute("href").startsWith("../index.html")){e.preventDefault();e.stopImmediatePropagation();}},true);
 });
 ''')

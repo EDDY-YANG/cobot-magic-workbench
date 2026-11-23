@@ -100,7 +100,7 @@ async function loadMeshes(root, hashes, signal) {
   return models;
 }
 
-function studioScene(visuals, models, bounds) {
+function studioScene(visuals, models, bounds, topView) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#f2f2f2');
   const robot = new THREE.Group();
@@ -120,13 +120,18 @@ function studioScene(visuals, models, bounds) {
   const center = lower.clone().add(upper).multiplyScalar(0.5);
   const extent = upper.clone().sub(lower);
   const span = Math.max(extent.x, extent.y, extent.z);
-  const width = span * 1.52;
-  const height = width * 1000 / 1400;
+  const width = topView ? Math.max(extent.x, extent.y) * 1.22 : span * 1.52;
+  const height = topView ? width : width * 1000 / 1400;
   const camera = new THREE.OrthographicCamera(-width / 2, width / 2, height / 2, -height / 2, 0.01, 50);
-  camera.up.set(0, 0, 1);
-  camera.position.copy(center).addScaledVector(new THREE.Vector3(2.5, -3.2, 1.65), span);
+  if (topView) {
+    camera.up.set(1, 0, 0);
+    camera.position.copy(center).add(new THREE.Vector3(0, 0, 3 * span));
+  } else {
+    camera.up.set(0, 0, 1);
+    camera.position.copy(center).addScaledVector(new THREE.Vector3(2.5, -3.2, 1.65), span);
+    camera.setViewOffset(1400, 1000, 215, 32, 928, 976);
+  }
   camera.lookAt(center);
-  camera.setViewOffset(1400, 1000, 215, 32, 928, 976);
   scene.add(new THREE.HemisphereLight(0xffffff, 0xe5e8ed, 2.0));
   scene.add(new THREE.AmbientLight(0xffffff, 1.7));
   for (const [position, intensity] of [[[2, -3, 4], 2.8], [[-3, -1, 3], 1.2], [[0, 4, 3], 1.4]]) {
@@ -156,7 +161,7 @@ async function renderAssembly() {
     const urdf = await checkedSource(root, source.urdf, source.urdf_hash, abort.signal);
     const visuals = readVisuals(xmlDocument(urdf).documentElement);
     const models = await loadMeshes(root, source.meshes, abort.signal);
-    const view = studioScene(visuals, models, source.bounds);
+    const view = studioScene(visuals, models, source.bounds, assembly.dataset.assemblyView === 'top');
     robot = view.robot;
     renderer.render(view.scene, view.camera);
     const context = canvas.getContext('2d');
@@ -167,7 +172,7 @@ async function renderAssembly() {
   } catch (error) {
     abort.abort();
     assembly.dataset.assemblyRender = 'fallback';
-    console.warn('Using the official assembly preview:', error.message);
+    console.warn('Assembly fallback:', error.message);
   } finally {
     clearTimeout(timer);
     if (robot) {

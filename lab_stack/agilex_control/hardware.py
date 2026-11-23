@@ -947,7 +947,7 @@ class PiperAdapter:
                      accel_deg_s2=50.0, cancel=lambda: False, transmit_hz=100.0,
                      endpoint_tolerance_deg=2.0, settle_timeout_s=3.0,
                      stationary_window_s=0.5, stationary_span_deg=0.5,
-                     companion_tick=None):
+                     companion_tick=None, require_existing_can=False):
         """Cosine trajectory from fresh stationary feedback, then verify arrival.
 
         path_reviewed acknowledges actual workspace sweep review; it does NOT
@@ -969,7 +969,7 @@ class PiperAdapter:
         self.require_leader_isolation()
         if not 10 <= transmit_hz <= 200:
             raise HardwareBlocked("Pose transmit_hz must be within10..200")
-        state = self.feedback(require_can=False)
+        state = self.feedback(require_can=require_existing_can)
         # Observe stationarity BEFORE the final effective mode handoff. A mode
         # request followed by a silent 0.5s window was an input-watchdog gap.
         # Healthy standby is a readable state, never an executable CAN substitute.
@@ -978,7 +978,7 @@ class PiperAdapter:
         while time.monotonic() < until:
             if cancel():
                 raise HardwareBlocked("Cancelled before first pose target")
-            state = self.feedback(require_can=False)
+            state = self.feedback(require_can=require_existing_can)
             history.append((time.monotonic(), tuple(state["q_deg"])))
             time.sleep(0.02)
         span = max(max(q[j] for _, q in history) - min(q[j] for _, q in history) for j in range(6))
@@ -988,6 +988,8 @@ class PiperAdapter:
                          max_speed_deg_s=speed_deg_s, max_accel_deg_s2=accel_deg_s2)
         if cancel():
             raise HardwareBlocked("Cancelled before first pose target")
+        if require_existing_can:
+            self.feedback(require_can=True, require_enabled=True)
         self.handoff_can_movej()
         # Replan using fresh actual feedback after the acknowledged handoff, then
         # send the first reference without another stationary/model-load window.

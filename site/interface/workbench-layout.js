@@ -51,9 +51,9 @@ function compactConnect() {
   const page = byId('page-connect'); if (!page) return;
   const bar = dock(page, '连接与模式操作');
   const find = action => page.querySelector(`[data-action="${action}"]`);
-  move(bar.actions, [find('connect'),find('disconnect'),find('hub_start'),find('mode_takeover'),find('mode_inspect')]);
-  const options = disclosure('更多模式', 'dock-popover');
-  move(options, [find('mode_high_follow'),find('mode_standby'),find('mode_disable'),find('mode_reset'),page.querySelector('[data-open-gripper]')]);
+  move(bar.actions, [find('connect'),find('disconnect'),find('hub_start'),find('mode_inspect')]);
+  const options = disclosure('右执行臂维护', 'dock-popover');
+  move(options, [find('mode_high_follow'),find('mode_standby'),find('mode_reset'),page.querySelector('[data-open-gripper]')]);
   bar.actions.append(options);
   const controller = byId('controller-mode-panel');
   if (controller) {
@@ -119,7 +119,7 @@ function compactRecording() {
   if(workspace)page.querySelector('.page-heading')?.after(workspace);
 }
 function labels() {
-  const map={'precision-title':'模型与任务','h50-deployment-title':'FP32运行记录','controller-mode-heading':'控制模式',
+  const map={'precision-title':'模型与任务','h50-deployment-title':'FP32运行记录','controller-mode-heading':'右执行臂模式诊断',
     'precision-load':'加载模型','precision-acceptance':'无运动验收','precision-start':'开始运行','precision-stop':'停止运行','precision-release':'释放显存',
     'h50-load':'加载模型','h50-shadow':'影子推理（FP32）','h50-acceptance':'无运动验收','h50-start':'人工试验（FP32，未验收）','h50-stop':'停止运行',
     'preview-target':'查看J计划','execute-target':'执行J目标','gripper-target-execute':'执行G开合','target-from-actual':'读取当前目标',
@@ -140,4 +140,4 @@ function mountCompactWorkbench() {
 mountCompactWorkbench();
 
 // Read-only motion traces; isolated from deployment/controller integration.
-void import("./motion-trace.js?v=20261024-1").catch(error => console.error("Motion trace unavailable", error));
+void import(new URL("./motion-trace.js?v=20261024-1", document.baseURI).href).catch(error => console.error("Motion trace unavailable", error));
