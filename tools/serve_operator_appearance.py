@@ -12,6 +12,8 @@ import sys
 from urllib.parse import urlsplit
 
 ASSET_PATHS = {
+    '/api/device-view/panel.mjs': ('device-mode-panel.mjs', 'text/javascript; charset=utf-8'),
+    '/api/device-view/panel.css': ('device-mode-panel.css', 'text/css; charset=utf-8'),
     '/device-mode-panel.mjs': ('device-mode-panel.mjs', 'text/javascript; charset=utf-8'),
     '/device-mode-panel.css': ('device-mode-panel.css', 'text/css; charset=utf-8'),
     '/api/appearance/operator-theme.css': ('operator-theme.css', 'text/css; charset=utf-8'),

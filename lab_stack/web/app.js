@@ -1,4 +1,4 @@
-import {bindDeviceModePanel} from "./device-mode-panel.mjs";
+import {bindDeviceModePanel} from "/api/device-view/panel.mjs";
 // Operator declarations: explicit-button-click, authorized by Tiger 2026-10-23.
 /* 通过项目工作台 HTTP 服务加载；不直接运行本文件。
  * 写入、录制和控制请求须来自明确按钮点击；恢复采集身份只发送只读回执核验。
