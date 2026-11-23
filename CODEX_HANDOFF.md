@@ -51,3 +51,12 @@ Validation before publication includes 48 Python tests, 14 UI state tests, origi
 ## 2026-11-23 USB session reconnect
 
 The server appearance entry installs a pinned reconnect extension for the existing Connect action. An expired storage session is released only after explicit reconnect, original-drive selection and a real remote idle lease. The existing config/source checks run under the lease; active Hub/writers remain blocked. No robot source or motion path is replaced. See docs/usb-session-reconnect.md. Tests cover successful recovery and failure/retry races; physical unplug/replug remains an operator acceptance step.
+
+## 2026-11-23 CAN group zero and Connection device panel
+
+See docs/can-mode-zero.md. New group-zero actions preserve old single-arm APIs and
+policy controllers. UI and executor check the same frozen registered arm list;
+gripper remains unchanged. 17 Python + 5 device-view JS + 4 appearance checks pass.
+Physical four-arm binding, paired teleop and hand-guiding are not validated.
+The private asset is external to this repository. Runtime publication/readback is
+recorded separately; an offline pass is not physical homing acceptance.

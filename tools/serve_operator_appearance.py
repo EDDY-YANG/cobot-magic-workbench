@@ -12,6 +12,8 @@ import sys
 from urllib.parse import urlsplit
 
 ASSET_PATHS = {
+    '/device-mode-panel.mjs': ('device-mode-panel.mjs', 'text/javascript; charset=utf-8'),
+    '/device-mode-panel.css': ('device-mode-panel.css', 'text/css; charset=utf-8'),
     '/api/appearance/operator-theme.css': ('operator-theme.css', 'text/css; charset=utf-8'),
     '/api/appearance/operator-theme.js': ('operator-theme.js', 'text/javascript; charset=utf-8'),
 }
@@ -42,6 +44,12 @@ def load_installation(path):
     assets = Path(__file__).resolve().parents[1]/'lab_stack'/'web'
     static = {route: ((assets/name).read_bytes(), mime)
               for route, (name, mime) in ASSET_PATHS.items()}
+    image_path = config.get("device_view_asset")
+    if image_path:
+        image_file = Path(image_path).resolve(strict=True)
+        if str(image_file) not in config["pins"]:
+            raise ValueError("Unpinned device overview image")
+        static["/api/device-view/cobot-top.png"] = (image_file.read_bytes(), "image/png")
     sys.path.insert(0, str(entry.parent))
     spec = importlib.util.spec_from_file_location('_original_operator_entry', entry)
     module = importlib.util.module_from_spec(spec)

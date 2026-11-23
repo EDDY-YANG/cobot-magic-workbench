@@ -462,6 +462,24 @@ def build_command(action, params, cfg):
         **{key: {"pose", "arm", "target_deg", "speed_deg_s", "leader_isolated", "path_reviewed", "close_gripper", "gripper_speed_mm_s"}
            for key in ("move_ready", "move_zero", "move_target")},
     }
+    if action in ("move_zero_can", "move_zero_can_plan"):
+        accepted = {"arms", "speed_deg_s", "leader_isolated", "path_reviewed"}
+        if set(params) - accepted:
+            raise ValidationError("全部CAN六零位不接受夹爪、角色切换或自定义目标")
+        roles = params.get("arms")
+        registered = cfg.get("can", {})
+        if (not isinstance(roles,list) or not roles or
+                any(not isinstance(r,str) or r not in registered for r in roles)
+                or len(set(roles)) != len(roles)):
+            raise ValidationError("需要明确且不重复的已登记机械臂清单")
+        speed = number(params, "speed_deg_s", cfg["pose_speed_deg_s"], 1, cfg["pose_speed_deg_s"])
+        argv = ["move", "zero", "--arm", "can-movej", "--expected-arms", *sorted(roles),
+                "--speed-deg-s", str(speed)]
+        if action == "move_zero_can_plan":
+            return argv + ["--json"]
+        if params.get("leader_isolated") is not True or params.get("path_reviewed") is not True:
+            raise ValidationError("请核对本轮全部目标臂的控制源隔离与回零路径")
+        return argv + ["--apply", "--leader-isolated", "--path-reviewed"]
     if action not in allowed:
         raise ValidationError("未知操作：" + str(action))
     extra = set(params) - allowed[action]
@@ -1100,6 +1118,10 @@ def capabilities(value, connected, cfg=None):
         if not reason and busy and not action.startswith("task_review_"):
             reason = "当前任务执行中，请等待回执；停止新目标仍可独立使用"
         result[action] = {"available": reason is None, "reason": reason}
+    from .can_zero import view as can_zero_view
+    zero = can_zero_view(value, cfg or {}, connected)
+    result["move_zero_can"] = zero
+    result["move_zero_can_plan"] = dict(zero)
     grip = right.get('gripper_feedback', {})
     age, position = grip.get('age_s'), grip.get('aperture_m')
     reason = None
@@ -1571,6 +1593,13 @@ class WebApp:
             if gate.get("available") is not True:
                 self.operation.release()
                 raise ValidationError(gate.get("reason") or "功能尚未就绪")
+            if action in ("move_zero_can", "move_zero_can_plan"):
+                from .can_zero import require_selection
+                try:
+                    require_selection(self.cfg, snapshot.get("status",{}).get("arms",{}), params.get("arms"))
+                except (ValueError, RuntimeError) as exc:
+                    self.operation.release()
+                    raise ValidationError(str(exc)) from exc
             job = {"id": uuid.uuid4().hex[:12], "action": action, "state": "queued", "created_at": stamp(),
                    "params": copy.deepcopy(params), "argv": argv, "result": None, "error": None}
             self.jobs.append(job)

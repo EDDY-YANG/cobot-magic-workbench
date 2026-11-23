@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="color-scheme" content="light" />
     <title>Emerge Robotics · AgileX 工作台</title>
-  <link rel="stylesheet" href="/dagger.css"></head>
+  <link rel="stylesheet" href="/dagger.css"><link rel="stylesheet" href="/device-mode-panel.css"></head>
   <body class="pixel-workbench emerge-workbench compact-workbench">
     <aside class="sidebar">
       <a class="brand" href="#connect" aria-label="Emerge Robotics 工作台" title="Emerge Robotics">
@@ -91,6 +91,24 @@
           </div>
           <div class="page-readiness" id="connect-readiness" aria-live="polite"></div>
           <div class="action-error" id="connect-action-error" role="alert" hidden></div>
+          <article class="panel" id="device-mode-panel" aria-label="设备与控制模式">
+            <div class="panel-title"><div><div class="eyebrow">DEVICE CONTROL / 设备控制</div><h2>Choose an arm. Inspect its mode.</h2><p>选择机械臂，查看与切换模式</p></div></div>
+            <div class="device-layout">
+              <figure class="device-top">
+                <img id="device-top-image" src="/api/device-view/cobot-top.png" alt="COBOT MAGIC 四臂静态俯视布局">
+                <p id="device-image-unavailable" hidden>资产预览未加载 · 仍可通过标记选择设备</p>
+                <button type="button" class="device-hotspot" data-device-id="LE" aria-label="选择左执行臂">LE</button><button type="button" class="device-hotspot" data-device-id="RE" aria-label="选择右执行臂">RE</button><button type="button" class="device-hotspot" data-device-id="LT" aria-label="选择左示教臂">LT</button><button type="button" class="device-hotspot" data-device-id="RT" aria-label="选择右示教臂">RT</button><button type="button" class="device-hotspot" data-device-id="BASE" aria-label="选择底盘">BASE</button>
+                <figcaption>TOP VIEW · 静态布局，点击仅选择设备</figcaption>
+              </figure>
+              <section>
+                <div class="device-side-head"><b class="device-code" id="device-selected-code">RE</b><div><h3 id="device-selected-title"></h3><span class="device-status" id="device-selected-state"></span></div></div>
+                <p class="footnote" id="device-selected-reason"></p>
+                <dl class="device-detail"><div><dt>Interface / 设备接口</dt><dd id="device-selected-interface"></dd></div><div><dt>Feedback age / 反馈年龄</dt><dd id="device-selected-age"></dd></div><div><dt>Pair / 主从配对</dt><dd id="device-selected-pair"></dd></div><div><dt>Controller report / 原始模式</dt><dd id="device-selected-raw"></dd></div></dl>
+                <div class="device-mode-actions" id="device-mode-actions"><button type="button" id="device-mode-teleop" disabled><strong>Teleoperation</strong><span>遥操作联动</span><small></small></button><button type="button" id="device-mode-pc" disabled><strong>PC control</strong><span>电脑接管 · CAN/MOVEJ</span><small></small></button><button type="button" id="device-mode-drag" disabled><strong>Hand guiding</strong><span>自由拖动</span><small></small></button><button type="button" id="device-mode-disable" disabled><strong>Motor disable</strong><span>电机失能</span><small></small></button></div>
+                <p class="device-notes">LE / RE 执行臂 · LT / RT 示教臂。遥操作按主从对切换。自由拖动不等于 STANDBY；失能不等于整机断电或自动停放。灰色操作尚未就绪。</p>
+              </section>
+            </div>
+          </article>
           <article class="panel usb-target-panel" data-usb-panel aria-label="AgileX 录制 U 盘">
             <div class="panel-title"><div><div class="eyebrow">STORAGE / USB TARGET</div><h2>AgileX 录制 U 盘</h2></div><button class="button" data-usb-scan>↻ 检查已插 U 盘</button></div>
             <p class="usb-target-state" data-usb-state role="status">尚未扫描 AgileX 上实际挂载的 USB。</p>
@@ -677,11 +695,12 @@
                 </div>
                 <div>
                   <span class="mini-tag">JOINT ZERO</span>
-                  <h3>六关节数值零位</h3>
+                  <h3>全部 CAN/MOVEJ 臂六零位</h3>
+                  <p id="zero-can-targets" role="status">等待核对已登记机械臂的真实模式。</p>
                   <code>0 / 0 / 0 / 0 / 0 / 0</code>
                   <p>这不是零点校准，不是已验证可靠支撑停放位。</p>
-                  <label class="preset-close-option">零位夹爪<select id="zero-close-gripper"><option value="no" selected>保持当前开度</option><option value="yes">同时闭合空爪</option></select></label>
-                  <p class="footnote" id="zero-gripper">未勾选：只发送六关节数值零位目标。</p>
+                  <label class="preset-close-option" hidden>零位夹爪<select id="zero-close-gripper" disabled><option value="no" selected>保持当前开度</option><option value="yes">同时闭合空爪</option></select></label>
+                  <p class="footnote" id="zero-gripper">夹爪保持当前开度；仅对本轮列出的CAN/MOVEJ臂逐个执行。</p>
                   <div class="button-row">
                     <button class="button" data-pose="zero" data-motion="plan">
                       查看六关节零位计划</button
