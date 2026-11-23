@@ -47,3 +47,7 @@ Release v0.1.0: operator workbench source, bilingual Pages, portable Windows cli
 English-first bilingual labels and original state colors are now integrated into the lab web source. See docs/release-v0.1.2.md. Production appearance serving uses external source pins and the existing application entry points. The public preview includes the independent review UI. Device/controller and native recording changes from the DAgger branch are outside this release.
 
 Validation before publication includes 48 Python tests, 14 UI state tests, original JavaScript hash and button-payload comparisons, and browser checks of the generated source preview. Physical validation remains pending while the robot link is unavailable.
+
+## 2026-11-23 USB session reconnect
+
+The server appearance entry installs a pinned reconnect extension for the existing Connect action. An expired storage session is released only after explicit reconnect, original-drive selection and a real remote idle lease. The existing config/source checks run under the lease; active Hub/writers remain blocked. No robot source or motion path is replaced. See docs/usb-session-reconnect.md. Tests cover successful recovery and failure/retry races; physical unplug/replug remains an operator acceptance step.

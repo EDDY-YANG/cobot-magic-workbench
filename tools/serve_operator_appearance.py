@@ -155,6 +155,18 @@ def main():
     args = parser.parse_args()
     config, module, static = load_installation(args.installation)
     if config['kind'] == 'workbench':
+        # A pinned server-only extension; robot source/handlers stay unchanged.
+        root = Path(config['argv'][config['argv'].index('--root') + 1])
+        sys.path.insert(0, str(root))
+        from agilex_control import web_backend
+        recovery_path = Path(__file__).with_name('workbench_usb_recovery.py')
+        for helper in (recovery_path, recovery_path.with_name('usb_reconnect_probe.py')):
+            if str(helper.resolve()) not in config['pins']:
+                raise ValueError('Unpinned USB reconnect helper: ' + str(helper))
+        recovery_spec = importlib.util.spec_from_file_location('_usb_recovery', recovery_path)
+        recovery = importlib.util.module_from_spec(recovery_spec)
+        recovery_spec.loader.exec_module(recovery)
+        recovery.install(web_backend)
         decorate_workbench(module, static)
     else:
         decorate_review(module, static)
