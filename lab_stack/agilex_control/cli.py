@@ -385,7 +385,8 @@ def parser(cfg=None):
     move.add_argument("target", choices=("ready", "zero", "target"))
     move.add_argument("--angles-deg", nargs=6, type=float, help="Explicit six-joint draft; degrees, not coordinate calibration")
     move.add_argument("--speed-deg-s", type=float, help="Pose reference speed; positive and no greater than configured pose cap")
-    move.add_argument("--arm", choices=("right", "left", "both"), default="right")
+    move.add_argument("--arm", choices=("right", "left", "both", "can-movej"), default="right")
+    move.add_argument("--expected-arms", nargs="+", help="Frozen registered CAN/MOVEJ targets; zero-only")
     move.add_argument("--apply", action="store_true")
     move.add_argument("--close-gripper", action="store_true", help="Right ready/zero only: close empty gripper during reviewed joint pose; verify both")
     move.add_argument("--gripper-speed-mm-s", type=float, help="Positive preparation reference speed, at most 10 mm/s; actual physical speed needs verification")
@@ -1197,8 +1198,24 @@ def main(cfg, root):
             if command == "move" and args.apply:
                 _apply_flags(args)
                 require_not_stopped(cfg)
-            roles = ("right", "left") if args.arm == "both" else (args.arm,)
+            can_zero = command == "move" and args.arm == "can-movej"
+            if can_zero:
+                if args.target != "zero" or args.close_gripper or args.gripper_speed_mm_s is not None:
+                    raise ValueError("All-CAN zero changes only six joint targets")
+                if pose_target != [0]*6:
+                    raise ValueError("All-CAN six-zero requires an actual six-zero preset")
+                from .can_zero import require_selection
+                roles = tuple(sorted(cfg["can"]))
+                expected = args.expected_arms
+                if not expected or any(r not in roles for r in expected) or len(set(expected)) != len(expected):
+                    raise ValueError("Missing or invalid frozen CAN/MOVEJ arm list")
+            else:
+                if command == "move" and args.expected_arms:
+                    raise ValueError("--expected-arms requires --arm can-movej")
+                roles = ("right", "left") if args.arm == "both" else (args.arm,)
             outcomes = {}
+            if can_zero:
+                session.report["can_zero_outcomes"] = outcomes
             prepared_adapters = {}
             with ExitStack() as stack:
                 # Acquire all requested locks before any movement; separate
@@ -1206,10 +1223,27 @@ def main(cfg, root):
                 if command == "limits" or args.apply:
                     for role in roles:
                         stack.enter_context(Ownership("writer-" + cfg["can"][role]["interface"]))
-                for role in roles:
-                    observer = CanObserver(**cfg["can"][role]).start()
-                    stack.callback(observer.stop)
+                observers = {}
+                if can_zero:
+                    # All writer leases are held before reading the current set.
+                    failures = {}
+                    for role in roles:
+                        try:
+                            obs = CanObserver(**cfg["can"][role]).start()
+                            observers[role] = obs
+                            stack.callback(obs.stop)
+                        except (OSError, RuntimeError) as exc:
+                            failures[role] = {"observer_error":str(exc)}
                     time.sleep(.3)
+                    states = {**failures, **{r:o.control_snapshot() for r,o in observers.items()}}
+                    chosen = require_selection(cfg, states, expected)
+                    session.report["can_zero_selection"] = chosen
+                    roles = tuple(chosen["targets"])
+                for role in roles:
+                    observer = observers.get(role) if can_zero else CanObserver(**cfg["can"][role]).start()
+                    if not can_zero:
+                        stack.callback(observer.stop)
+                        time.sleep(.3)
                     if command == "move" and not args.apply:
                         state = observer.snapshot()
                         target = pose_target
@@ -1248,16 +1282,25 @@ def main(cfg, root):
                     # enable. A blocked left target must not first move the right.
                     adapter.require_leader_isolation()
                     adapter.require_no_foreign_commands()
-                    state = adapter.feedback(require_enabled=False)
+                    state = adapter.feedback(require_enabled=can_zero)
                     target = pose_target
                     plan_pose(state["q_deg"], target, adapter.cfg["command_limits_deg"],
                               max_speed_deg_s=pose_speed, max_accel_deg_s2=cfg["pose_accel_deg_s2"])
                     prepared_adapters[role] = (adapter, events)
+                if can_zero and args.apply:
+                    require_selection(cfg, {r:o.control_snapshot() for r,o in observers.items()}, expected)
                 # Execution is deliberately sequential, not a bimanual
                 # collision planner. Every arm replans from fresh feedback.
                 for role, (adapter, events) in prepared_adapters.items():
+                    if can_zero:
+                        # Earlier arms can have our own recent TX; revalidate only the
+                        # not-yet-executed target, without suppressing its foreign TX.
+                        one_cfg = {**cfg, "can": {role: cfg["can"][role]}}
+                        require_selection(one_cfg, {role: observers[role].control_snapshot()}, [role])
                     adapter.connect_for_apply()
                     if not all(adapter.feedback(require_enabled=False)["enabled"]):
+                        if can_zero:
+                            raise RuntimeError("Selected CAN/MOVEJ arm became disabled; no automatic enable")
                         adapter.handoff_can_movej()
                         adapter.enable()
                     print("实际执行请求：", role, args.target, f"；参考上限 {pose_speed}°/s。先确认静止和控制模式，随后才发送位置目标。", flush=True)
@@ -1265,6 +1308,8 @@ def main(cfg, root):
                         accel_deg_s2=cfg["pose_accel_deg_s2"], transmit_hz=cfg["pose_send_hz"],
                         cancel=lambda: stop_event.is_set() or stop_requested(cfg),
                         endpoint_tolerance_deg=cfg["endpoint_tolerance_deg"], settle_timeout_s=cfg["endpoint_settle_timeout_s"])
+                    if can_zero:
+                        pose_options["require_existing_can"] = True
                     if args.close_gripper:
                         from .preparation import prepare_ready_pose
                         try:

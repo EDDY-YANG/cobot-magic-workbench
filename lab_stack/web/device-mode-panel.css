@@ -1,0 +1,123 @@
+/* Copyright (c) 2026 Yang Taige. SPDX-License-Identifier: MIT */
+#device-mode-panel { container-type: inline-size; }
+#device-mode-panel [hidden] { display: none !important; }
+#device-mode-panel .panel-title { margin-bottom: 16px; }
+#device-mode-panel .panel-title .eyebrow { display: none; }
+#device-mode-panel .panel-title h2 { margin: 0; }
+#device-mode-panel .panel-title p { margin: 3px 0 0; color: #506078; font-size: 13px; }
+
+#device-mode-panel:not(.arm-overview) .device-top {
+  position: relative; margin: 0 auto; max-width: 400px; aspect-ratio: 1;
+}
+.arm-overview .device-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.14fr) minmax(0, 1fr);
+  grid-template-areas: "le diagram re" "lt diagram rt";
+  align-items: stretch;
+  gap: clamp(8px, 1.2cqi, 18px);
+}
+.arm-card[data-arm="LE"] { grid-area: le; }
+.arm-card[data-arm="RE"] { grid-area: re; }
+.arm-card[data-arm="LT"] { grid-area: lt; }
+.arm-card[data-arm="RT"] { grid-area: rt; }
+
+.arm-overview .device-top {
+  grid-area: diagram;
+  position: relative;
+  align-self: center;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: 0;
+  background: #e4e7eb;
+  border: 1px solid #c9d2dc;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.device-top img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.device-top figcaption {
+  position: absolute; inset: auto 0 0;
+  padding: 6px 4px; background: #f5f7f9ee;
+  color: #415063; font: 500 11px/1.25 "Segoe UI", sans-serif; text-align: center;
+}
+#device-image-unavailable { position: absolute; inset: 28% 20% auto; text-align: center; font-size: 12px; color: #455366; }
+.device-hotspot {
+  position: absolute; transform: translate(-50%, -50%); min-width: 36px; min-height: 28px;
+  padding: 3px 7px; border: 1px solid #9dabb9; background: #fcfdff; color: #26384c;
+  font: 700 12px/1.2 Consolas, monospace; cursor: pointer;
+}
+.device-hotspot[aria-pressed="true"] { background: #1d5592; border-color: #16457a; color: #fff; box-shadow: 0 0 0 2px #fff; }
+.device-hotspot[data-device-id="LE"] { left: 22%; top: 24%; }
+.device-hotspot[data-device-id="RE"] { left: 78%; top: 24%; }
+.device-hotspot[data-device-id="LT"] { left: 22%; top: 77%; }
+.device-hotspot[data-device-id="RT"] { left: 78%; top: 77%; }
+.device-hotspot[data-device-id="BASE"] { left: 50%; top: 52%; }
+
+.arm-card { min-width: 0; padding: clamp(10px, 1.15cqi, 17px); border: 1px solid #d2dae3; border-radius: 6px; background: #fff; }
+.arm-card.is-selected { border-color: #6692bb; box-shadow: inset 0 2px 0 #2b6096; }
+.arm-card .arm-select {
+  display: flex; align-items: center; gap: 9px; padding: 0; margin: 0; border: 0;
+  width: 100%; min-width: 0; background: none; color: #1c2a3b; text-align: left; cursor: pointer;
+}
+.arm-code {
+  flex: none; display: grid; place-items: center; width: 36px; height: 36px;
+  border: 1px solid #c7d1dc; border-radius: 4px; background: #f1f4f7; color: #33485e;
+  font: 700 16px/1 Consolas, monospace;
+}
+.is-selected .arm-code { background: #e6effa; color: #194e84; border-color: #a3bed9; }
+.arm-title { min-width: 0; }
+.arm-title strong { display: block; font-size: 15px; line-height: 1.35; font-weight: 650; }
+.arm-title small { display: block; color: #536479; font: 400 12px/1.3 "Segoe UI", sans-serif; }
+.arm-reading {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 3px 7px; min-width: 0; margin: 9px 0; padding-block: 6px;
+  border-block: 1px solid #e5eaf0; font-size: 12px; line-height: 1.35;
+}
+.arm-status { display: inline-flex; gap: 5px; align-items: center; color: #35465a; font-weight: 650; }
+.arm-status::before { content: ""; width: 7px; height: 7px; flex: none; border-radius: 50%; background: #637387; }
+.arm-status[data-tone="observed"]::before { background: #267558; }
+.arm-status[data-tone="unknown"]::before { background: transparent; border: 1.5px solid #8e7956; }
+.arm-channel { overflow-wrap: anywhere; color: #526174; font: 11px/1.4 Consolas, "Microsoft YaHei", monospace; }
+.arm-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+.arm-modes .arm-mode {
+  min-width: 0; padding: 5px 3px; min-height: 38px; border: 1px solid #83a6ca;
+  background: #eef5ff; color: #184e87; text-align: center; cursor: pointer;
+}
+.arm-modes .arm-mode strong { display: block; font: 600 13px/1.3 "Segoe UI","Microsoft YaHei UI",sans-serif; }
+.arm-modes .arm-mode small { display: block; font: 400 10px/1.4 "Segoe UI",sans-serif; }
+#device-mode-panel .arm-mode:disabled {
+  opacity: 1; color: #596778; background: #f4f6f8; border-color: #d9e0e7; cursor: not-allowed;
+}
+#device-mode-panel button:focus-visible, .arm-inspector summary:focus-visible { outline: 2px solid #245f9c; outline-offset: 2px; }
+.arm-inspector { margin-top: 12px; border-top: 1px solid #dce2e8; }
+.arm-inspector summary { padding: 8px 0 0; color: #324c68; font-size: 13px; cursor: pointer; }
+.arm-inspector > section { padding: 8px 0 0; color: #394b5e; }
+.arm-inspector .device-side-head { display: flex; align-items: center; gap: 8px; }
+.arm-inspector .device-side-head h3 { margin: 0; font-size: 14px; }
+.arm-inspector .device-code { font-family: Consolas, monospace; }
+.arm-inspector .device-status, .arm-inspector .device-notes { font-size: 12px; }
+.device-detail { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; margin: 10px 0; }
+.device-detail dt, .arm-mode-reasons dt { font-size: 12px; font-weight: 600; }
+.device-detail dd, .arm-mode-reasons dd { margin: 2px 0; font-size: 12px; overflow-wrap: anywhere; }
+.arm-mode-reasons { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px 16px; margin: 10px 0; }
+
+@container (max-width: 720px) {
+  .arm-overview .device-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "le re" "diagram diagram" "lt rt";
+  }
+  .arm-overview .device-top { justify-self: center; width: min(100%, 260px); }
+  .device-detail { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@container (max-width: 415px) {
+  .arm-overview .device-layout { gap: 7px; }
+  .arm-card { padding: 7px; }
+  .arm-select { gap: 5px !important; }
+  .arm-code { width: 25px; height: 25px; font-size: 12px; }
+  .arm-title strong { font-size: 13px; }
+  .arm-title small, .arm-modes .arm-mode small { display: none; }
+  .arm-reading { margin: 5px 0; }
+  .arm-modes .arm-mode { padding-inline: 1px; min-height: 31px; }
+  .arm-modes .arm-mode strong { font-size: 12px; }
+  .arm-overview .device-top { width: min(100%, 200px); }
+  .arm-mode-reasons { grid-template-columns: 1fr; }
+}
