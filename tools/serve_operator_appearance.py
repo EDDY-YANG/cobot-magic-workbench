@@ -12,6 +12,7 @@ import sys
 from urllib.parse import urlsplit
 
 ASSET_PATHS = {
+    '/api/appearance/workbench-layout.js': ('workbench-layout.js', 'text/javascript; charset=utf-8'),
     '/api/device-view/panel.mjs': ('device-mode-panel.mjs', 'text/javascript; charset=utf-8'),
     '/api/device-view/panel.css': ('device-mode-panel.css', 'text/css; charset=utf-8'),
     '/device-mode-panel.mjs': ('device-mode-panel.mjs', 'text/javascript; charset=utf-8'),
@@ -135,6 +136,7 @@ def decorate_workbench(module, static):
         result = original_assets(root)
         for path in ('/', '/index.html'):
             raw, mime = result[path]
+            raw = raw.replace(b'src="/workbench-layout.js', b'src="/api/appearance/workbench-layout.js')
             result[path] = (inject_html(raw), mime)
         app, mime = result["/app.js"]
         result["/app.js"] = (decorate_right_feedback(app), mime)

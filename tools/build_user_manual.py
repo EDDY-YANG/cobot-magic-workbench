@@ -1,6 +1,7 @@
 """Build the bilingual browser manual and Markdown editions."""
 from pathlib import Path
 import re
+from build_public_release import write_generated
 from build_project_page import ROOT,SITE,t,p,h,top,frame,footer
 CHAPTERS=[]
 def add(key,en,zh,a,b):
@@ -35,6 +36,10 @@ add("inspect","Inspect before a trial","试验前检查",
 <p>Operator confirmations belong to the current trial. An explicit execution click supplies the operator declaration, and the backend also validates measurable conditions. A model, device or software change can require a fresh check.</p>""",
 """<ol><li>读回 GPU 主机与机器人计算机的真实主机名和启动周期。</li><li>检查已登记 CAN 适配器、波特率、控制模式和新鲜关节/夹爪反馈。</li><li>通过现有共享生产者查看所需相机画面。</li><li>选择物理 USB 盘，核对身份、可写挂载和剩余空间。</li><li>检查活动任务、录制/保存状态、执行 owner 与 STOP 状态。</li><li>确认检查点、提示词、控制路线和匹配的验收记录。</li></ol>
 <p>人工确认属于本次试验。明确点击执行提供操作员声明，后台同时核验可测条件。模型、设备或软件发生变化后可能需要重新检查。</p>""")
+
+add("arm-modes","Arm control scope","机械臂操作范围",
+"""<p>In Connection, select LE or RE for an execution arm, LT or RT for a teaching arm, or BASE for chassis details. The card shows measured state and available actions independently. Request PC control or motor disable on the RE card. The RE maintenance menu holds OEM following, standby and supported reset. Feedback readback determines the confirmed mode.</p><p>Motion tests group joint-zero freezes the registered arms currently reporting CAN / MOVEJ and moves them in sequence after their checks. DAgger intervention is tied to a running model job. Use the header or deployment stop control to stop new targets, and use the recording controls to finish saving an episode.</p>""",
+"""<p>连接页四张卡分别对应 LE 左执行臂、RE 右执行臂、LT 左示教臂、RT 右示教臂。点击 BASE 可查看底盘详情。每张卡分别显示设备反馈和可用操作。电脑接管和电机失能在 RE 卡片上申请。原厂高跟随、待机和受支撑复位在右执行臂维护菜单内，切换结果以设备反馈为准。</p><p>运动测试的全部六零位在提交时固定已登记并回报 CAN / MOVEJ 的目标臂，条件满足后依次回零。DAgger 按当前模型任务身份交接。顶部和部署页的停止入口停止发送新目标，录制页的结束入口保存当前片段。</p>""")
 
 add("operations","Operate a trial","运行一次试验",
 """<h3>Collect a demonstration</h3><ol><li>Enter the reviewed leader–follower mode.</li><li>Confirm the task label, camera views and recording destination.</li><li>Start recording and demonstrate the task while watching feedback.</li><li>Stop the trial, wait for recording finalization and review the episode.</li></ol>
@@ -111,12 +116,12 @@ def build():
     for key,en,zh,a,b in CHAPTERS:
         body+='<section id="'+key+'">'+h(en,zh)+'<div data-language="en">'+a+'</div><div data-language="zh" hidden>'+b+'</div></section>'
     body+='</div></div>'+footer()+'</main>'
-    (SITE/"manual.html").write_text(frame(body,"User manual | COBOT MAGIC Workbench","使用手册 | COBOT MAGIC 工作台"),encoding="utf8")
+    write_generated((SITE/"manual.html"), frame(body,"User manual | COBOT MAGIC Workbench","使用手册 | COBOT MAGIC 工作台"))
     for language,index in [("en",3),("zh",4)]:
         text="# "+("COBOT MAGIC Workbench — User manual" if language=="en" else "COBOT MAGIC 工作台使用手册")+"\n\nYang Taige · Ye Hanzhi | Emerge Robotics\n\n"
         for entry in CHAPTERS:
             text+="## "+entry[1 if language=="en" else 2]+"\n\n"+md(entry[index])+"\n\n"
-        (ROOT/"docs"/("USER_GUIDE."+language+".md")).write_text(text.rstrip()+"\n",encoding="utf8")
+        write_generated((ROOT/"docs"/("USER_GUIDE."+language+".md")), text.rstrip()+"\n")
 if __name__=="__main__":
     build()
     print("Built bilingual browser manual and two Markdown guides")

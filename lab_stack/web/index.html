@@ -175,10 +175,10 @@
           </article>
           <article class="panel controller-panel" id="controller-mode-panel" aria-labelledby="controller-mode-heading">
             <div class="panel-title">
-              <div><div class="eyebrow">RIGHT ARM / CONTROLLER HANDOFF</div><h2 id="controller-mode-heading">底层控制模式 · 遥操、电脑控制与待机</h2></div>
+              <div><div class="eyebrow">RIGHT ARM / CONTROLLER HANDOFF</div><h2 id="controller-mode-heading">右执行臂模式诊断</h2></div>
               <div class="mode-state-pills"><span class="pill neutral" id="mode-state" aria-live="polite">UNKNOWN · 未知</span><span class="pill warn" id="mode-freshness">待读数 · 模式未核对</span></div>
             </div>
-            <p class="panel-copy">按当前用途选择电脑控制、原厂主从高跟随、待机或六关节失能。每次独立提交并读取真实回执；模式操作不自动发送位置目标，恢复高跟随仍可能让执行臂响应主臂。</p>
+            <p class="panel-copy">这里显示右执行臂的控制器反馈和操作回执。原厂高跟随可能使执行臂响应主臂目标。</p>
             <div class="mode-summary">
               <div><label>最后真实报告的模式 · 新鲜度单独核对</label><strong id="mode-actual">尚未收到可识别的真实模式</strong><p id="mode-reason">连接后先刷新模式诊断。</p></div>
               <div><label>最近一次模式请求 · 历史结果</label><strong id="mode-requested">尚无模式请求回执</strong><p id="mode-history-context">本栏记录该次请求的时间和结果；当前模式、使能与控制来源分别以新鲜反馈为准。</p></div>
@@ -219,12 +219,10 @@
               <p id="mode-confirmation-state" class="footnote" aria-live="polite">现场声明尚未完成。</p>
             </div>
             <div class="button-row">
-              <button class="button" data-action="mode_inspect" data-params='{"arm":"right","seconds":1}'>刷新模式诊断</button>
-              <button class="button primary" data-action="mode_takeover">切换到电脑 CAN / MOVEJ</button>
-              <button class="button primary" data-action="mode_high_follow">恢复原厂主从高跟随</button>
-              <button class="button" data-action="mode_standby">切到待机</button>
-              <button class="button mode-reset-button" data-action="mode_disable">六关节失能</button>
-              <button class="button mode-reset-button" data-action="mode_reset">受支撑单次复位</button>
+              <button class="button" data-action="mode_inspect" data-params='{"arm":"right","seconds":1}'>读取 RE 模式诊断</button>
+              <button class="button primary" data-action="mode_high_follow" data-params='{"arm":"right"}'>RE 恢复原厂高跟随</button>
+              <button class="button" data-action="mode_standby" data-params='{"arm":"right"}'>RE 切到待机</button>
+              <button class="button mode-reset-button" data-action="mode_reset" data-params='{"arm":"right"}'>RE 受支撑单次复位</button>
               <p class="muted">电脑接管、待机与失能要求先隔离主臂目标；恢复高跟随则要求正确主从角色、姿态对应和新鲜目标流。待机不等于电机失能；六关节失能会失去保持力，不包含夹爪。这里不改主从角色、不重新校零。高跟随请求的内部状态不能只靠 CAN/MOVEJ 回传确认，仍须现场核实跟随。</p>
               <button class="button quiet" data-open-page="motion">运动测试 →</button>
             </div>
@@ -466,7 +464,7 @@
               </p>
               <div class="button-row">
                 <button class="button" data-action="hub_start">启动监控</button
-                ><button class="button" data-open-controller>遥操／待机／失能设置</button>
+                ><button class="button" data-open-controller>查看机械臂模式</button>
               </div>
               <div class="note" id="teleop-reason">
                 已由厂家恢复主从跟随时，可直接准备采集；需要切换控制器模式时打开上方设置。
@@ -555,7 +553,7 @@
           </div>
           <div class="page-readiness" id="motion-readiness" aria-live="polite"></div>
           <div class="action-error" id="motion-action-error" role="alert" hidden></div>
-          <div class="mode-link-strip"><span>右臂底层模式：<strong data-mode-summary>UNKNOWN · 未知</strong></span><button class="button quiet" data-open-page="connect" data-open-mode>查看模式诊断与切换 →</button></div>
+          <div class="mode-link-strip"><span>右臂底层模式：<strong data-mode-summary>UNKNOWN · 未知</strong></span><button class="button quiet" data-open-page="connect" data-open-mode>查看 RE 模式诊断 →</button></div>
           <div class="confirmation-box motion-confirmations" id="motion-confirmations">
             <strong>执行前现场确认</strong>
             
@@ -852,7 +850,7 @@
             <div class="supervisor-readiness-grid"><div><strong>✓ 离线验证已完成</strong><p>任务阶段与人员／人手结果已同屏验证；历史录像需对应 U 盘在本机可读。</p></div><div><strong>○ 实时监督未接入</strong><p>当前相机流尚未接入 StartLux；未在现场持续识别人手，不会据此暂停或恢复机器人。</p></div><div><strong>○ 新 H50 协同未完成</strong><p>4090 FP32/H50 的加载与影子状态见下方独立入口；Jev 与新策略的实时协同尚未验收。</p></div></div>
           </article>
           <p class="footnote" id="model-loading-detail" aria-live="polite">尚未核对模型进程；启动回执与模型就绪分别显示。</p>
-          <div class="mode-link-strip"><span>VLA 执行通路 · 底层模式：<strong data-mode-summary>UNKNOWN · 未知</strong></span><button class="button quiet" data-open-page="connect" data-open-mode>查看模式诊断与切换 →</button></div>
+          <div class="mode-link-strip"><span>VLA 执行通路 · RE 底层模式：<strong data-mode-summary>UNKNOWN · 未知</strong></span><button class="button quiet" data-open-page="connect" data-open-mode>查看 RE 模式诊断 →</button></div>
           <article class="panel task-workspace" id="task-workspace" aria-labelledby="task-workspace-title">
             <div class="panel-title">
               <div><div class="eyebrow">TASK / EXECUTION &amp; EVIDENCE</div><h2 id="task-workspace-title">本次任务进程</h2></div>
@@ -1108,9 +1106,7 @@
           <div class="panel-title">
             <h2>任务与事件</h2>
             <div class="button-row">
-              <button class="button quiet" data-action="clear_stop">
-                清除停止锁存</button
-              ><button class="button quiet" id="show-details">
+              <button class="button quiet" id="show-details">
                 查看原始回执
               </button>
             </div>

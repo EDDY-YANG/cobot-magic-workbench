@@ -66,6 +66,12 @@ A complete lab installation has its device backend and model/controller environm
 
 Operator confirmations belong to the current trial. An explicit execution click supplies the operator declaration, and the backend also validates measurable conditions. A model, device or software change can require a fresh check.
 
+## Arm control scope
+
+In Connection, select LE or RE for an execution arm, LT or RT for a teaching arm, or BASE for chassis details. The card shows measured state and available actions independently. Request PC control or motor disable on the RE card. The RE maintenance menu holds OEM following, standby and supported reset. Feedback readback determines the confirmed mode.
+
+Motion tests group joint-zero freezes the registered arms currently reporting CAN / MOVEJ and moves them in sequence after their checks. DAgger intervention is tied to a running model job. Use the header or deployment stop control to stop new targets, and use the recording controls to finish saving an episode.
+
 ## Operate a trial
 
 ### Collect a demonstration

@@ -7,7 +7,7 @@ const devices = {
  RT: {title:"Right teaching arm", zh:"右示教臂", role:null, pair:"RT → RE"},
  BASE: {title:"Mobile base", zh:"移动底盘", role:null, pair:"Independent device / 独立设备"}
 };
-export function deviceView(state, id, online) {
+export function deviceView(state, id, online, capabilityFor) {
  const d=devices[id] || devices.RE;
  const mode=d.role ? state.controller_modes?.[d.role] : null;
  const connected=online && state.connected === true;
@@ -28,7 +28,8 @@ export function deviceView(state, id, online) {
   {key:"disable",name:"Motor disable",zh:"电机失能",action:"mode_disable"}
  ].map(a=>{
    if(!a.action) return a;
-   const cap=state.capabilities?.[a.action];
+   const cap=connected && fresh && id==="RE" && capabilityFor
+     ? capabilityFor(a.action) : state.capabilities?.[a.action];
    const ready=id==="RE" && fresh && cap?.available===true;
    return {...a,enabled:ready,reason:ready ? "" : id!=="RE" ? "当前执行入口只验收了右执行臂；该实体接口尚未接入。" :
      reason || cap?.reason || "等待执行条件核验。"};
@@ -107,7 +108,7 @@ function buildArmCard(document, id, select, request) {
   };
 }
 
-export function bindDeviceModePanel({document, submit}) {
+export function bindDeviceModePanel({document, submit, capabilityFor}) {
   const root = document.getElementById("device-mode-panel");
   if (!root) return {update() {}};
 
@@ -155,7 +156,7 @@ export function bindDeviceModePanel({document, submit}) {
   function request(id, key) {
     // Resolve against the clicked card and the latest state even if a different
     // hotspot is selected. Use the same action and payload as the single panel.
-    const view = deviceView(state, id, online);
+    const view = deviceView(state, id, online, capabilityFor);
     const action = view.actions.find(item => item.key === key);
     if (action?.enabled && action.action && view.role) submit(action.action, {arm: view.role});
   }
@@ -171,7 +172,7 @@ export function bindDeviceModePanel({document, submit}) {
   function render() {
     let active;
     for (const [id, entry] of cards) {
-      const view = deviceView(state, id, online);
+      const view = deviceView(state, id, online, capabilityFor);
       entry.update(view, id === selected);
       if (id === selected) active = view;
     }
@@ -198,8 +199,10 @@ export function bindDeviceModePanel({document, submit}) {
     img.hidden = true;
     document.getElementById("device-image-unavailable").hidden = false;
   }
-  img.addEventListener("error", showImageFallback);
-  if (img.complete && !img.naturalWidth) showImageFallback();
+  if (img) {
+    img.addEventListener("error", showImageFallback);
+    if (img.complete && !img.naturalWidth) showImageFallback();
+  }
   render();
   return {
     update(next, isOnline) {

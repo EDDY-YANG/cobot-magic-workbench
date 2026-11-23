@@ -60,3 +60,7 @@ gripper remains unchanged. 17 Python + 5 device-view JS + 4 appearance checks pa
 Physical four-arm binding, paired teleop and hand-guiding are not validated.
 The private asset is external to this repository. Runtime publication/readback is
 recorded separately; an offline pass is not physical homing acceptance.
+
+## v0.1.3 arm mode controls
+
+The RE card owns both ordinary mode actions. The Connection dock identifies its remaining right-arm diagnostics and maintenance. The group joint-zero action has its own frozen target list. See docs/release-v0.1.3.md and docs/release-v0.1.3.zh.md for the released capabilities and hardware scope.

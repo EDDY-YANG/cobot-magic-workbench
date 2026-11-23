@@ -119,6 +119,13 @@ let target = [0, 0, 0, 0, 0, 0],
 let gripperTargetInitialized = false;
 let taskDisplayReceivedAt = null, taskDisplayHub = {};
 let collectionWorkbench = null;
+const deviceModePanel = bindDeviceModePanel({
+  document,
+  capabilityFor: action => submitting
+    ? {available: false, reason: "正在提交操作，请等待回执。"}
+    : capability(action),
+  submit: (action, params) => submit(action, modeFieldConfirm(action, params)),
+});
 const isNumber = (x) => typeof x === "number" && Number.isFinite(x);
 const number = (v, n = 2) => (isNumber(v) ? v.toFixed(n) : "—");
 const object = (v) =>
@@ -547,6 +554,7 @@ function capability(action) {
   return { available: false, reason: "后端未提供此功能的就绪状态；请核对版本同步与连接" };
 }
 function refreshCapabilities() {
+  deviceModePanel.update(lastState, backendOnline);
   zeroCanSummary();
   const setAvailability = (e, c, action) => {
     e.disabled = !c.available || submitting;
@@ -777,7 +785,8 @@ function renderModeConfirmations() {
   text("mode-confirmation-state", "点击执行即确认现场条件；实际模式以反馈为准。");
 }
 function modeFieldConfirm(action, params) {
-  const result = { ...params, arm: "right" };
+  if (params.arm !== "right") throw new Error("该模式操作需要明确指定右执行臂 RE，目标臂未获支持。");
+  const result = { ...params };
   for (const [key] of modeConfirmationFields(action)) result[key] = true;
   return result;
 }
@@ -882,7 +891,7 @@ for (const button of document.querySelectorAll("[data-open-gripper]"))
 for (const button of document.querySelectorAll("[data-open-controller]"))
   button.addEventListener("click", () => {
     openPage("connect");
-    requestAnimationFrame(() => $("controller-mode-panel").scrollIntoView({block:"start", behavior:"smooth"}));
+    requestAnimationFrame(() => $("device-mode-panel").scrollIntoView({block:"start", behavior:"smooth"}));
   });
 $("gripper-panel-close").addEventListener("click", () => { $("gripper-calibration-panel").hidden = true; });
 for (const id of ["gripper-measure-label"])
@@ -1217,10 +1226,7 @@ function feedbackDeliveryText(state, online) {
   return result + " 最近读数可展示至 500 ms；显示宽限不放宽录制和运动的反馈门槛。";
 }
 // FEEDBACK_DELIVERY_VIEW_END
-let deviceModePanel = null;
 function renderState(state) {
-  deviceModePanel ??= bindDeviceModePanel({document,submit:(action,params)=>submit(action,modeFieldConfirm(action,params))});
-  deviceModePanel.update(state,backendOnline);
   displayDagger(state.dagger);
   lastState = state;
   renderDualFollowerTelemetry(state);

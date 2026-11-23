@@ -54,6 +54,14 @@ FP32运行记录|FP32 run history
 操作说明|Operating notes
 条件与诊断|Readiness & diagnostics
 更多模式|More modes
+右执行臂维护|RE maintenance
+右执行臂模式诊断|RE mode diagnostics
+读取 RE 模式诊断|Read RE mode
+RE 恢复原厂高跟随|RE · OEM following
+RE 切到待机|RE · Standby
+RE 受支撑单次复位|RE · Supported reset
+查看机械臂模式|View arm modes
+查看 RE 模式诊断 →|RE mode diagnostics
 状态字段与请求回执|State & receipts
 模式操作说明|Mode notes
 保存位置与身份详情|Storage identity
