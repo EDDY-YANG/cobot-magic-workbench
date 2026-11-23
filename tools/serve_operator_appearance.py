@@ -60,10 +60,32 @@ def decorate_right_feedback(raw):
         source = source.replace(old, new, 1)
 
     marker = "function capability(action) {"
-    replace_once(marker, """function rightSharedFeedbackBlock(state) {
+    replace_once(marker, """let rightCanErrors = null;
+function observeRightCanErrors(state, now = performance.now()) {
   const hub = state?.hub;
   const arm = hub?.arms?.right;
-  if (state?.connected !== true || hub?.api_reachable !== true || arm?.fresh !== false) return null;
+  const owner = hub?.producer;
+  if (state?.connected !== true || hub?.api_reachable !== true ||
+      !Number.isInteger(owner?.pid) || typeof owner.proc_start_ticks !== "string" ||
+      !Number.isSafeInteger(arm?.error_frames) || arm.error_frames < 0) {
+    rightCanErrors = null;
+    return;
+  }
+  const identity = owner.pid + ":" + owner.proc_start_ticks;
+  if (rightCanErrors?.identity !== identity || arm.error_frames < rightCanErrors.count) {
+    rightCanErrors = { identity, count: arm.error_frames, lastIncreaseMs: -Infinity };
+    return;
+  }
+  if (arm.error_frames > rightCanErrors.count) rightCanErrors.lastIncreaseMs = now;
+  rightCanErrors.count = arm.error_frames;
+}
+function rightSharedFeedbackBlock(state, now = performance.now()) {
+  const hub = state?.hub;
+  const arm = hub?.arms?.right;
+  if (state?.connected !== true || hub?.api_reachable !== true || !arm) return null;
+  if (rightCanErrors && now - rightCanErrors.lastIncreaseMs <= 1500)
+    return "右侧 CAN 正在新增错误帧。右臂姿态及新运动目标已暂停，请检查总线。";
+  if (arm.fresh !== false) return null;
   const count = Number.isInteger(arm.timestamp_failures) && arm.timestamp_failures > 0
     ? "（时间戳异常 " + arm.timestamp_failures + " 次）" : "";
   return "右臂共享反馈无效" + count + "，暂不能确认单臂姿态。请核对右侧 CAN 反馈来源。";
@@ -74,6 +96,7 @@ def decorate_right_feedback(raw):
   if (feedbackBlock && (motionActions.has(action) || action === "mode_takeover" || action === "mode_high_follow"))
     return { available: false, reason: feedbackBlock };
 """ + marker)
+    replace_once("  renderDualFollowerTelemetry(state);", "  observeRightCanErrors(state);\n  renderDualFollowerTelemetry(state);")
     marker = "    const sourceReady = connected && arm.observer_running === true &&"
     replace_once(marker, """    const sharedBlock = role === "right" && rightSharedFeedbackBlock(state);
     const sourceReady = connected && !sharedBlock && arm.observer_running === true &&""")
