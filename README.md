@@ -43,4 +43,4 @@ See [development and publication](docs/development.md), [source contracts](docs/
 
 Original code and documentation are distributed under [MIT](LICENSE). Demonstration video content, playback versions, covers, and frames have [separate viewing and reuse terms](site/assets/demo/LICENSE.txt). Earlier valid grants, including the published CC BY 4.0 grant, continue to apply. See [third-party notices](THIRD_PARTY_NOTICES.md).
 
-The system diagram displays AgileX Robotics’ official whole-machine preview from the pinned upstream URL. The image remains hosted in the upstream repository.
+The system diagram renders the four-arm COBOT MAGIC assembly on a light background. The browser reads the pinned URDF and meshes directly from the AgileX Robotics repository. The official upstream preview is the fallback.

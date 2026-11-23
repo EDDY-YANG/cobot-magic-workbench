@@ -21,12 +21,14 @@ def architecture_figure():
         '<figure class="diagram"><div class="architecture-art">'
         '<img class="architecture-base" src="' + figure_path + '" width="1160" height="680" '
         'alt="Operator PC, GPU host, robot computer, verified USB and COBOT MAGIC" loading="lazy">'
-        '<a class="architecture-assembly" href="' + UPSTREAM_ASSEMBLY_IMAGE + '" target="_blank" rel="noopener noreferrer">'
+        '<a class="architecture-assembly" data-assembly-render="pending" href="' + UPSTREAM_ASSEMBLY_IMAGE + '" target="_blank" rel="noopener noreferrer">'
         '<img src="' + UPSTREAM_ASSEMBLY_IMAGE + '" width="1134" height="819" loading="lazy" '
-        'referrerpolicy="no-referrer" alt="AgileX COBOT MAGIC whole-machine digital asset with four arms and a mobile base"></a>'
+        'referrerpolicy="no-referrer" alt="AgileX COBOT MAGIC whole-machine digital asset with four arms and a mobile base">'
+        '<canvas width="650" height="684" aria-label="White-background model rendered from the original AgileX URDF"></canvas>'
+        '<span class="assembly-loading" role="status">' + t("Loading the AgileX assembly…", "正在载入 AgileX 整机…") + '</span></a>'
         '</div><figcaption>' + t(
-            "The PC provides access. The GPU host runs inference. The robot computer owns the devices and local execution. Whole-machine preview hosted by AgileX Robotics.",
-            "PC 提供入口，GPU 主机运行推理，机器人电脑负责设备和本地执行。整机图由 AgileX Robotics 提供。"
+            "The PC provides access. The GPU host runs inference. The robot computer owns the devices and local execution. White-background render from the pinned AgileX assembly at source zero pose. The official preview is available as a fallback.",
+            "PC 提供入口，GPU 主机运行推理，机器人电脑负责设备和本地执行。白底整机图由固定版本 AgileX 资产按源零位在浏览器中渲染。渲染不可用时显示官方预览。"
         ) + '</figcaption><div class="figure-actions">'
         '<a href="' + figure_path + '">SVG schematic</a>'
         '<a href="assets/figures/system-architecture.png">PNG schematic</a></div></figure>'
@@ -63,7 +65,7 @@ def build():
     body+='<section id="workflow">'+h('Use it in six steps','六步完成一次试验')+figure('workflow','Connect inspect select start record review','An explicit operator click starts a trial. Reconnecting SSH never repeats a command.','试验由操作员明确点击开始，SSH 重连不会重发命令。')+'</section>'
     body+='<section id="data">'+h('Trace the data','追踪数据链路')+figure('data-link','Images and feedback to inference, local execution and storage','Video, feedback, predictions and commands retain their timestamps and identities.','视频、反馈、预测和命令保留各自时间戳与身份。')+'</section>'
     body+='<section class="download-band">'+h('Start with the recorded demo','从离线回放开始')+p('Extract the Windows ZIP and double-click Start-Workbench.cmd. Python and OpenSSH are included. Use Connect for an already configured 4090 server; no model weights or private machine profiles are bundled.','解压 Windows ZIP，双击 Start-Workbench.cmd，内置 Python 与 OpenSSH。在 Connect 页面接入已配置的 4090 服务；不包含模型权重或私有机器配置。')+'<a class="button primary" href="'+DOWNLOAD+'">Windows x64 SDK</a> <a class="button" href="'+REPO+'/releases/tag/v0.1.2">'+t('Release & checksums','版本与校验和')+'</a></section></main>'+footer()
-    write_generated(SITE/'index.html',frame(body,'COBOT MAGIC Workbench | Emerge Robotics','COBOT MAGIC 工作台 | Emerge Robotics').replace('</body>','<script src="assets/replay.js" defer></script></body>'))
+    write_generated(SITE/'index.html',frame(body,'COBOT MAGIC Workbench | Emerge Robotics','COBOT MAGIC 工作台 | Emerge Robotics').replace('</body>','<script src="assets/replay.js" defer></script><script type="module" src="assets/cobot-assembly.js"></script></body>'))
     replay=top()+'<main><header class="compact-heading"><p class="eyebrow">RECORDED SESSION · READ ONLY</p><h1>'+t('Experiment replay','实验回放')+'</h1>'+p('Recorded camera views, measured angles and model visualization on one timeline.','同一时间轴上的真实相机画面、实测角度与模型可视化。')+'</header>'+player(True)+'</main>'+footer()
     write_generated(SITE/'replay.html',frame(replay,'Recorded experiment | Emerge Robotics','实验回放 | Emerge Robotics').replace('</body>','<script src="assets/replay.js" defer></script></body>'))
 
