@@ -722,3 +722,13 @@ footer {
 .architecture-assembly img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .architecture-assembly:focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
 .video-rights { margin: 4px 0 10px; color: #627183; font-size: .82rem; }
+.architecture-assembly canvas { display: none; width: 100%; height: 100%; }
+.architecture-assembly[data-assembly-render="ready"] img { display: none; }
+.architecture-assembly[data-assembly-render="ready"] canvas { display: block; }
+.architecture-assembly .assembly-loading { display: none; }
+.architecture-assembly[data-assembly-render="loading"] { background: #f2f2f2; }
+.architecture-assembly[data-assembly-render="loading"] img { display: none; }
+.architecture-assembly[data-assembly-render="loading"] .assembly-loading {
+  display: grid; place-content: center; width: 100%; height: 100%;
+  padding: 10px; text-align: center; color: #627183; font-size: clamp(.6rem, 1.6vw, .9rem);
+}

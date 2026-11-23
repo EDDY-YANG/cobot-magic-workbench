@@ -1,0 +1,36 @@
+{
+  "commit": "f799ae0192c0c2bbd502ec4d9bbec8c2633acd1a",
+  "urdf": "aloha_new_description/urdf/aloha_new.urdf",
+  "urdf_hash": "d4a115493af6a67ef969cfb8686b54f2970225b617ec6dd99cf682c0c4c7b6e9",
+  "bounds": {
+    "min": [
+      -0.695450484752655,
+      -0.560417652130127,
+      -0.0023403398226946592
+    ],
+    "max": [
+      0.49166780710220337,
+      0.5413768887519836,
+      1.5086610317230225
+    ]
+  },
+  "meshes": {
+    "aloha_new_description/meshes/tracer_base_link_no_wheel.dae": "d3a1ee3b34dbc418e888d68148d04fccda589e00d5100fbd3cbc2f17154e0a08",
+    "aloha_new_description/meshes/tracer_wheel.dae": "42784402bca05e9f406f4e08d8ea1cc7ff57db9fee0e0b0b557670d0ee1d10c1",
+    "aloha_new_description/meshes/castor_joint.dae": "901cad2da533c8fd0f3e3ce25a4d5b5d1c689d5f852640cd7dab041dc647d629",
+    "aloha_new_description/meshes/castor.dae": "0a61bca6839f37ebebd89021474821abfd908d2b50867f221e3504db4d84a06a",
+    "aloha_new_description/meshes/body.dae": "2bad2557aad93a83adad913da6ee30f32d4414602f9f7be138c377a0543be659",
+    "aloha_new_description/meshes/base_link.dae": "3c9a5f47db03dfbaa75fc2a98135bd5c7d0e3661c2a601b7372bd04e3cfdb689",
+    "aloha_new_description/meshes/link1.dae": "2bb0e08b05a4de1a1c3f073c59dde29335ba3cec9a020e0a09735108c0420b28",
+    "aloha_new_description/meshes/link2.dae": "64e70cd8927b3f4d23f056f978e3f1004ca8d6f6a01843ef6a5e08075be2c6f3",
+    "aloha_new_description/meshes/link3.dae": "c3f3f592868362852da55bdfc6fdbbfeef653bb8e226721dbdd448161f298d04",
+    "aloha_new_description/meshes/link4.dae": "d74c2f686f8e42e0b71044afa29f2726cddfb346f4e2d92f8566489be5882a14",
+    "aloha_new_description/meshes/link5.dae": "cb463d5e034adb780fea4a0b7d716d1b3b1de1535c728d747a3370bc347f95e2",
+    "aloha_new_description/meshes/piper_slave_meshes/link6.dae": "397e24f536d1f0827ab79adce41af87c016d5869098601284eefe8748510cda6",
+    "aloha_new_description/meshes/piper_slave_meshes/link7.dae": "7534447abb248829c447a8e19d84c6fb3903ab70ebc32dfd164abcc4099fc74a",
+    "aloha_new_description/meshes/piper_slave_meshes/link8.dae": "662d36ce7edf3e1cbb887302f4499a76aff75ccf1996730fa63f2a30f749adda",
+    "aloha_new_description/meshes/piper_master_meshes/link6.dae": "ab476fdbbf91aed978a7525b0abf7353fa25e1523083a2f3759e6b87ea5f7278",
+    "aloha_new_description/meshes/piper_master_meshes/link7.dae": "5b2b05d99ebec49ad1f6c051e7f62e42956a89a64d1678fd59c7e92ad2c1c56c",
+    "aloha_new_description/meshes/piper_master_meshes/link8.dae": "911046ddddd6925702dfb28bfe2c07744fe6ef714a7dc68f42442b9e9d98520e"
+  }
+}
