@@ -1,5 +1,10 @@
-Recorded demo export: Creative Commons Attribution 4.0 International (CC BY 4.0).
-Copyright 2026 Yang Taige, Ye Hanzhi / Emerge Robotics.
-https://creativecommons.org/licenses/by/4.0/
-Credit the authors and project, link this license, and indicate modifications.
-PiPER geometry used in the kinematic render remains under its upstream MIT license (Copyright 2024 RosenYin).
+Copyright (c) 2026 Yang Taige
+
+All rights reserved for Yang Taige’s original demonstration video content, playback versions, audio, covers, and frames. Public viewing is provided on the original COBOT MAGIC Workbench project website.
+
+Downloading or retaining copies, screen recording or external filming, taking screenshots or extracting frames, copying audio, reposting, embedding, editing, redistribution, or other reuse requires prior written permission from Yang Taige, except as allowed by applicable law or an existing valid authorization. Attribution or citation alone does not grant permission.
+
+The MIT license for project software and documentation excludes these video materials. These terms preserve earlier valid licenses, including the CC BY 4.0 grant for demo exports previously distributed under that license. The previously published measured-joint data retain their release terms. Credits to Ye Hanzhi and Emerge Robotics on the earlier exports and the upstream MIT license for PiPER visualization geometry (Copyright 2024 RosenYin) are retained.
+
+Existing CC BY 4.0 terms: https://creativecommons.org/licenses/by/4.0/legalcode
+Original project site: https://eddy-yang.github.io/cobot-magic-workbench/
