@@ -2,6 +2,15 @@
 
 Copyright (c) 2026 Yang Taige
 
+## Current experimental result
+
+The first live role request received a 0x476/0x70 response, but the trial
+aborted after three initial target triplets. Its last joint feedback preceded
+the role request. A fresh post-role feedback barrier is required before any
+further operational use; a fixed 0.1-second wait is not sufficient. No zero
+endpoint or physical pair control was accepted. The historical USB artifact
+and receipt remain unchanged.
+
 This isolated experiment invokes the installed `piper-sdk 0.6.2` role API
 `MasterSlaveConfig(0xFC, 0, 0, 0)` once, then requests CAN/MOVEJ position-speed
 control and sends a bounded common six-zero trajectory on the verified right bus.
