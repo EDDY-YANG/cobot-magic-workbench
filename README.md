@@ -1,13 +1,14 @@
 # COBOT MAGIC Workbench
 
-**Yang Taige · Ye Hanzhi — Emerge Robotics**  
+**Yang Taige · Ye Hanzhi — Emerge Robotics**
+
 HKU Faculty of Engineering · Tam Wing Fam Innovation Wing
 
 [Project page](https://eddy-yang.github.io/cobot-magic-workbench/) · [User manual](https://eddy-yang.github.io/cobot-magic-workbench/manual.html) · [Windows SDK](https://github.com/EDDY-YANG/cobot-magic-workbench/releases/tag/v0.1.2) · [中文手册](docs/USER_GUIDE.zh.md)
 
 A browser workspace linking a Windows operator PC, an RTX 4090 edge host and COBOT MAGIC: device status, teleoperation, recording, policy deployment, controller selection and experiment review.
 
-![Measured recording replay](site/assets/demo/showcase-poster.jpg)
+[Watch the measured recording on the project site](https://eddy-yang.github.io/cobot-magic-workbench/replay.html).
 
 ## Try it
 
@@ -40,4 +41,6 @@ See [development and publication](docs/development.md), [source contracts](docs/
 
 ## License
 
-Original code/docs: [MIT](LICENSE). Recorded demo exports: CC BY 4.0. Third-party code/assets retain their licenses; see [notices](THIRD_PARTY_NOTICES.md). The incomplete-license whole-machine v2 asset is linked at source and excluded from distribution.
+Original code and documentation are distributed under [MIT](LICENSE). Demonstration video content, playback versions, covers, and frames have [separate viewing and reuse terms](site/assets/demo/LICENSE.txt). Earlier valid grants, including the published CC BY 4.0 grant, continue to apply. See [third-party notices](THIRD_PARTY_NOTICES.md).
+
+The system diagram displays AgileX Robotics’ official whole-machine preview from the pinned upstream URL. The image remains hosted in the upstream repository.

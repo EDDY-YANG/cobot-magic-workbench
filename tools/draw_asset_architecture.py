@@ -13,13 +13,20 @@ svg=[f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" ro
 '<rect width="1160" height="680" fill="white"/>','<style>text{font-family:Segoe UI,Arial,sans-serif}</style>']
 image=Image.new("RGB",(width*2,height*2),"white")
 draw=ImageDraw.Draw(image)
-fontdir=Path("C:/Windows/Fonts")
+fontdir = Path("C:/Windows/Fonts")
+normal_font, bold_font = fontdir / "segoeui.ttf", fontdir / "seguisb.ttf"
+if not normal_font.is_file():
+    fonts = Path("/usr/share/fonts/truetype/liberation2")
+    normal_font, bold_font = fonts / "LiberationSans-Regular.ttf", fonts / "LiberationSans-Bold.ttf"
+    if not normal_font.is_file():
+        fonts = Path("/usr/share/fonts/truetype/dejavu")
+        normal_font, bold_font = fonts / "DejaVuSans.ttf", fonts / "DejaVuSans-Bold.ttf"
 def box(x,y,w,h):
     svg.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="#fbfcfe" stroke="#dce2e9" rx="7"/>')
     draw.rounded_rectangle((x*2,y*2,(x+w)*2,(y+h)*2),14,fill="#fbfcfe",outline="#dce2e9",width=2)
 def text(x,y,s,size=16,color="#172331",bold=False):
     svg.append(f'<text x="{x}" y="{y}" font-size="{size}" fill="{color}" font-weight="{600 if bold else 400}">{escape(s)}</text>')
-    font=ImageFont.truetype(str(fontdir/("seguisb.ttf" if bold else "segoeui.ttf")),size*2)
+    font=ImageFont.truetype(str(bold_font if bold else normal_font),size*2)
     draw.text((x*2,y*2),s,font=font,fill=color,anchor="ls")
 def arrow(points,color="#2563eb",dashed=False):
     value=" ".join(f"{x},{y}" for x,y in points)
@@ -110,12 +117,14 @@ text(333,428,"Save",14,"#d97706",True)
 box(769,87,367,508)
 text(790,122,"COBOT MAGIC",25,bold=True)
 text(790,151,"Four-arm mobile platform",15,"#627183")
-for y,title,subtitle in [(220,"Leader arms","Human demonstrations"),(330,"Follower arms","Local device commands"),(440,"Cameras + mobile base","Installed platform hardware")]:
-    box(791,y-35,322,85)
-    text(807,y,title,19,bold=True)
-    text(807,y+27,subtitle,14,"#627183")
-text(790,555,"Whole-machine reference",16,bold=True)
-text(790,579,"Official upstream asset linked separately",12,"#627183")
+# Pages places the pinned source image here without bundling it.
+box(790,183,325,342)
+svg.append('<a href="https://raw.githubusercontent.com/agilexrobotics/mobile_aloha_sim/f799ae0192c0c2bbd502ec4d9bbec8c2633acd1a/img/img.png">')
+text(820,346,"View the upstream assembly",16,"#1c5aa6",True)
+svg.append("</a>")
+text(820,370,"AgileX Robotics · source preview",13,"#627183")
+text(790,555,"Whole-machine digital asset",16,bold=True)
+text(790,579,"AgileX mobile_aloha_sim · f799ae0",12,"#627183")
 arrow([(694,444),(769,444)],"#087e75")
 text(706,423,"CAN",13,"#087e75",True)
 text(701,471,"Cameras",12,"#627183")
