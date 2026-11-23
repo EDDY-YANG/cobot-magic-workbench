@@ -49,6 +49,53 @@ def load_installation(path):
     return config, module, static
 
 
+def decorate_right_feedback(raw):
+    """Prefer an explicit Hub integrity failure over a fresh-looking CAN snapshot."""
+    source = raw.decode("utf-8")
+
+    def replace_once(old, new):
+        nonlocal source
+        if source.count(old) != 1:
+            raise ValueError("Unrecognized operator app structure: " + old.splitlines()[0])
+        source = source.replace(old, new, 1)
+
+    marker = "function capability(action) {"
+    replace_once(marker, """function rightSharedFeedbackBlock(state) {
+  const hub = state?.hub;
+  const arm = hub?.arms?.right;
+  if (state?.connected !== true || hub?.api_reachable !== true || arm?.fresh !== false) return null;
+  const count = Number.isInteger(arm.timestamp_failures) && arm.timestamp_failures > 0
+    ? "（时间戳异常 " + arm.timestamp_failures + " 次）" : "";
+  return "右臂共享反馈无效" + count + "，暂不能确认单臂姿态。请核对右侧 CAN 反馈来源。";
+}
+""" + marker)
+    marker = '  if (action === "move_target" && !targetInitialized)'
+    replace_once(marker, """  const feedbackBlock = rightSharedFeedbackBlock(lastState);
+  if (feedbackBlock && (motionActions.has(action) || action === "mode_takeover" || action === "mode_high_follow"))
+    return { available: false, reason: feedbackBlock };
+""" + marker)
+    marker = "    const sourceReady = connected && arm.observer_running === true &&"
+    replace_once(marker, """    const sharedBlock = role === "right" && rightSharedFeedbackBlock(state);
+    const sourceReady = connected && !sharedBlock && arm.observer_running === true &&""")
+    replace_once('!connected ? "未连接" : !sourceReady ? "观察通道未就绪" : "关节过期／缺失",',
+                 '!connected ? "未连接" : sharedBlock ? "右臂共享反馈无效" : !sourceReady ? "观察通道未就绪" : "关节过期／缺失",')
+    replace_once("    right = object(arms.right),", """    rightSource = object(arms.right),
+    feedbackBlock = rightSharedFeedbackBlock(state),
+    right = feedbackBlock ? { ...rightSource, fresh: false, q_deg: null, joints_deg: null,
+      grip_m: null, gripper_m: null, gripper_feedback: null } : rightSource,""")
+    replace_once('"device-can",\n    right.fresh === true', '"device-can",\n    feedbackBlock ? "右臂共享反馈无效" : right.fresh === true')
+    replace_once('"device-can-detail",\n    "反馈年龄 "', '"device-can-detail",\n    feedbackBlock || "反馈年龄 "')
+    replace_once('setPill("motion-feedback-state", displayFeedback.label, displayFeedback.kind);',
+                 'setPill("motion-feedback-state", feedbackBlock ? "右臂反馈未通过" : displayFeedback.label, feedbackBlock ? "warn" : displayFeedback.kind);')
+    replace_once('"robot-source",\n    actual', '"robot-source",\n    feedbackBlock || (actual')
+    replace_once(': "实际姿态：未接收到真实反馈",\n  );', ': "实际姿态：未接收到真实反馈"),\n  );')
+    marker = '  if (error.source === "precondition" && available)'
+    replace_once(marker, """  if (online && currentCapability?.available === false && currentCapability.reason)
+    current = "当前阻塞：" + currentCapability.reason;
+""" + marker)
+    return source.encode("utf-8")
+
+
 def decorate_workbench(module, static):
     original_assets = module.assets
     def assets(root):
@@ -56,6 +103,8 @@ def decorate_workbench(module, static):
         for path in ('/', '/index.html'):
             raw, mime = result[path]
             result[path] = (inject_html(raw), mime)
+        app, mime = result["/app.js"]
+        result["/app.js"] = (decorate_right_feedback(app), mime)
         result.update(static)
         return result
     module.assets = assets
