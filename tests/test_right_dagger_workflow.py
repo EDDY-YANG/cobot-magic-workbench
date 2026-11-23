@@ -1,5 +1,6 @@
 """Offline workflow with scripted hardware and capture boundaries."""
 from copy import deepcopy
+import json
 from pathlib import Path
 import tempfile
 import threading
@@ -184,6 +185,7 @@ class WorkflowTests(unittest.TestCase):
             patch.object(dg, "Ownership", Owner), patch.object(dg, "Session", Receipt),
             patch.object(dg, "TxEvidenceWriter", Evidence), patch.object(dg, "stop_requested", return_value=False),
             patch.object(dg, "verify_usb", return_value=self.root),
+            patch("agilex_control.storage.verify_usb", return_value=self.root),
             patch.object(dg, "require_gripper_feedback", return_value={"healthy": True, "enabled": True}),
             patch.object(dg, "adapter_identity", side_effect=lambda interface, serial:
                          {"interface": interface, "serial": serial, "identity_verified": True}),
@@ -201,18 +203,29 @@ class WorkflowTests(unittest.TestCase):
     def capture_state(self):
         return {"api_reachable": True, "age_s": 0., "recording": deepcopy(self.capture)}
 
-    def hub(self, path="/status?compact=1", payload=None, *, maintain=True):
+    def hub(self, path="/status?compact=1", payload=None, *, maintain=True, timeout=8):
         if path.startswith("/status"):
             return {"recording": deepcopy(self.capture), "task_state": {"active": False}}
         if path == "/record/start":
-            self.capture = {"active": True, "path": str(self.root/"episode"),
-                            "right_dagger": deepcopy(payload["dagger_context"])}
+            path = self.root / "episode"
+            path.mkdir()
+            self.capture = {"active": True, "saving": False, "path": str(path),
+                            "right_dagger": deepcopy(payload["dagger_context"]),
+                            "owned_stop_protocol": "tiger-owned-recording-stop-v1", "status": "STARTED",
+                            "samples": 1, "error": None, "overflows": 0, "queue_depth": 0,
+                            "raw_CAN_queue_depth": 0, "camera_frame_counts": {"front": 1, "right": 1},
+                            "raw_CAN_counts": {"right": 1}}
             return deepcopy(self.capture)
         if path == "/record/stop":
             assert payload["expected_path"] == self.capture["path"]
-            self.capture["active"] = False
+            self.capture.update(active=False, status="RECORDED_NATIVE_REVIEW_REQUIRES_QC")
+            final = {"raw_storage": self.capture["path"], "status": self.capture["status"], "samples": 1,
+                     "failure": None, "queue_overflows": 0, "camera_frame_counts": self.capture["camera_frame_counts"],
+                     "raw_CAN_counts": self.capture["raw_CAN_counts"]}
+            (Path(self.capture["path"]) / "operation.json").write_text(json.dumps(final))
             self.saved_paths.append(payload["expected_path"])
-            return {"finalization": {"healthy": True, "completed": True, "owned_path": payload["expected_path"]}}
+            return {**deepcopy(self.capture), "stop_owner_verified": True,
+                    "stopped_expected_path": payload["expected_path"]}
         raise AssertionError(path)
 
     def request(self, action, binding=None, **data):
@@ -261,6 +274,28 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(set(Owner.held), {"writer-rear-test"})
         self.assertEqual(Writer.calls.count(("role", "rear-test", "leader")), 1)
         self.assertEqual(Writer.calls.count(("role", "rear-test", "follower")), 2)
+
+    def test_saved_file_counts_must_match_terminal_recorder_status(self):
+        binding = self.prepare()
+        self.request("bind_policy", binding, job_id="b"*12, task="offline task")
+        self.request("intervene", binding, job_id="b"*12)
+        self.request("policy_finished", binding, job_id="b"*12)
+        self.wait_phase("human")
+        with self.service.lock:
+            self.service.state["phase"] = "finishing"
+        original = self.service._hub
+        def mismatched(path="/status?compact=1", payload=None, **kwargs):
+            result = original(path, payload, **kwargs)
+            if path == "/record/stop":
+                p = Path(self.capture["path"]) / "operation.json"
+                value = json.loads(p.read_text())
+                value["samples"] = 2
+                p.write_text(json.dumps(value))
+            return result
+        self.service._hub = mismatched
+        with self.assertRaisesRegex(HardwareBlocked, "Correction save is incomplete"):
+            self.service._finish_record(maintain=False)
+        self.assertFalse(self.service.session.report["correction_finalization"]["healthy"])
 
     def test_front_owner_must_exit_before_human_role(self):
         binding = self.prepare()

@@ -20,6 +20,7 @@ from .capture_profile import RIGHT, contract
 from .hardware import (DOCUMENTED_COMMAND_LIMITS_DEG, HardwareBlocked, PiperAdapter,
                        require_feedback, require_gripper_feedback, validate_target_deg)
 from .sensors import CanObserver, adapter_identity
+from .recording_lifecycle import preserving_rpc, stop_owned_recording
 from .storage import Ownership, Session, stop_requested, verify_usb
 from .tx_evidence import TxEvidenceWriter
 
@@ -195,12 +196,12 @@ class RightDaggerService:
             writer.feedback(require_can=True)
             writer.keep_control_mode()
 
-    def _hub(self, path="/status?compact=1", payload=None, *, maintain=True):
+    def _hub(self, path="/status?compact=1", payload=None, *, maintain=True, timeout=8):
         data = None if payload is None else json.dumps(payload, allow_nan=False).encode()
         req = urllib.request.Request(f"http://127.0.0.1:{self.cfg['hub_port']}" + path,
                                      data=data, headers={"Content-Type": "application/json"})
         def request():
-            with urllib.request.urlopen(req, timeout=8) as response:
+            with urllib.request.urlopen(req, timeout=timeout) as response:
                 return json.load(response)
         future = self.rpc_executor.submit(request)
         heartbeat_error = None
@@ -604,12 +605,23 @@ class RightDaggerService:
     def _finish_record(self, *, maintain=True):
         if not self.record_path:
             return None
-        result = self._hub("/record/stop", {"expected_path": self.record_path}, maintain=maintain)
-        final = result.get("finalization") or {}
+        def raw_rpc(cfg, path, data=None, timeout=20):
+            return self._hub(path, data, maintain=maintain, timeout=timeout)
+        def rpc(cfg, path, data=None, timeout=20):
+            return preserving_rpc(raw_rpc, cfg, path, data, timeout=timeout)
+        def wait(seconds):
+            until = time.monotonic() + seconds
+            while time.monotonic() < until:
+                if maintain:
+                    self._heartbeat()
+                time.sleep(min(.005, max(0., until-time.monotonic())))
+        final = stop_owned_recording(self.cfg, rpc, self.record_path, timeout=30, sleep=wait)
+        if self.session is not None:
+            self.session.report["correction_finalization"] = final
         if not (final.get("healthy") is True and final.get("completed") is True
                 and final.get("owned_path") == self.record_path):
-            raise HardwareBlocked("Correction save is incomplete or belongs to another episode")
-        return result
+            raise HardwareBlocked("Correction save is incomplete: " + str(final.get("failure")))
+        return {"finalization": final}
 
     def _finish(self, resume=False):
         if self.session is None:
@@ -632,7 +644,9 @@ class RightDaggerService:
         self.session.report["rear_role_restored"] = self.state.get("rear_role_restored", False)
         self.session.report["correction_finalization"] = saved
         self.session.save()
-        valid_correction = bool(saved) and self.state.get("human_inputs", 0) > 0
+        prior_evidence = self.session.report.get("expert_evidence") or {}
+        valid_correction = (bool(saved) and self.state.get("human_inputs", 0) > 0
+                            and prior_evidence.get("timing_evidence_incomplete") is not True)
         if resume:
             self._require_aligned()
             self.heartbeats.discard("front")

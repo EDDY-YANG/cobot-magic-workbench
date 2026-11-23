@@ -234,6 +234,21 @@ class SessionTests(unittest.TestCase):
         rear_owner.close.assert_not_called()
         self.assertIsNone(service.front_lock)
 
+    def test_finish_retry_cannot_relabel_incomplete_expert_log_as_saved(self):
+        service = bare_service("fault")
+        service.state["human_inputs"] = 1
+        service.session = Mock(report={"phase": "fault", "expert_evidence": {"timing_evidence_incomplete": True}})
+        service._finish_record = Mock(return_value={"finalization": {"healthy": True}})
+        service.front_writer = None
+        service.heartbeats = set()
+        service.record_path = "/test/episode"
+        service._release = Mock(return_value=True)
+        service._set = Mock()
+        service._finish()
+        self.assertEqual(service._set.call_args.args[0], "ended")
+        self.assertFalse(service._set.call_args.kwargs["saved"])
+        self.assertTrue(service._set.call_args.kwargs["native_record_saved"])
+
     def test_inactive_state_does_not_poll_or_repeat_failed_io(self):
         service = bare_service("fault")
         service._check = Mock(side_effect=AssertionError("should stay inactive"))
