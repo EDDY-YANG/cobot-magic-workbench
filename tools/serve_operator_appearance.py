@@ -130,6 +130,35 @@ function rightSharedFeedbackBlock(state, now = performance.now()) {
     return source.encode("utf-8")
 
 
+def install_display_snapshot(module, root, config):
+    """Validate prebuilt display files against the installed native handlers at startup."""
+    overrides = config.get("workbench_display")
+    if overrides is None:
+        return
+    if set(overrides) != {"/index.html", "/app.js"}:
+        raise ValueError("Workbench display requires exactly an index and an app module")
+    original = module.assets(root)
+    for url, spec in overrides.items():
+        path = Path(spec["file"]).resolve(strict=True)
+        expected = config["pins"].get(str(path))
+        replacement = path.read_bytes()
+        if not expected or hashlib.sha256(replacement).hexdigest() != expected:
+            raise ValueError("Unpinned workbench display file: " + url)
+        aliases = ["/", "/index.html"] if url == "/index.html" else [url]
+        for key in aliases:
+            raw, mime = original[key]
+            if hashlib.sha256(raw).hexdigest() != spec["base_sha256"]:
+                raise ValueError("Native workbench display baseline changed: " + key)
+            original[key] = (replacement, mime)
+
+    def snapshot(actual_root):
+        if Path(actual_root).resolve() != root.resolve():
+            raise ValueError("Workbench runtime root changed")
+        return original.copy()
+
+    module.assets = snapshot
+
+
 def decorate_workbench(module, static):
     original_assets = module.assets
     def assets(root):
@@ -179,6 +208,7 @@ def main():
         recovery = importlib.util.module_from_spec(recovery_spec)
         recovery_spec.loader.exec_module(recovery)
         recovery.install(web_backend)
+        install_display_snapshot(module, root, config)
         decorate_workbench(module, static)
     else:
         decorate_review(module, static)
