@@ -140,4 +140,4 @@ function mountCompactWorkbench() {
 mountCompactWorkbench();
 
 // Read-only motion traces; isolated from deployment/controller integration.
-void import("./motion-trace.js?v=20261024-1").catch(error => console.error("Motion trace unavailable", error));
+void import(new URL("./motion-trace.js?v=20261024-1", document.baseURI).href).catch(error => console.error("Motion trace unavailable", error));
