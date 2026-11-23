@@ -1,5 +1,9 @@
 # CODEX_HANDOFF.md
 
+## Right-side DAgger development
+
+Scheme one is implemented in right_dagger.py and right_dagger_web.py and wired to the SSH agent, original guarded writer and native recorder. The operator page has prepare, intervene, resume and finish actions. Tests use explicit hardware doubles. The AgileX robot was powered down during implementation. Device installation and real role/synchronization/teleoperation checks remain pending. See docs/right-dagger.md for the protocol and rollout scope.
+
 ## 当前目标
 
 Release v0.1.0: operator workbench source, bilingual Pages, portable Windows client and recorded evidence replay.

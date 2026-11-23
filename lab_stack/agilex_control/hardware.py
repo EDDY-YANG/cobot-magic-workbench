@@ -280,10 +280,11 @@ class PiperAdapter:
     snapshot callable: sensors.CanObserver.snapshot for this exact bus.
     event callback must enqueue bounded records without blocking the control loop.
     """
-    def __init__(self, cfg: Mapping, snapshot: Callable[[], Mapping], event=None):
+    def __init__(self, cfg: Mapping, snapshot: Callable[[], Mapping], event=None, *, send_guard=None):
         self.cfg = dict(cfg)
         self.snapshot = snapshot
         self.event = event or (lambda value: None)
+        self.send_guard = send_guard
         self.sdk = None
         self._allowed_ids = frozenset()
         self._sent = {}
@@ -400,8 +401,15 @@ class PiperAdapter:
                 'host_begin_monotonic_ns': begin, 'interface': self.cfg['interface']})
             begin_recorded = True
             phase = 'writer_guard'
+            if self.send_guard is not None:
+                self.send_guard()
             if can_id not in self._allowed_ids or len(payload) != 8:
                 raise HardwareBlocked(f"Unexpected SDK TX 0x{can_id:x}; prohibited")
+            if self._connection_scope == "role":
+                if payload not in (bytes.fromhex("fa00000000000000"), bytes.fromhex("fc00000000000000")):
+                    raise HardwareBlocked("Role writer accepts only zero-offset leader/follower configuration")
+                if self._sent.get("0x470", 0):
+                    raise HardwareBlocked("One role write per explicitly opened role operation")
             if self._connection_scope == 'mode':
                 percent = int(self.cfg.get('native_speed_percent', 40))
                 allowed = {bytes((ctrl, 1, percent, 0, 0, 0, 0, 0)) for ctrl in (0, 1)}
@@ -473,12 +481,12 @@ class PiperAdapter:
         self.event({"kind": name, "monotonic_s": time.monotonic(), **fields})
 
     def connect_for_apply(self, *, query_only=False, mode_only=False, reset_only=False,
-                          gripper_calibration_only=False, high_follow_only=False, disable_only=False):
+                          gripper_calibration_only=False, high_follow_only=False, disable_only=False, role_only=False):
         """Explicit socket acquisition. No query/reset or motor enable on connect."""
         if self.sdk is not None:
             raise HardwareBlocked("Writer already connected")
         if sum(bool(flag) for flag in (query_only, mode_only, reset_only, gripper_calibration_only,
-                                       high_follow_only, disable_only)) > 1:
+                                       high_follow_only, disable_only, role_only)) > 1:
             raise HardwareBlocked("Writer scopes are mutually exclusive")
         snap = self.snapshot()
         if snap.get("interface") is not None and snap["interface"] != self.cfg["interface"]:
@@ -511,7 +519,7 @@ class PiperAdapter:
                 raise HardwareBlocked("SDK interface source differs from reviewed installed source")
         self._connection_scope = ("query" if query_only else "mode" if mode_only
                                   else "reset" if reset_only else "gripper_calibration" if gripper_calibration_only
-                                  else "high_follow" if high_follow_only else "disable" if disable_only else "motion")
+                                  else "high_follow" if high_follow_only else "disable" if disable_only else "role" if role_only else "motion")
         self._allowed_ids = frozenset({0x472} if query_only else {0x151} if mode_only
                                     else {0x150} if reset_only else
                                     {0x159} if gripper_calibration_only else
@@ -581,6 +589,24 @@ class PiperAdapter:
     def _require_connected(self):
         if self.sdk is None:
             raise HardwareBlocked("No writer: call connect_for_apply explicitly")
+
+    def configure_role(self, role, latest_frame, *, timeout_s=2.0, companion_tick=None):
+        """Official MasterSlaveConfig with a fresh configuration acknowledgement."""
+        self._require_connected()
+        self.require_leader_isolation()
+        if self._connection_scope != "role" or role not in ("leader", "follower"):
+            raise HardwareBlocked("Role change needs a dedicated role writer")
+        began = time.monotonic()
+        self.sdk.MasterSlaveConfig(0xFA if role == "leader" else 0xFC, 0, 0, 0)
+        while time.monotonic() - began < timeout_s:
+            if companion_tick is not None:
+                companion_tick()
+            frame = latest_frame(0x476)
+            if frame and began < frame[0] <= time.monotonic() and len(frame[1]) == 8 and frame[1][0] == 0x70:
+                return {"role_requested": role, "ack_monotonic_s": frame[0],
+                        "ack_payload": frame[1].hex(), "feedback_still_required": True}
+            time.sleep(.005)
+        raise HardwareBlocked("Role request lacks a fresh 0x476 configuration acknowledgement")
 
     def disable_gripper_for_calibration(self):
         """Explicit separate operator action; disables only the gripper, never clears a fault."""
@@ -771,7 +797,7 @@ class PiperAdapter:
         self.sdk.ResetPiper()
         self._emit("supported_reset_submitted", reset_packets_sent=self._sent.get("0x150", 0))
 
-    def handoff_can_movej(self, *, timeout_s=2.0):
+    def handoff_can_movej(self, *, timeout_s=2.0, companion_tick=None):
         """Bounded mode-only request; a real post-request 0x2A1 is required.
 
         Historical hardware evidence supported 100 Hz mode-only requests. That
@@ -806,6 +832,8 @@ class PiperAdapter:
                    before_status_hex=receipt["before_status_hex"], timeout_s=timeout_s)
         try:
             while time.monotonic() < deadline:
+                if companion_tick is not None:
+                    companion_tick()
                 self.require_no_foreign_commands()
                 now = time.monotonic()
                 if now >= deadline:
@@ -855,7 +883,32 @@ class PiperAdapter:
             receipt.update(status_changes=list(changes), status_transition_count=transition_count,
                            status_changes_truncated=transition_count > changes.maxlen)
 
-    def enable(self, *, timeout_s=2.0):
+    def keep_control_mode(self):
+        """Refresh an already verified CAN/MOVEJ motion mode without a new target."""
+        self._require_connected()
+        if self._connection_scope != "motion":
+            raise HardwareBlocked("Control heartbeat requires the motion writer scope")
+        self.require_leader_isolation()
+        self.require_no_foreign_commands()
+        self.feedback(require_can=True)
+        percent = int(self.cfg.get("native_speed_percent", 40))
+        if not 1 <= percent <= 100:
+            raise HardwareBlocked("Native speed percentage must be within 1..100")
+        self.sdk.MotionCtrl_2(1, 1, percent, 0)
+
+    def prime_measured_hold(self):
+        """Submit the measured joint pose before an explicit motor-enable request."""
+        self._require_connected()
+        if self._connection_scope != "motion":
+            raise HardwareBlocked("Measured hold requires the motion writer scope")
+        self.require_leader_isolation()
+        self.require_no_foreign_commands()
+        state = self.feedback(require_can=True, require_enabled=False)
+        values = validate_target_deg(state["q_deg"], self.cfg.get("command_limits_deg"))
+        self.sdk.JointCtrl(*(round(value * 1000) for value in values))
+        return state
+
+    def enable(self, *, timeout_s=2.0, companion_tick=None):
         self._require_connected()
         self.require_leader_isolation()
         self.require_no_foreign_commands()
@@ -870,7 +923,13 @@ class PiperAdapter:
                 return state
             if time.monotonic() >= deadline:
                 raise HardwareBlocked("Motor enable not confirmed by real low-speed feedback")
-            time.sleep(0.05)
+            if companion_tick is None:
+                time.sleep(.05)
+            else:
+                next_request = time.monotonic() + .05
+                while time.monotonic() < next_request:
+                    companion_tick()
+                    time.sleep(.005)
 
     def send_joint_target_deg(self, target_deg):
         self._require_connected()
@@ -911,7 +970,7 @@ class PiperAdapter:
         # meters -> 0.001mm = micrometers; enable1, NEVER clear errors/zero.
         self.sdk.GripperCtrl(quantized, effort, 0x01, 0x00)
 
-    def query_limits(self, latest_frame: Callable[[int], Mapping | None], *, timeout_s=1.0):
+    def query_limits(self, latest_frame: Callable[[int], Mapping | None], *, timeout_s=1.0, companion_tick=None):
         """Explicit six sequential queries, not a receive-only operation.
 
         latest_frame(0x473) returns (monotonic_s,bytes), or equivalent raw dict.
@@ -925,6 +984,8 @@ class PiperAdapter:
             self.sdk.SearchMotorMaxAngleSpdAccLimit(joint, 0x01)
             deadline = query_time + timeout_s
             while True:
+                if companion_tick is not None:
+                    companion_tick()
                 frame = latest_frame(0x473)
                 if isinstance(frame, tuple):
                     frame = {"monotonic_s": frame[0], "payload_hex": bytes(frame[1]).hex()}
@@ -935,7 +996,7 @@ class PiperAdapter:
                         break
                 if time.monotonic() >= deadline:
                     raise HardwareBlocked(f"No fresh motor-specific 0x473 reply for J{joint}")
-                time.sleep(0.01)
+                time.sleep(.005 if companion_tick is not None else .01)
         return {"source": "six sequential raw 0x473 controller replies", "interface": self.cfg["interface"],
                 "sdk_version": self.cfg.get('sdk_version',SDK_VERSION),
                 "sdk_interface": 'C_PiperInterface_V3' if self.cfg.get('sdk_version')=='0.7.0a1' else 'C_PiperInterface_V2',

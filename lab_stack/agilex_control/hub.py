@@ -242,7 +242,10 @@ class SensorHub:
         startup = threading.Lock()
         self.cameras = {role: Camera(role, cfg['cameras'][role], startup)
                         for role in self.capture_contract['required_camera_roles']}
-        self.observers = {role: CanObserver(**entry) for role, entry in cfg["can"].items()}
+        from .right_dagger import reserved_can_roles
+        reserved = reserved_can_roles(cfg)
+        self.observers = {role: CanObserver(**entry) for role, entry in cfg["can"].items()
+                          if role not in reserved}
         self.observer_start_errors = {}
         self.recorder = Recorder(cfg, self.record_state, self.record_frames)
         self.record_request_lock = threading.RLock()
@@ -489,10 +492,19 @@ class SensorHub:
 
     def start_recording(self, data):
         """Bind a batch identity BEFORE capture, and replay a lost response safely."""
-        allowed={'task','batch_id','trial_id','category','notes'}
+        allowed={'task','batch_id','trial_id','category','notes','dagger_context'}
         if not isinstance(data,dict) or set(data)-allowed:
             raise ValueError('Unsupported recording request fields')
         with self.record_request_lock:
+            if "dagger_context" in data:
+                from .right_dagger import validate_record_context
+                context = validate_record_context(self.cfg, data)
+                current = self.recorder.status()
+                if current.get("right_dagger") == context:
+                    return current
+                if current.get("active") or current.get("saving"):
+                    raise RuntimeError("Another recording owns the capture producer")
+                return self.recorder.start(data["task"], dagger_context=context)
             if 'batch_id' not in data:
                 if set(data)-{'task'}:
                     raise ValueError('Batch metadata requires a batch ID')

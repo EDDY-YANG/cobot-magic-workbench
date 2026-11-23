@@ -17,6 +17,7 @@ from collections import Counter, deque
 from copy import deepcopy
 import json
 import math
+import re
 import os
 from pathlib import Path
 import socket
@@ -36,7 +37,7 @@ MOTOR_IDS = tuple(range(0x261, 0x267))
 # Firmware supports +0x10/+0x20 control offsets through0x470. Observe
 # Cartesian/joint/gripper IDs in all three ranges, without inferring source.
 COMMAND_IDS = tuple(base + index for base in (0x150, 0x160, 0x170) for index in range(10)) + (0x470,)
-OBSERVED_IDS = JOINT_IDS + MOTOR_IDS + COMMAND_IDS + (0x251, 0x2A1, 0x2A8, 0x2A9, 0x473)
+OBSERVED_IDS = JOINT_IDS + MOTOR_IDS + COMMAND_IDS + (0x251, 0x2A1, 0x2A8, 0x2A9, 0x473, 0x476)
 CAN_EFF, CAN_RTR, CAN_ERR = 0x80000000, 0x40000000, 0x20000000
 COUNTERS = ("rx_packets", "rx_bytes", "rx_errors", "rx_dropped", "tx_packets", "tx_bytes", "tx_errors", "tx_dropped")
 CTRL_NAMES = {0: "STANDBY", 1: "CAN_CTRL", 2: "TEACHING_MODE", 3: "ETHERNET_CONTROL_MODE", 4: "WIFI_CONTROL_MODE", 5: "REMOTE_CONTROL_MODE", 6: "LINKAGE_TEACHING_INPUT_MODE", 7: "OFFLINE_TRAJECTORY_MODE"}
@@ -60,8 +61,9 @@ def _gripper_width(latest, can_id=0x2A8):
 
 def adapter_identity(interface, expected_serial=None):
     """Verify real USB adapter identity before opening its receive socket."""
-    if interface not in CAN_SERIALS:
-        raise ValueError("Only registered can_right/can_left interfaces are supported")
+    if interface not in CAN_SERIALS and (not expected_serial or
+            not re.fullmatch(r"[A-Za-z0-9_-]{1,15}", interface)):
+        raise ValueError("Additional CAN interfaces require an explicit serial identity")
     device = Path("/sys/class/net") / interface / "device"
     resolved = device.resolve(strict=True)
     serial = None
@@ -109,8 +111,9 @@ class CanObserver:
     IDs indicate bus traffic, not the originating leader/process identity.
     """
     def __init__(self, interface="can_right", expected_serial=None, stale_after=.2, clock_domain=None):
-        if interface not in CAN_SERIALS:
-            raise ValueError("Unknown CAN interface")
+        if interface not in CAN_SERIALS and (not expected_serial or
+                not re.fullmatch(r"[A-Za-z0-9_-]{1,15}", interface)):
+            raise ValueError("Additional CAN interfaces require an explicit serial identity")
         if not math.isfinite(stale_after) or not 0 < stale_after <= 2:
             raise ValueError("stale_after must be finite, >0 and <=2 seconds")
         self.interface = interface
@@ -127,6 +130,7 @@ class CanObserver:
         self._error = None
         self._latest = {}
         self._latest_timing = {}
+        self._local_origin = {}
         self._counts = Counter()
         self._gaps = {cid: deque(maxlen=256) for cid in OBSERVED_IDS}
         self._max_gaps = Counter()
@@ -211,6 +215,8 @@ class CanObserver:
                     self._gap_exceed[cid] += 1
             evidence = self._bind_source_timing(cid, self._counts[cid] + 1, source_timing)
             self._latest[cid] = (received_at, bytes(payload))
+            self._local_origin[cid] = (source_timing.get("local_origin")
+                                       if isinstance(source_timing, dict) else None)
             self._latest_timing[cid] = evidence
             self._counts[cid] += 1
             for key, ids in self._groups.items():
@@ -346,6 +352,7 @@ class CanObserver:
                     with self._lock:
                         self._malformed += 1
                     continue
+                source_timing["local_origin"] = bool(flags & socket.MSG_DONTROUTE)
                 self.feed_frame(cid, payload, received_at, source_timing=source_timing)
         except Exception as exc:
             if not self._stop.is_set():
@@ -477,6 +484,11 @@ class CanObserver:
                                    "pair_ages_s": [ages.get(cid) for cid in (0x155, 0x156, 0x157)], "grip_age_s": ages.get(0x159)},
                 "raw": {hex(cid): {"monotonic_s": stamp, "payload_hex": payload.hex(), "count": counts.get(cid, 0)}
                         for cid, (stamp, payload) in latest.items()}}
+
+    def latest_origin(self, can_id):
+        """True denotes a local SocketCAN transmission, False a bus-origin frame."""
+        with self._lock:
+            return self._local_origin.get(can_id)
 
     def latest_frame(self, can_id):
         """Return receipt timestamp and copied bytes; None means never observed."""

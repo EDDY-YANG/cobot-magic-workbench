@@ -1,0 +1,26 @@
+<section class="page" id="page-dagger" aria-labelledby="dagger-heading">
+  <div class="dagger-view">
+    <header class="dagger-heading"><h1 id="dagger-heading">右侧 DAgger · 方案一</h1><span id="dg-phase" role="status">读取状态中</span></header>
+    <div class="dg-summary">
+      <div><label>模型执行</label><b id="dg-policy">读取中</b></div>
+      <div><label>纠正录制</label><b id="dg-record">读取中</b></div>
+      <div><label>现场验收</label><b id="dg-validation">待验证</b></div>
+    </div>
+    <section class="dg-panel"><h2>右侧两臂反馈</h2>
+      <div class="dg-table">
+        <div class="dg-row dg-th"><span>机械臂</span><span>实际六关节角度</span><span>夹爪开度</span><span>反馈状态</span></div>
+        <div class="dg-row"><strong>右后臂</strong><span id="dg-rear-q">—</span><span id="dg-rear-g">—</span><span id="dg-rear-s">等待读数</span></div>
+        <div class="dg-row"><strong>右前臂</strong><span id="dg-front-q">—</span><span id="dg-front-g">—</span><span id="dg-front-s">等待读数</span></div>
+      </div>
+    </section>
+    <div class="dg-message" id="dg-note" role="status">等待读取当前启动周期及设备状态。</div>
+    <p id="dg-episode" hidden></p>
+    <div class="dg-footer">
+      <button id="dg-prepare" class="button" disabled>准备并对齐右后臂</button>
+      <button id="dg-enter" class="button" disabled>暂停并接管</button>
+      <button id="dg-resume" class="button" disabled>继续模型</button>
+      <button id="dg-finish" class="button" disabled>结束并保存</button>
+    </div>
+    <p id="dg-error" role="alert" hidden></p>
+  </div>
+</section>

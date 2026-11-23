@@ -342,7 +342,7 @@ class Recorder:
                     for role, frame in images.items() if isinstance(frame, dict)}}
         return item
 
-    def start(self, task, collection_v1=None, on_created=None):
+    def start(self, task, collection_v1=None, on_created=None, dagger_context=None):
         with self.lock:
             if collection_v1 is not None:
                 from .collection import validate_metadata
@@ -406,6 +406,8 @@ class Recorder:
                 optional_camera_source_index_schema="tiger-recorded-camera-source-index-v1",
                 source_timing_scope="producer metadata only; missing fields remain unknown; no common selection",
                 training_dataset_verified=False)
+            if dagger_context is not None:
+                self.session.report["right_dagger"] = copy.deepcopy(dagger_context)
             if collection_v1 is not None:
                 self.session.report['collection_v1'] = copy.deepcopy(collection_v1)
             for field in ('capture_coordinate_reference', 'capture_image_reference'):
@@ -704,6 +706,8 @@ class Recorder:
                    max(0.,(time.monotonic() if finished is None else finished)-self.started_monotonic))
         busy = any(t is not None and t.is_alive() for t in (self.thread,self.sample_thread))
         return {"owned_stop_protocol":OWNED_RECORDING_STOP_PROTOCOL,
+                "right_dagger": (copy.deepcopy(self.session.report.get("right_dagger"))
+                                 if self.session is not None else None),
                 "recorder_io": self.io_metrics(),
                 "capture_profile": self.capture_contract['profile'],
                 "capture_contract": copy.deepcopy(self.capture_contract),

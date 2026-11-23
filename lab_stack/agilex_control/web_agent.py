@@ -83,12 +83,41 @@ class RobotAgent:
             self.observers[role] = {"fresh": False, "observer_start_failed": True,
                                     "observer_start_attempts": 0, "q_deg": None}
         self._retry_observer_starts()
+        self.right_dagger = None
+        self.right_dagger_error = None
+        self._start_right_dagger()
         self._refresh_threads = [
             threading.Thread(target=self._refresh, daemon=True, name="read-only-hub-status"),
             threading.Thread(target=self._metadata, daemon=True, name="read-only-service-metadata"),
             threading.Thread(target=self._refresh_fp32_shadow, daemon=True, name="read-only-fp32-shadow-health")]
         for worker in self._refresh_threads:
             worker.start()
+
+    def _start_right_dagger(self):
+        from .right_dagger import RightDaggerService
+        with self.lock:
+            if self.right_dagger is not None:
+                return
+            try:
+                self.right_dagger = RightDaggerService(self.cfg, lambda: self.observers.get("right"), self._dagger_capture_state)
+                self.right_dagger_error = None
+            except Exception as exc:
+                self.right_dagger_error = str(exc)
+
+    def _dagger_capture_state(self):
+        with self.lock:
+            hub = self.cached.get("hub") or {}
+            sampled = self._component_refresh.get("hub", {}).get("sampled_at")
+            return {"api_reachable": hub.get("api_reachable"),
+                    "age_s": time.monotonic()-sampled if sampled is not None else 999.,
+                    "recording": copy.deepcopy(hub.get("recording") or {})}
+
+    def dagger_snapshot(self):
+        from .right_dagger import SCHEMA
+        if getattr(self, "right_dagger", None) is not None:
+            return self.right_dagger.snapshot()
+        return {"schema": SCHEMA, "enabled": bool(self.cfg.get("right_dagger", {}).get("enabled")),
+                "phase": "unavailable", "error": getattr(self, "right_dagger_error", None), "hardware_validated": False}
 
     def _retry_observer_starts(self):
         """Retry failed initialization only; never hide a running receiver fault.
@@ -99,10 +128,17 @@ class RobotAgent:
         per five seconds even if a constructor/start fails immediately.
         """
         from .sensors import CanObserver
+        from .right_dagger import reserved_can_roles
         with self.lock:
             if self.closing.is_set():
                 return
+            reserved = reserved_can_roles(self.cfg)
             for role, entry in self.cfg["can"].items():
+                if role in reserved:
+                    self.observers[role] = {"fresh": False, "observer_running": False,
+                                            "q_deg": None, "grip_m": None,
+                                            "reason": "Adapter reserved for the independent right rear arm"}
+                    continue
                 previous = self.observers.get(role)
                 if (not isinstance(previous, dict) or not previous.get("observer_start_failed")
                         or role in self._observer_cleanup_pending):
@@ -137,6 +173,9 @@ class RobotAgent:
                     self.observers[role] = failed
 
     def _stop_observers(self):
+        if getattr(self, "right_dagger", None) is not None:
+            self.right_dagger.close()
+
         with self.lock:
             # Seal retries even when cleanup is invoked outside run().
             self.closing.set()
@@ -408,7 +447,7 @@ class RobotAgent:
             "stop_latch": stop_latch,
             "model_stage": {"marker_present": marker_present,
                             "note": "Presence is a prerequisite, not weight verification; loading rechecks actual files"},
-            "jobs": jobs, **services}
+            "jobs": jobs, "right_dagger": self.dagger_snapshot(), **services}
 
     def submit(self, action, params):
         argv = build_command(action, params, self.cfg)
@@ -493,6 +532,11 @@ class RobotAgent:
                 job.update(state="failed", error=repr(exc), finished_at=stamp())
 
     def _begin_close(self, require_idle=False):
+        if require_idle and getattr(self, "right_dagger", None) is not None:
+            from .right_dagger import FINISHED
+            if self.right_dagger.snapshot()["phase"] not in FINISHED:
+                raise ValidationError("Finish the right DAgger session before disconnecting")
+
         """Seal submission/launch before checking whether a local stop is needed.
 
         Normal operator disconnect refuses any registered work. Unexpected EOF
@@ -512,6 +556,19 @@ class RobotAgent:
 
     def dispatch(self, request):
         op = request.get("op")
+        if op == "right_dagger":
+            if set(request) - {"id", "op", "action", "binding", "data"}:
+                raise ValidationError("Unexpected right DAgger fields")
+            if self.closing.is_set():
+                raise ValidationError("Robot connection is closing")
+            if self.right_dagger is None and request.get("action") == "prepare":
+                self._start_right_dagger()
+            if self.right_dagger is None:
+                raise ValidationError(self.right_dagger_error or "Right DAgger is unavailable")
+            data = request.get("data", {})
+            if not isinstance(data, dict):
+                raise ValidationError("Right DAgger data must be an object")
+            return self.right_dagger.request(request.get("action"), request.get("binding"), **data)
         if op == "state":
             return self.state()
         if op == "submit":
