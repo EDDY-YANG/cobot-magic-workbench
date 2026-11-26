@@ -17,6 +17,7 @@ import math
 import os
 from pathlib import Path
 import signal
+import errno
 import socket
 import subprocess
 import sys
@@ -536,6 +537,8 @@ def child(cfg, root, role, operation, *arguments):
         saved, alive = _registered_child(root, operation)
         if alive:
             raise RuntimeError(f"Registered {operation} PID {saved['pid']} is still running; no duplicate launch")
+        if operation == "hub-serve":
+            _wait_hub_exit(root, cfg["hub_port"])
         session = Session(cfg, operation + "-launch")
         command = [cfg[role + "_python"], "-I", "-B", str(root / ENTRY), operation, *arguments]
         with (session.path / "service.log").open("xb") as output:
@@ -620,6 +623,10 @@ def _hub_readiness_errors(cfg, value, registered, transport_age_s):
             continue
         if camera.get('serial') != cfg['cameras'][role]:
             raise RuntimeError('Camera physical serial mismatch: ' + role)
+        if (role == 'front' and camera.get('recovery_state') in ('waiting_for_device', 'opening')
+                and camera.get('thread_alive') is True and camera.get('alignment_publication_error') is None):
+            pending.append('Front camera reconnect: ' + camera['recovery_state'])
+            continue
         if camera.get('error') is not None or camera.get('alignment_publication_error') is not None:
             raise RuntimeError('Camera worker failed: ' + role + ': ' + repr(camera.get('error') or camera.get('alignment_publication_error')))
         profile = camera.get('profile')
@@ -723,9 +730,37 @@ def _wait_hub_ready(cfg, root, rpc, *, expected_child=None, timeout_s=30., poll_
         raise RuntimeError('Hub failed real readiness; child/log retained at %s: %s' % (log, exc)) from exc
 
 
-def stop_child(root, operation):
+def _wait_hub_exit(root, port, *, timeout_s=25.):
+    """Wait for the registered owner and verify the socket can be rebound."""
+    deadline = time.monotonic() + timeout_s
+    while True:
+        _, alive = _registered_child(root, "hub-serve")
+        if not alive:
+            with socket.socket() as probe:
+                probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                try:
+                    probe.bind(("127.0.0.1", port))
+                except OSError as exc:
+                    if exc.errno != errno.EADDRINUSE:
+                        raise
+                else:
+                    return
+        if time.monotonic() >= deadline:
+            raise RuntimeError("Hub stop pending: old process or listening port has not been released")
+        time.sleep(.1)
+
+
+def stop_child(root, operation, *, hub_port=None):
     with Ownership("service-launch-" + operation):
         saved, alive = _registered_child(root, operation)
+        if hub_port is not None:
+            if alive:
+                try:
+                    os.kill(saved["pid"], signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
+            _wait_hub_exit(root, hub_port)
+            return {**(saved or {"operation": operation}), "status": "HUB_EXIT_AND_PORT_RELEASE_VERIFIED"}
         if saved is None:
             return {"status": "NO_REGISTERED_PROCESS", "operation": operation}
         if not alive:
@@ -1073,7 +1108,7 @@ def main(cfg, root):
                 SensorHub(cfg).run()
             result = {"status": "SENSOR_HUB_CLOSED"}
         elif command == "hub-stop":
-            result = stop_child(root, "hub-serve")
+            result = stop_child(root, "hub-serve", hub_port=cfg["hub_port"])
         elif command in ("record-start", "record-stop",'record-retry'):
             from .hub import rpc
             if command == 'record-retry':

@@ -12,6 +12,7 @@ HTTP endpoints are loopback only and never issue robot commands. Read-only CAN
 observers share receive traffic; the hub has no SDK instance or CAN send call.
 """
 import base64
+from contextlib import ExitStack, contextmanager, nullcontext
 from copy import deepcopy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import importlib.metadata
@@ -115,12 +116,26 @@ def verify_camera(serial):
     raise RuntimeError("Camera serial unavailable in sysfs")
 
 
+class CameraUnavailable(RuntimeError):
+    pass
+
+
+def capture_device(serial):
+    try:
+        return verify_camera(serial)
+    except (OSError, RuntimeError) as exc:
+        raise CameraUnavailable(str(exc)) from exc
+
+
 class Camera:
-    def __init__(self, role, serial, startup_lock):
+    def __init__(self, role, serial, startup_lock, reopen_guard=None):
         self.role, self.serial, self.startup_lock = role, serial, startup_lock
         self.lock, self.stop_event = threading.Lock(), threading.Event()
         self.latest = None
         self.error = None
+        self.reopen_guard = reopen_guard
+        self.recovery_state = None
+        self.reconnect_attempts = 0
         self.profile = None
         self.count = 0
         self.clock_domain = None
@@ -129,19 +144,68 @@ class Camera:
         self.thread = threading.Thread(target=self.run, name="unified-camera-" + role, daemon=True)
 
     def run(self):
+        retry = False
+        while not self.stop_event.is_set():
+            first_frame = self.count
+            try:
+                self._capture(retry)
+            except Exception as exc:
+                with self.lock:
+                    self.error = repr(exc)
+                    self.latest = None
+                    self.profile = None
+                    # A successful reopen must deliver approximately two seconds of
+                    # real frames before a later outage receives a fresh retry.
+                    can_retry = (self.reopen_guard is not None
+                                 and isinstance(exc, (CameraUnavailable, TimeoutError, OSError))
+                                 and (not retry or self.count - first_frame >= 60)
+                                 and not self.stop_event.is_set())
+                    self.recovery_state = "waiting_for_device" if can_retry else "failed"
+                if can_retry:
+                    retry = True
+                    continue
+            return
+
+    @contextmanager
+    def _reopen(self):
+        # Keep this camera's existing worker alive while USB is absent. Verify
+        # twice across the settle interval and acquire the idle guard only then.
+        while not self.stop_event.wait(.75):
+            try:
+                capture_device(self.serial)
+            except CameraUnavailable:
+                continue
+            if self.stop_event.wait(.75):
+                break
+            try:
+                capture_device(self.serial)
+            except CameraUnavailable:
+                continue
+            with self.reopen_guard() as idle:
+                if not idle:
+                    continue
+                with self.lock:
+                    self.recovery_state = "opening"
+                    self.reconnect_attempts += 1
+                yield
+                return
+        yield
+
+    def _capture(self, retry):
         camera = None
         try:
             import cv2
             from lerobot.cameras.opencv.camera_opencv import OpenCVCamera
             from lerobot.cameras.opencv.configuration_opencv import ColorMode, OpenCVCameraConfig
-            device = verify_camera(self.serial)
-            config = OpenCVCameraConfig(index_or_path=device, fps=30, width=640, height=480,
-                # Bounded startup only: two real cold-starts exceeded 1 s.
-                # Runtime freshness and the 30 Hz/MJPG profile stay separate.
-                color_mode=ColorMode.RGB, backend=cv2.CAP_V4L2, fourcc="MJPG", warmup_s=3)
-            camera = OpenCVCamera(config)
-            with self.startup_lock:
-                camera.connect(warmup=True)
+            with self._reopen() if retry else nullcontext():
+                with self.startup_lock:
+                    if self.stop_event.is_set():
+                        return
+                    device = capture_device(self.serial)
+                    config = OpenCVCameraConfig(index_or_path=device, fps=30, width=640, height=480,
+                        color_mode=ColorMode.RGB, backend=cv2.CAP_V4L2, fourcc="MJPG", warmup_s=6)
+                    camera = OpenCVCamera(config)
+                    camera.connect(warmup=True)
             cap = camera.videocapture
             self.profile = {"width": int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
                 "height": int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), "fps": cap.get(cv2.CAP_PROP_FPS),
@@ -149,12 +213,13 @@ class Camera:
             if (self.profile["width"], self.profile["height"], self.profile["backend"], self.profile["fourcc"]) != (640, 480, "V4L2", "MJPG") or abs(self.profile["fps"] - 30) > .01:
                 raise RuntimeError("Actual camera profile differs from requested: " + repr(self.profile))
             previous, check_at = None, 0
+            last_frame_at = time.monotonic()
             while not self.stop_event.is_set():
                 if time.monotonic() > check_at:
-                    verify_camera(self.serial)
+                    capture_device(self.serial)
                     check_at = time.monotonic() + 2
                 if camera.thread is None or not camera.thread.is_alive():
-                    raise RuntimeError("LeRobot camera read thread exited")
+                    raise CameraUnavailable("LeRobot camera read thread exited")
                 with camera.frame_lock:
                     frame, stamp = camera.latest_frame, camera.latest_timestamp
                     image = None if frame is None else frame.copy()
@@ -186,6 +251,8 @@ class Camera:
                                        "source_timing": source_timing, "frame_id": self.count + 1,
                                        "available_monotonic_ns": available_ns}
                         self.count += 1
+                        self.error = None
+                        self.recovery_state = None
                         published = self.latest
                     if self.publication_callback is not None:
                         try:
@@ -193,23 +260,25 @@ class Camera:
                         except Exception as exc:
                             self.alignment_publication_error = repr(exc)
                     previous = stamp
+                    last_frame_at = time.monotonic()
+                elif self.reopen_guard is not None and time.monotonic() - last_frame_at > 2:
+                    raise CameraUnavailable("Front camera stopped producing new frames")
                 self.stop_event.wait(.005)
-        except Exception as exc:
-            self.error = repr(exc)
         finally:
-            if camera is not None:
+            if camera is not None and (camera.is_connected or camera.thread is not None):
                 try:
                     camera.disconnect()
                 except Exception as exc:
-                    self.error = (self.error + "; " if self.error else "") + "Cleanup: " + repr(exc)
+                    raise RuntimeError("Camera close failed; refusing to reopen " + self.role) from exc
 
     def status(self):
         with self.lock:
             age = None if self.latest is None else time.perf_counter() - self.latest["stamp_perf"]
-        return {"serial": self.serial, "profile": self.profile, "frames": self.count,
-                "age_s": age, "fresh": self.thread.is_alive() and self.error is None and age is not None and 0 <= age <= .5,
-                "error": self.error, "thread_alive": self.thread.is_alive(),
-                "alignment_publication_error": self.alignment_publication_error}
+            return {"serial": self.serial, "profile": self.profile, "frames": self.count,
+                    "age_s": age, "fresh": self.thread.is_alive() and self.error is None and age is not None and 0 <= age <= .5,
+                    "error": self.error, "thread_alive": self.thread.is_alive(),
+                    "recovery_state": self.recovery_state, "reconnect_attempts": self.reconnect_attempts,
+                    "alignment_publication_error": self.alignment_publication_error}
 
     def frame(self):
         with self.lock:
@@ -226,7 +295,7 @@ class Camera:
     def close(self):
         self.stop_event.set()
         if self.thread.ident is not None:
-            self.thread.join(4)
+            self.thread.join(15)
             if self.thread.is_alive():
                 raise RuntimeError('Camera capture thread still stopping: ' + self.role)
 
@@ -240,7 +309,8 @@ class SensorHub:
         self.alignment = None
         self.stop_event = threading.Event()
         startup = threading.Lock()
-        self.cameras = {role: Camera(role, cfg['cameras'][role], startup)
+        self.cameras = {role: Camera(role, cfg['cameras'][role], startup,
+                                     self._front_reopen_guard if role == 'front' else None)
                         for role in self.capture_contract['required_camera_roles']}
         self.observers = {role: CanObserver(**entry) for role, entry in cfg["can"].items()}
         self.observer_start_errors = {}
@@ -260,6 +330,32 @@ class SensorHub:
         self.task_event_lock = threading.RLock()
         self.task_event_sequences = {}
         self.task_lease_until = 0.
+
+    @contextmanager
+    def _front_reopen_guard(self):
+        """Retain the existing device owner and reserve the idle writer slots."""
+        if not self.record_request_lock.acquire(blocking=False):
+            yield False
+            return
+        try:
+            with ExitStack() as locks:
+                recording = self.recorder.status()
+                idle = (recording.get('active') is False and recording.get('saving') is False
+                        and self.task_snapshot().get('active') is False
+                        and self.recovery_snapshot().get('deployment_active') is False
+                        and not self.stop_event.is_set())
+                if idle:
+                    interfaces = sorted({entry['interface'] for entry in self.cfg['can'].values()})
+                    try:
+                        for interface in interfaces:
+                            locks.enter_context(Ownership('writer-' + interface))
+                    except RuntimeError:
+                        idle = False
+                if idle:
+                    verify_usb(self.cfg)
+                yield idle
+        finally:
+            self.record_request_lock.release()
 
     def visual_servo_snapshot(self):
         servo = getattr(self, "visual_servo", None)
