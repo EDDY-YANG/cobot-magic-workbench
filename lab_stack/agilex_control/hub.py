@@ -136,6 +136,7 @@ class Camera:
         self.reopen_guard = reopen_guard
         self.recovery_state = None
         self.reconnect_attempts = 0
+        self.opening_capture = threading.Event()
         self.profile = None
         self.count = 0
         self.clock_domain = None
@@ -205,7 +206,13 @@ class Camera:
                     config = OpenCVCameraConfig(index_or_path=device, fps=30, width=640, height=480,
                         color_mode=ColorMode.RGB, backend=cv2.CAP_V4L2, fourcc="MJPG", warmup_s=6)
                     camera = OpenCVCamera(config)
-                    camera.connect(warmup=True)
+                    self.opening_capture.set()
+                    try:
+                        if self.stop_event.is_set():
+                            return
+                        camera.connect(warmup=True)
+                    finally:
+                        self.opening_capture.clear()
             cap = camera.videocapture
             self.profile = {"width": int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
                 "height": int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)), "fps": cap.get(cv2.CAP_PROP_FPS),
@@ -295,7 +302,7 @@ class Camera:
     def close(self):
         self.stop_event.set()
         if self.thread.ident is not None:
-            self.thread.join(15)
+            self.thread.join(15 if self.opening_capture.is_set() else 4)
             if self.thread.is_alive():
                 raise RuntimeError('Camera capture thread still stopping: ' + self.role)
 
